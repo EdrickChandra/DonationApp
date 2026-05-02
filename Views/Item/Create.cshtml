@@ -1,0 +1,59 @@
+@model DonationApp.Models.Item
+@using DonationApp.Models
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<a class="back-btn" asp-controller="Item" asp-action="MyDonations">← Kembali ke page sebelumnya</a>
+
+<div style="display:flex; justify-content:center;">
+    <div class="form-card">
+        <div class="form-title">Buat listing Donasi</div>
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label class="form-label" asp-for="NamaBarang">Nama Barang</label>
+                <input class="form-input" asp-for="NamaBarang" placeholder="Masukkan nama barang..." />
+                <span class="validation-message" asp-validation-for="NamaBarang"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Kategori">Kategori</label>
+                <select class="form-input" asp-for="Kategori">
+                    <option value="">Pilih Kategori</option>
+                    <option value="@((int)ItemCategory.Pakaian)">Pakaian</option>
+                    <option value="@((int)ItemCategory.Elektronik)">Elektronik</option>
+                    <option value="@((int)ItemCategory.Buku)">Buku</option>
+                </select>
+                <span class="validation-message" asp-validation-for="Kategori"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Kondisi Barang</label>
+                <input type="hidden" id="kondisiInput" name="Kondisi" value="@((int)ItemCondition.Baru)" />
+                <div class="condition-group">
+                    <button type="button" class="condition-btn selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                    <button type="button" class="condition-btn" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                    <button type="button" class="condition-btn" data-value="@((int)ItemCondition.PerluPerbaikan)">Perlu Perbaikan</button>
+                </div>
+                <span class="validation-message" asp-validation-for="Kondisi"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Lokasi">Lokasi</label>
+                <input class="form-input" asp-for="Lokasi" placeholder="Kota / Kecamatan..." />
+                <span class="validation-message" asp-validation-for="Lokasi"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Deskripsi">Deskripsi</label>
+                <textarea class="form-input" asp-for="Deskripsi" placeholder="Ceritakan kondisi barang secara detail..."></textarea>
+                <span class="validation-message" asp-validation-for="Deskripsi"></span>
+            </div>
+
+            <button type="submit" class="submit-btn">Posting Donasi</button>
+        </form>
+    </div>
+</div>
