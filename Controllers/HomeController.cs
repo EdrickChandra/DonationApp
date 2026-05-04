@@ -24,7 +24,7 @@ public class HomeController : Controller
 
         var items = await query.OrderByDescending(i => i.CreatedAt).ToListAsync();
 
-        ViewBag.SelectedKategori = kategori ?? ItemCategory.Semua;
+        ViewBag.SelectedKategori = (int)(kategori ?? ItemCategory.Semua);
 
         return View(items);
     }

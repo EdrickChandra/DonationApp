@@ -1,0 +1,68 @@
+﻿@model DonationApp.Models.RegisterViewModel
+@{
+    ViewData["HideSearch"] = true;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="display:flex; justify-content:center; padding: 32px 0;">
+    <div class="auth-card">
+        <div class="auth-title">Buat Akun</div>
+        <div class="auth-subtitle">Sudah punya akun? <a asp-controller="Account" asp-action="Login">Masuk di sini</a></div>
+
+        <form asp-action="Register" method="post">
+
+            <span class="validation-message" asp-validation-summary="ModelOnly"></span>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label class="form-label" asp-for="NamaDepan">Nama Depan</label>
+                    <input class="form-input" asp-for="NamaDepan" placeholder="Nathan" />
+                    <span class="validation-message" asp-validation-for="NamaDepan"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="NamaBelakang">Nama Belakang</label>
+                    <input class="form-input" asp-for="NamaBelakang" placeholder="Edmund" />
+                    <span class="validation-message" asp-validation-for="NamaBelakang"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Email">Email</label>
+                <input class="form-input" asp-for="Email" placeholder="email@contoh.com" />
+                <span class="validation-message" asp-validation-for="Email"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="NomorTelepon">Nomor Telepon</label>
+                <input class="form-input" asp-for="NomorTelepon" placeholder="+62 812 3456 7890" />
+                <span class="validation-message" asp-validation-for="NomorTelepon"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Alamat">Alamat</label>
+                <input class="form-input" asp-for="Alamat" placeholder="Jl. Contoh No. 1, Kota..." />
+                <span class="validation-message" asp-validation-for="Alamat"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="Password">Password</label>
+                <input class="form-input" asp-for="Password" type="password" placeholder="••••••••" />
+                <span class="validation-message" asp-validation-for="Password"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" asp-for="KonfirmasiPassword">Konfirmasi Password</label>
+                <input class="form-input" asp-for="KonfirmasiPassword" type="password" placeholder="••••••••" />
+                <span class="validation-message" asp-validation-for="KonfirmasiPassword"></span>
+            </div>
+
+            <button type="submit" class="submit-btn">Daftar Sekarang</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+}

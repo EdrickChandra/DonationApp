@@ -2,7 +2,7 @@
 @using DonationApp.Models
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var selected = (ItemCategory)ViewBag.SelectedKategori;
+    var selected = ViewBag.SelectedKategori != null ? (ItemCategory)(int)ViewBag.SelectedKategori : ItemCategory.Semua;
 }
 
 <div class="category-label">Kategori</div>

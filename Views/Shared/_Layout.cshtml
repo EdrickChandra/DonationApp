@@ -510,17 +510,99 @@
                 color: var(--text-dark);
                 flex: 1;
             }
+            .nav-login-btn {
+                background: transparent;
+                color: white;
+                border: 1.5px solid rgba(255,255,255,0.3);
+                border-radius: 6px;
+                padding: 8px 16px;
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                white-space: nowrap;
+            }
+
+            .logout-btn {
+                background: transparent;
+                color: #94a3b8;
+                border: none;
+                font-size: 12px;
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-family: 'DM Sans', sans-serif;
+            }
+
+                .logout-btn:hover {
+                    color: white;
+                }
+
+            .auth-card {
+                background: #ffffff;
+                border-radius: 12px;
+                padding: 32px 28px;
+                width: 100%;
+                max-width: 420px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            }
+
+            .auth-title {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 20px;
+                font-weight: 800;
+                color: var(--text-dark);
+                margin-bottom: 4px;
+            }
+
+            .auth-subtitle {
+                font-size: 13px;
+                color: #64748b;
+                margin-bottom: 24px;
+            }
+
+                .auth-subtitle a {
+                    color: var(--blue);
+                    font-weight: 600;
+                    text-decoration: none;
+                }
+
+            .input-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
     </style>
 </head>
 <body>
     <nav>
         <a class="logo" asp-controller="Home" asp-action="Index">IDonasi</a>
-        <input class="search-bar" type="text" placeholder="Search...">
-        <a class="nav-donasi-btn" asp-controller="Item" asp-action="MyDonations">🎁 Donasi</a>
-        <div class="nav-user">
-            Nathan Edmund
-            <div class="avatar">N</div>
-        </div>
+
+        @if (ViewData["HideSearch"] == null)
+        {
+            <input class="search-bar" type="text" placeholder="Search...">
+        }
+
+        @if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            <a class="nav-donasi-btn" asp-controller="Item" asp-action="MyDonations">🎁 Donasi</a>
+            <div class="nav-user">
+                @(User.Identity?.Name ?? "")
+                <div class="avatar">@(User.Identity?.Name?[0].ToString().ToUpper() ?? "?")</div>
+                <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="logout-btn">Keluar</button>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div style="margin-left:auto; display:flex; gap:8px;">
+                <a class="nav-login-btn" asp-controller="Account" asp-action="Login">Masuk</a>
+                <a class="nav-btn nav-donasi-btn" asp-controller="Account" asp-action="Register">Daftar</a>
+            </div>
+        }
     </nav>
 
     <main>

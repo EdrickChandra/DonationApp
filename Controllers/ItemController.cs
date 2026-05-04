@@ -2,9 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DonationApp.Data;
 using DonationApp.Models;
+using Microsoft.AspNetCore.Authorization;
+
+
 
 namespace DonationApp.Controllers;
 
+
+[Authorize]
 public class ItemController : Controller
 {
     private readonly AppDbContext _context;
