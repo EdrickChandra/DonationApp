@@ -588,8 +588,11 @@
         {
             <a class="nav-donasi-btn" asp-controller="Item" asp-action="MyDonations">🎁 Donasi</a>
             <div class="nav-user">
-                @(User.Identity?.Name ?? "")
-                <div class="avatar">@(User.Identity?.Name?[0].ToString().ToUpper() ?? "?")</div>
+                @{
+                    var userName = User.Identity?.Name ?? "";
+                    var avatarLetter = userName.Length > 0 ? userName[0].ToString().ToUpper() : "?";
+                }
+                @avatarLetter
                 <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="logout-btn">Keluar</button>

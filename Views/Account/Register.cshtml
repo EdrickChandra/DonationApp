@@ -9,6 +9,11 @@
         <div class="auth-title">Buat Akun</div>
         <div class="auth-subtitle">Sudah punya akun? <a asp-controller="Account" asp-action="Login">Masuk di sini</a></div>
 
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <div style="color:red">@error.ErrorMessage</div>
+        }
+
         <form asp-action="Register" method="post">
 
             <span class="validation-message" asp-validation-summary="ModelOnly"></span>

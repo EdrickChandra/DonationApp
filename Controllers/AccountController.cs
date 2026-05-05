@@ -17,18 +17,27 @@ public class AccountController : Controller
 
     public IActionResult Register() => View();
 
+    [HttpGet]
+    public IActionResult TestRegister()
+    {
+        return Content("Controller is reachable");
+    }
+
     [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        if (!ModelState.IsValid)
+        Console.WriteLine("POST HIT");
+        Console.WriteLine($"ModelState valid: {ModelState.IsValid}");
+
+        foreach (var key in ModelState.Keys)
         {
-            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-            {
-                Console.WriteLine(error.ErrorMessage);
-            }
-            return View(model);
+            var state = ModelState[key];
+            foreach (var error in state.Errors)
+                Console.WriteLine($"Field: {key} Error: {error.ErrorMessage}");
         }
+
+        if (!ModelState.IsValid)
+            return View(model);
 
         var user = new ApplicationUser
         {
@@ -40,7 +49,12 @@ public class AccountController : Controller
             Alamat = model.Alamat
         };
 
+        Console.WriteLine("Creating user...");
         var result = await _userManager.CreateAsync(user, model.Password);
+        Console.WriteLine($"Result: {result.Succeeded}");
+
+        foreach (var error in result.Errors)
+            Console.WriteLine($"Identity error: {error.Description}");
 
         if (result.Succeeded)
         {
