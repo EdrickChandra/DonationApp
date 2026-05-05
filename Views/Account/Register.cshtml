@@ -4,19 +4,15 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div style="display:flex; justify-content:center; padding: 32px 0;">
-    <div class="auth-card">
+<link rel="stylesheet" href="/css/auth.css" />
+
+<div class="auth-wrap">
+    <div class="auth-card" style="max-width:520px;">
         <div class="auth-title">Buat Akun</div>
         <div class="auth-subtitle">Sudah punya akun? <a asp-controller="Account" asp-action="Login">Masuk di sini</a></div>
 
-        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
-        {
-            <div style="color:red">@error.ErrorMessage</div>
-        }
-
         <form asp-action="Register" method="post">
-
-            <span class="validation-message" asp-validation-summary="ModelOnly"></span>
+            <div class="validation-message" asp-validation-summary="All"></div>
 
             <div class="input-row">
                 <div class="form-group">
@@ -45,19 +41,68 @@
 
             <div class="form-group">
                 <label class="form-label" asp-for="Alamat">Alamat</label>
-                <input class="form-input" asp-for="Alamat" placeholder="Jl. Contoh No. 1, Kota..." />
+                <input class="form-input" asp-for="Alamat" placeholder="Jl. Contoh No. 1" />
                 <span class="validation-message" asp-validation-for="Alamat"></span>
+            </div>
+
+            <div class="input-row">
+                <div class="form-group">
+                    <label class="form-label" asp-for="Provinsi">Provinsi</label>
+                    <select class="form-input" asp-for="Provinsi">
+                        <option value="">Pilih Provinsi</option>
+                        <option>Aceh</option>
+                        <option>Bali</option>
+                        <option>Banten</option>
+                        <option>Bengkulu</option>
+                        <option>DI Yogyakarta</option>
+                        <option>DKI Jakarta</option>
+                        <option>Gorontalo</option>
+                        <option>Jambi</option>
+                        <option>Jawa Barat</option>
+                        <option>Jawa Tengah</option>
+                        <option>Jawa Timur</option>
+                        <option>Kalimantan Barat</option>
+                        <option>Kalimantan Selatan</option>
+                        <option>Kalimantan Tengah</option>
+                        <option>Kalimantan Timur</option>
+                        <option>Kalimantan Utara</option>
+                        <option>Kepulauan Bangka Belitung</option>
+                        <option>Kepulauan Riau</option>
+                        <option>Lampung</option>
+                        <option>Maluku</option>
+                        <option>Maluku Utara</option>
+                        <option>Nusa Tenggara Barat</option>
+                        <option>Nusa Tenggara Timur</option>
+                        <option>Papua</option>
+                        <option>Papua Barat</option>
+                        <option>Riau</option>
+                        <option>Sulawesi Barat</option>
+                        <option>Sulawesi Selatan</option>
+                        <option>Sulawesi Tengah</option>
+                        <option>Sulawesi Tenggara</option>
+                        <option>Sulawesi Utara</option>
+                        <option>Sumatera Barat</option>
+                        <option>Sumatera Selatan</option>
+                        <option>Sumatera Utara</option>
+                    </select>
+                    <span class="validation-message" asp-validation-for="Provinsi"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="KodePos">Kode Pos</label>
+                    <input class="form-input" asp-for="KodePos" placeholder="12345" maxlength="5" />
+                    <span class="validation-message" asp-validation-for="KodePos"></span>
+                </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label" asp-for="Password">Password</label>
-                <input class="form-input" asp-for="Password" type="password" placeholder="••••••••" />
+                <input class="form-input" asp-for="Password" type="password" />
                 <span class="validation-message" asp-validation-for="Password"></span>
             </div>
 
             <div class="form-group">
                 <label class="form-label" asp-for="KonfirmasiPassword">Konfirmasi Password</label>
-                <input class="form-input" asp-for="KonfirmasiPassword" type="password" placeholder="••••••••" />
+                <input class="form-input" asp-for="KonfirmasiPassword" type="password"/>
                 <span class="validation-message" asp-validation-for="KonfirmasiPassword"></span>
             </div>
 

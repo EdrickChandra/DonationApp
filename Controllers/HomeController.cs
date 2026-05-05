@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DonationApp.Data;
 using DonationApp.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace DonationApp.Controllers;
 
@@ -9,7 +10,7 @@ public class HomeController : Controller
 {
     private readonly AppDbContext _context;
 
-    public HomeController(AppDbContext context)
+    public HomeController(AppDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
     }
@@ -17,6 +18,7 @@ public class HomeController : Controller
     public async Task<IActionResult> Index(ItemCategory? kategori)
     {
         var query = _context.Items
+            .Include(i => i.Images)
             .Where(i => i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
 
         if (kategori.HasValue && kategori.Value != ItemCategory.Semua)

@@ -10,7 +10,7 @@
     <div class="form-card">
         <div class="form-title">Buat listing Donasi</div>
 
-        <form asp-action="Create" method="post">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
 
             <div class="form-group">
@@ -36,7 +36,6 @@
                 <div class="condition-group">
                     <button type="button" class="condition-btn selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
                     <button type="button" class="condition-btn" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
-                    <button type="button" class="condition-btn" data-value="@((int)ItemCondition.PerluPerbaikan)">Perlu Perbaikan</button>
                 </div>
                 <span class="validation-message" asp-validation-for="Kondisi"></span>
             </div>
@@ -53,7 +52,55 @@
                 <span class="validation-message" asp-validation-for="Deskripsi"></span>
             </div>
 
-            <button type="submit" class="submit-btn">Posting Donasi</button>
+            <div class="form-group">
+                <label class="form-label">Foto Barang <span style="font-weight:400; color:#94a3b8;">(maks. 5 foto, 5MB per foto, JPG/PNG)</span></label>
+                <input type="file" id="imageInput" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
+                <div class="upload-zone" onclick="document.getElementById('imageInput').click()">
+                    <span style="font-size:22px; color:#94a3b8;">+</span>
+                    <p style="font-size:12px; color:#64748b; margin:4px 0 0;">Klik untuk unggah foto</p>
+                </div>
+                <span class="validation-message" id="imageError"></span>
+                <div id="previewContainer" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;"></div>
+            </div>
+
+            <button type="submit" class="submit-btn" onclick="return validateImages()">Posting Donasi</button>
+
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function () {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            const files = Array.from(this.files).slice(0, 5);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'width:60px;height:60px;border-radius:6px;overflow:hidden;border:0.5px solid #cbd5e1;';
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+                    div.appendChild(img);
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function validateImages() {
+
+            const input = document.getElementById('imageInput');
+            const error = document.getElementById('imageError');
+            if (!input.files || input.files.length === 0) {
+                error.textContent = 'Minimal 1 foto harus diunggah.';
+                return false;
+            }
+            error.textContent = '';
+            return true;
+        }
+    </script>
+}
+}

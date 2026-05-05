@@ -20,6 +20,13 @@ public class RegisterViewModel
     [Required(ErrorMessage = "Alamat wajib diisi.")]
     public string Alamat { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Provinsi wajib diisi.")]
+    public string Provinsi { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Kode pos wajib diisi.")]
+    [RegularExpression(@"^\d{5}$", ErrorMessage = "Kode pos harus 5 digit angka.")]
+    public string KodePos { get; set; } = string.Empty;
+
     [Required(ErrorMessage = "Password wajib diisi.")]
     [MinLength(6, ErrorMessage = "Password minimal 6 karakter.")]
     public string Password { get; set; } = string.Empty;

@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
 
 public enum ItemCondition
 {
     Baru,
-    Bekas,
-    PerluPerbaikan
+    Bekas
 }
 
 public enum ItemCategory
@@ -49,4 +49,14 @@ public class Item
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime ExpiresAt { get; set; } = DateTime.UtcNow.AddDays(7);
+
+    [Required]
+    public string UserId { get; set; } = string.Empty;
+
+    [ForeignKey("UserId")]
+    public ApplicationUser? User { get; set; }
+
+    public ICollection<ItemImage> Images { get; set; } = new List<ItemImage>();
+
+    public ICollection<ClaimRequest> ClaimRequests { get; set; } = new List<ClaimRequest>();
 }

@@ -17,25 +17,10 @@ public class AccountController : Controller
 
     public IActionResult Register() => View();
 
-    [HttpGet]
-    public IActionResult TestRegister()
-    {
-        return Content("Controller is reachable");
-    }
-
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
-        Console.WriteLine("POST HIT");
-        Console.WriteLine($"ModelState valid: {ModelState.IsValid}");
-
-        foreach (var key in ModelState.Keys)
-        {
-            var state = ModelState[key];
-            foreach (var error in state.Errors)
-                Console.WriteLine($"Field: {key} Error: {error.ErrorMessage}");
-        }
-
         if (!ModelState.IsValid)
             return View(model);
 
@@ -44,17 +29,14 @@ public class AccountController : Controller
             NamaDepan = model.NamaDepan,
             NamaBelakang = model.NamaBelakang,
             Email = model.Email,
-            UserName = model.Email,
+            UserName = model.NamaDepan,
             NomorTelepon = model.NomorTelepon,
-            Alamat = model.Alamat
+            Alamat = model.Alamat,
+            Provinsi = model.Provinsi,
+            KodePos = model.KodePos
         };
 
-        Console.WriteLine("Creating user...");
         var result = await _userManager.CreateAsync(user, model.Password);
-        Console.WriteLine($"Result: {result.Succeeded}");
-
-        foreach (var error in result.Errors)
-            Console.WriteLine($"Identity error: {error.Description}");
 
         if (result.Succeeded)
         {
@@ -77,7 +59,14 @@ public class AccountController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user == null)
+        {
+            ModelState.AddModelError(string.Empty, "Email atau password salah.");
+            return View(model);
+        }
+
+        var result = await _signInManager.PasswordSignInAsync(user.UserName!, model.Password, isPersistent: false, lockoutOnFailure: false);
 
         if (result.Succeeded)
             return RedirectToAction("Index", "Home");

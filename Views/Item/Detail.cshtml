@@ -1,0 +1,123 @@
+﻿@model DonationApp.Models.Item
+@using DonationApp.Models
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var images = Model.Images.ToList();
+    var daysLeft = (Model.ExpiresAt - DateTime.UtcNow).Days;
+    var isOwner = (bool)ViewBag.IsOwner;
+    var hasRequested = (bool)ViewBag.HasRequested;
+}
+
+<link rel="stylesheet" href="/css/item.css" />
+
+<a class="back-btn" asp-controller="Home" asp-action="Index">← Kembali</a>
+
+<div class="detail-grid">
+
+    <div>
+        <div class="detail-image-wrap">
+            <img id="mainImage" src="@images[0].FilePath" class="detail-main-img" />
+            <button onclick="slideImage(-1)" class="detail-slide-btn" style="left:8px;">‹</button>
+            <button onclick="slideImage(1)" class="detail-slide-btn" style="right:8px;">›</button>
+            <div id="imageCounter" class="detail-counter">1 / @images.Count</div>
+            <button onclick="openZoom()" class="detail-zoom-btn">🔍 Zoom</button>
+        </div>
+
+        <div class="detail-thumbs">
+            @for (int i = 0; i < images.Count; i++)
+            {
+                <div onclick="setImage(@i)" class="detail-thumb @(i == 0 ? "active" : "")" id="thumb-@i">
+                    <img src="@images[i].FilePath" />
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="detail-info">
+        <div>
+            <p class="detail-name">@Model.NamaBarang</p>
+            <div class="detail-badges">
+                <span class="detail-badge-kategori">@Model.Kategori</span>
+                <span class="detail-badge-kondisi">@Model.Kondisi</span>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <p class="detail-row-label">Lokasi</p>
+            <p class="detail-row-value">@Model.Lokasi</p>
+        </div>
+
+        <div class="detail-row">
+            <p class="detail-row-label">Deskripsi</p>
+            <p class="detail-row-value">@Model.Deskripsi</p>
+        </div>
+
+        <div class="detail-row">
+            <p class="detail-row-label">Sisa waktu</p>
+            <p class="detail-row-value">⏱ @daysLeft hari lagi</p>
+        </div>
+
+        <div class="detail-action">
+            @if (isOwner)
+            {
+                <button class="submit-btn" disabled style="opacity:0.5;">Barang Anda</button>
+            }
+            else if (hasRequested)
+            {
+                <button class="submit-btn" disabled style="opacity:0.5;">Sudah Diminta</button>
+            }
+            else if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <form asp-controller="Item" asp-action="Request" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="itemId" value="@Model.Id" />
+                    <button type="submit" class="submit-btn">Minta Barang</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login" class="submit-btn" style="display:block;text-align:center;text-decoration:none;">Masuk untuk Meminta</a>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="zoomModal">
+    <div class="zoom-modal-inner">
+        <button onclick="closeZoom()" class="zoom-close-btn">✕</button>
+        <img id="zoomImage" src="" class="zoom-img" />
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var images = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(images.Select(i => i.FilePath).ToList()));
+        var currentIndex = 0;
+
+        function setImage(index) {
+            currentIndex = index;
+            document.getElementById('mainImage').src = images[index];
+            document.getElementById('imageCounter').textContent = (index + 1) + ' / ' + images.length;
+            document.querySelectorAll('[id^="thumb-"]').forEach(function(el, i) {
+                el.classList.toggle('active', i === index);
+            });
+        }
+
+        function slideImage(dir) {
+            setImage((currentIndex + dir + images.length) % images.length);
+        }
+
+        function openZoom() {
+            document.getElementById('zoomImage').src = images[currentIndex];
+            document.getElementById('zoomModal').classList.add('open');
+        }
+
+        function closeZoom() {
+            document.getElementById('zoomModal').classList.remove('open');
+        }
+
+        document.getElementById('zoomModal').addEventListener('click', function(e) {
+            if (e.target === this) closeZoom();
+        });
+    </script>
+}

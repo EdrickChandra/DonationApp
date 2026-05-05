@@ -1,0 +1,335 @@
+﻿@using DonationApp.Models
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = ViewBag.User as ApplicationUser;
+    var donations = ViewBag.Donations as List<Item>;
+    var requests = ViewBag.Requests as List<ClaimRequest>;
+    var section = ViewBag.Section as string ?? "overview";
+    var avatarLetter = user?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+}
+
+<link rel="stylesheet" href="/css/profile.css" />
+
+<div class="profile-grid">
+
+    <div class="profile-sidebar">
+        <div class="profile-avatar-wrap">
+            <div class="profile-avatar">@avatarLetter</div>
+            <p class="profile-name">@user?.NamaDepan</p>
+            <p class="profile-email">@user?.Email</p>
+        </div>
+
+        @foreach (var nav in new[] { ("overview", "Overview"), ("donasi", "Donasi"), ("permintaan", "Permintaan Masuk"), ("request", "Request"), ("profil", "Profil") })
+        {
+            <a asp-controller="Profile" asp-action="Index" asp-route-section="@nav.Item1"
+               class="profile-nav-item @(section == nav.Item1 ? "active" : "")">
+                @nav.Item2
+            </a>
+        }
+    </div>
+
+    <div class="profile-content">
+
+        @if (section == "overview")
+        {
+            <div class="profile-inner">
+                <p class="profile-section-title">Overview</p>
+                <div class="profile-stat-grid">
+                    <div class="profile-stat-card">
+                        <p class="profile-stat-label">Total Donasi</p>
+                        <p class="profile-stat-value">@(donations?.Count ?? 0)</p>
+                    </div>
+                    <div class="profile-stat-card">
+                        <p class="profile-stat-label">Total Request</p>
+                        <p class="profile-stat-value">@(requests?.Count ?? 0)</p>
+                    </div>
+                </div>
+
+                <div class="profile-tab-bar">
+                    <button onclick="switchOvTab('donasi')" id="ovTabDonasi" class="profile-tab active">Donasi</button>
+                    <button onclick="switchOvTab('request')" id="ovTabRequest" class="profile-tab">Request</button>
+                </div>
+
+                <div id="ovDonasi">
+                    @if (donations == null || !donations.Any())
+                    {
+                        <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada donasi.</p>
+                    }
+                    else
+                    {
+                        @foreach (var d in donations)
+                        {
+                            var daysLeft = (d.ExpiresAt - DateTime.UtcNow).Days;
+                            <div class="profile-item-row">
+                                <img src="@d.Images.First().FilePath" style="width:44px;height:44px;border-radius:6px;object-fit:cover;" />
+                                <div style="flex:1;">
+                                    <p class="profile-item-name">@d.NamaBarang</p>
+                                    <p class="profile-item-sub">@d.Kategori · @daysLeft hari lagi</p>
+                                </div>
+                                <span class="profile-badge @(d.Status == ItemStatus.Available ? "profile-badge-available" : "profile-badge-claimed")">@d.Status</span>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div id="ovRequest" style="display:none;">
+                    @if (requests == null || !requests.Any())
+                    {
+                        <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada request.</p>
+                    }
+                    else
+                    {
+                        @foreach (var r in requests)
+                        {
+                            <div class="profile-item-row">
+                                @if (r.Item?.Images.Any() == true)
+                                {
+                                    <img src="@r.Item.Images.First().FilePath" style="width:44px;height:44px;border-radius:6px;object-fit:cover;" />
+                                }
+                                <div style="flex:1;">
+                                    <p class="profile-item-name">@r.Item?.NamaBarang</p>
+                                    <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
+                                </div>
+                                <span class="profile-badge @(r.Status == ClaimRequestStatus.Accepted ? "profile-badge-claimed" : "profile-badge-pending")">@r.Status</span>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+
+        @if (section == "donasi")
+        {
+            <div class="profile-inner">
+                <p class="profile-section-title">Buat Donasi</p>
+                <div class="profile-card">
+                    <form asp-controller="Item" asp-action="Create" method="post" enctype="multipart/form-data">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label class="form-label">Nama Barang</label>
+                            <input class="form-input" name="NamaBarang" placeholder="Masukkan nama barang..." />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Kategori</label>
+                            <select class="form-input" name="Kategori">
+                                <option value="">Pilih Kategori</option>
+                                <option value="@((int)ItemCategory.Pakaian)">Pakaian</option>
+                                <option value="@((int)ItemCategory.Elektronik)">Elektronik</option>
+                                <option value="@((int)ItemCategory.Buku)">Buku</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Kondisi Barang</label>
+                            <input type="hidden" id="kondisiInput" name="Kondisi" value="@((int)ItemCondition.Baru)" />
+                            <div class="condition-group">
+                                <button type="button" class="condition-btn selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                                <button type="button" class="condition-btn" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Lokasi</label>
+                            <input class="form-input" name="Lokasi" placeholder="Kota / Kecamatan..." />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea class="form-input" name="Deskripsi" placeholder="Ceritakan kondisi barang secara detail..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Foto Barang <span style="font-weight:400;color:#94a3b8;">(maks. 5, 5MB, JPG/PNG)</span></label>
+                            <input type="file" id="imageInput" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
+                            <div class="upload-zone" onclick="document.getElementById('imageInput').click()">
+                                <p style="font-size:12px;color:#64748b;margin:0;">Klik untuk unggah foto</p>
+                            </div>
+                            <span class="validation-message" id="imageError"></span>
+                            <div id="previewContainer" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
+                        </div>
+
+                        <button type="submit" class="submit-btn" onclick="return validateImages()">Posting Donasi</button>
+                    </form>
+                </div>
+            </div>
+        }
+
+        @if (section == "permintaan")
+        {
+            var myDonations = donations?.Where(d => d.ClaimRequests.Any()).ToList();
+            var firstItemId = myDonations?.FirstOrDefault()?.Id;
+            var selectedIdStr = Context.Request.Query["itemId"].ToString();
+            var selectedId = int.TryParse(selectedIdStr, out var parsedId) ? parsedId : firstItemId ?? 0;
+            var selectedItem = myDonations?.FirstOrDefault(d => d.Id == selectedId);
+
+            <div class="profile-inner" style="max-width:700px;">
+                <p class="profile-section-title">Permintaan Masuk</p>
+                @if (myDonations == null || !myDonations.Any())
+                {
+                    <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada permintaan masuk.</p>
+                }
+                else
+                {
+                    <div class="permintaan-split">
+                        <div class="permintaan-list">
+                            @foreach (var d in myDonations)
+                            {
+                                <a asp-controller="Profile" asp-action="Index"
+                                   asp-route-section="permintaan"
+                                   asp-route-itemId="@d.Id"
+                                   class="permintaan-list-item @(d.Id == selectedId ? "active" : "")">
+                                    <img src="@d.Images.First().FilePath" class="permintaan-list-thumb" />
+                                    <div>
+                                        <p class="permintaan-list-name">@d.NamaBarang</p>
+                                        <p class="permintaan-list-count">@d.ClaimRequests.Count permintaan</p>
+                                    </div>
+                                </a>
+                            }
+                        </div>
+
+                        <div class="permintaan-detail">
+                            @if (selectedItem != null)
+                            {
+                                <p class="permintaan-detail-title">Permintaan untuk @selectedItem.NamaBarang</p>
+                                @foreach (var r in selectedItem.ClaimRequests)
+                                {
+                                    var requesterName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
+                                    var avatarLetter2 = r.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+                                    <div class="permintaan-req-row">
+                                        <div class="permintaan-req-avatar">@avatarLetter2</div>
+                                        <span class="permintaan-req-name">@requesterName</span>
+                                        <div class="permintaan-req-actions">
+                                            @if (r.Status == ClaimRequestStatus.Accepted)
+                                            {
+                                                <span style="font-size:12px;color:#166534;font-weight:600;">Diterima</span>
+                                            }
+                                            else if (selectedItem.Status == ItemStatus.Available)
+                                            {
+                                                <form asp-controller="Item" asp-action="Accept" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                                    <button type="submit" class="permintaan-accept-btn">Terima</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="permintaan-empty">Pilih item di sebelah kiri.</div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (section == "request")
+        {
+            <div class="profile-inner">
+                <p class="profile-section-title">Request Saya</p>
+                <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada request.</p>
+            </div>
+        }
+
+        @if (section == "profil")
+        {
+            <div class="profile-inner">
+                <p class="profile-section-title">Profil Saya</p>
+                <div class="profile-card">
+                    <form asp-controller="Profile" asp-action="UpdateProfile" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label class="form-label">Nama Depan</label>
+                                <input class="form-input" name="NamaDepan" value="@user?.NamaDepan" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nama Belakang</label>
+                                <input class="form-input" name="NamaBelakang" value="@user?.NamaBelakang" />
+                            </div>
+                        </div>
+
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input class="form-input" value="@user?.Email" disabled />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Nomor Telepon</label>
+                                <input class="form-input" name="NomorTelepon" value="@user?.NomorTelepon" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Alamat</label>
+                            <input class="form-input" name="Alamat" value="@user?.Alamat" />
+                        </div>
+
+                        <div class="input-row">
+                            <div class="form-group">
+                                <label class="form-label">Provinsi</label>
+                                <select class="form-input" name="Provinsi">
+                                    @foreach (var prov in new[] { "Aceh", "Bali", "Banten", "Bengkulu", "DI Yogyakarta", "DKI Jakarta", "Gorontalo", "Jambi", "Jawa Barat", "Jawa Tengah", "Jawa Timur", "Kalimantan Barat", "Kalimantan Selatan", "Kalimantan Tengah", "Kalimantan Timur", "Kalimantan Utara", "Kepulauan Bangka Belitung", "Kepulauan Riau", "Lampung", "Maluku", "Maluku Utara", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Papua", "Papua Barat", "Riau", "Sulawesi Barat", "Sulawesi Selatan", "Sulawesi Tengah", "Sulawesi Tenggara", "Sulawesi Utara", "Sumatera Barat", "Sumatera Selatan", "Sumatera Utara" })
+                                    {
+                                        <option selected="@(user?.Provinsi == prov)">@prov</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Kode Pos</label>
+                                <input class="form-input" name="KodePos" value="@user?.KodePos" maxlength="5" />
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function switchOvTab(tab) {
+            document.getElementById('ovDonasi').style.display = tab === 'donasi' ? 'block' : 'none';
+            document.getElementById('ovRequest').style.display = tab === 'request' ? 'block' : 'none';
+            document.getElementById('ovTabDonasi').classList.toggle('active', tab === 'donasi');
+            document.getElementById('ovTabRequest').classList.toggle('active', tab === 'request');
+        }
+
+        document.getElementById('imageInput')?.addEventListener('change', function () {
+            var container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            Array.from(this.files).slice(0, 5).forEach(function(file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var div = document.createElement('div');
+                    div.style.cssText = 'width:60px;height:60px;border-radius:6px;overflow:hidden;border:0.5px solid #cbd5e1;';
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+                    div.appendChild(img);
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function validateImages() {
+            var input = document.getElementById('imageInput');
+            var error = document.getElementById('imageError');
+            if (input && (!input.files || input.files.length === 0)) {
+                error.textContent = 'Minimal 1 foto harus diunggah.';
+                return false;
+            }
+            return true;
+        }
+    </script>
+}
