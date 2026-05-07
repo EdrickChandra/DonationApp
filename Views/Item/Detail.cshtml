@@ -1,5 +1,4 @@
 ﻿@model DonationApp.Models.Item
-@using DonationApp.Models
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var images = Model.Images.ToList();
@@ -16,11 +15,10 @@
 
     <div>
         <div class="detail-image-wrap">
-            <img id="mainImage" src="@images[0].FilePath" class="detail-main-img" />
+            <img id="mainImage" src="@images[0].FilePath" class="detail-main-img" onclick="openZoom()" style="cursor:pointer;" />
             <button onclick="slideImage(-1)" class="detail-slide-btn" style="left:8px;">‹</button>
             <button onclick="slideImage(1)" class="detail-slide-btn" style="right:8px;">›</button>
             <div id="imageCounter" class="detail-counter">1 / @images.Count</div>
-            <button onclick="openZoom()" class="detail-zoom-btn">🔍 Zoom</button>
         </div>
 
         <div class="detail-thumbs">

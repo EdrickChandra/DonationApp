@@ -197,19 +197,6 @@
     border-radius: 20px;
 }
 
-.detail-zoom-btn {
-    position: absolute;
-    bottom: 8px;
-    left: 8px;
-    background: rgba(0,0,0,0.5);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 3px 10px;
-    font-size: 11px;
-    cursor: pointer;
-}
-
 .detail-thumbs {
     display: flex;
     gap: 8px;
