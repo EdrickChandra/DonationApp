@@ -8,13 +8,14 @@ using Microsoft.AspNetCore.Identity;
 namespace DonationApp.Controllers;
 
 [Authorize]
-public class ItemController : Controller
+public class ItemController : BaseController
 {
     private readonly AppDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _environment;
 
     public ItemController(AppDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment)
+        : base(context, userManager)
     {
         _context = context;
         _userManager = userManager;
@@ -125,6 +126,18 @@ public class ItemController : Controller
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow
             });
+
+            var requester = await _userManager.FindByIdAsync(userId);
+            var requesterName = requester != null ? requester.NamaDepan + " " + requester.NamaBelakang : "Seseorang";
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = item.UserId,
+                Message = $"{requesterName} meminta barang \"{item.NamaBarang}\" milik Anda.",
+                Link = "/Profile?section=permintaan&itemId=" + itemId,
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
         }
 
@@ -147,8 +160,42 @@ public class ItemController : Controller
         request.Status = ClaimRequestStatus.Accepted;
         request.Item.Status = ItemStatus.Claimed;
 
+        _context.Notifications.Add(new Notification
+        {
+            UserId = request.UserId,
+            Message = $"Permintaan Anda untuk barang \"{request.Item.NamaBarang}\" telah diterima!",
+            Link = "/Item/Detail/" + request.Item.Id,
+            CreatedAt = DateTime.UtcNow
+        });
+
         await _context.SaveChangesAsync();
         return RedirectToAction("Index", "Profile", new { section = "permintaan" });
     }
 
-}   
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reject(int requestId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var request = await _context.ClaimRequests
+            .Include(r => r.Item)
+            .FirstOrDefaultAsync(r => r.Id == requestId);
+
+        if (request == null || request.Item == null || request.Item.UserId != userId)
+            return RedirectToAction("Index", "Profile", new { section = "permintaan" });
+
+        request.Status = ClaimRequestStatus.Rejected;
+
+        _context.Notifications.Add(new Notification
+        {
+            UserId = request.UserId,
+            Message = $"Permintaan Anda untuk barang \"{request.Item.NamaBarang}\" ditolak.",
+            Link = "/Home/Index",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+        return RedirectToAction("Index", "Profile", new { section = "permintaan" });
+    }
+}

@@ -3,22 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
 
-public enum ClaimRequestStatus
-{
-    Pending,
-    Accepted,
-    Rejected
-}
-
-public class ClaimRequest
+public class Notification
 {
     public int Id { get; set; }
-
-    [Required]
-    public int ItemId { get; set; }
-
-    [ForeignKey("ItemId")]
-    public Item? Item { get; set; }
 
     [Required]
     public string UserId { get; set; } = string.Empty;
@@ -26,7 +13,12 @@ public class ClaimRequest
     [ForeignKey("UserId")]
     public ApplicationUser? User { get; set; }
 
-    public ClaimRequestStatus Status { get; set; } = ClaimRequestStatus.Pending;
+    [Required]
+    public string Message { get; set; } = string.Empty;
+
+    public bool IsRead { get; set; } = false;
+
+    public string? Link { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

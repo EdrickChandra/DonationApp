@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DonationApp.Controllers;
 
-public class HomeController : Controller
+public class HomeController : BaseController
 {
     private readonly AppDbContext _context;
 
     public HomeController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        : base(context, userManager)
     {
         _context = context;
     }

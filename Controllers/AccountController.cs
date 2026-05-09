@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using DonationApp.Data;
 using DonationApp.Models;
 
 namespace DonationApp.Controllers;
 
-public class AccountController : Controller
+public class AccountController : BaseController
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
 
-    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AppDbContext context)
+        : base(context, userManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;

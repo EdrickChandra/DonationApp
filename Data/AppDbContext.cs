@@ -11,4 +11,5 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Item> Items { get; set; }
     public DbSet<ItemImage> ItemImages { get; set; }
     public DbSet<ClaimRequest> ClaimRequests { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 }

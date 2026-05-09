@@ -4,8 +4,10 @@
     var user = ViewBag.User as ApplicationUser;
     var donations = ViewBag.Donations as List<Item>;
     var requests = ViewBag.Requests as List<ClaimRequest>;
+    var notifications = ViewBag.Notifications as List<Notification>;
     var section = ViewBag.Section as string ?? "overview";
     var avatarLetter = user?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+    var unreadCount = ViewBag.UnreadCount as int? ?? 0;
 }
 
 <link rel="stylesheet" href="/css/profile.css" />
@@ -19,11 +21,15 @@
             <p class="profile-email">@user?.Email</p>
         </div>
 
-        @foreach (var nav in new[] { ("overview", "Overview"), ("donasi", "Donasi"), ("permintaan", "Permintaan Masuk"), ("request", "Request"), ("profil", "Profil") })
+        @foreach (var nav in new[] { ("overview", "Overview"), ("donasi", "Donasi"), ("permintaan", "Permintaan Masuk"), ("request", "Request"), ("notifikasi", "Notifikasi"), ("profil", "Profil") })
         {
             <a asp-controller="Profile" asp-action="Index" asp-route-section="@nav.Item1"
                class="profile-nav-item @(section == nav.Item1 ? "active" : "")">
                 @nav.Item2
+                @if (nav.Item1 == "notifikasi" && unreadCount > 0)
+                {
+                    <span class="profile-nav-badge">@unreadCount</span>
+                }
             </a>
         }
     </div>
@@ -90,7 +96,7 @@
                                     <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                     <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                                 </div>
-                                <span class="profile-badge @(r.Status == ClaimRequestStatus.Accepted ? "profile-badge-claimed" : "profile-badge-pending")">@r.Status</span>
+                                <span class="profile-badge @(r.Status == ClaimRequestStatus.Accepted ? "profile-badge-claimed" : r.Status == ClaimRequestStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
                             </div>
                         }
                     }
@@ -205,12 +211,21 @@
                                             {
                                                 <span style="font-size:12px;color:#166534;font-weight:600;">Diterima</span>
                                             }
+                                            else if (r.Status == ClaimRequestStatus.Rejected)
+                                            {
+                                                <span style="font-size:12px;color:#991b1b;font-weight:600;">Ditolak</span>
+                                            }
                                             else if (selectedItem.Status == ItemStatus.Available)
                                             {
-                                                <form asp-controller="Item" asp-action="Accept" method="post">
+                                                <form asp-controller="Item" asp-action="Accept" method="post" style="display:inline;">
                                                     @Html.AntiForgeryToken()
                                                     <input type="hidden" name="requestId" value="@r.Id" />
                                                     <button type="submit" class="permintaan-accept-btn">Terima</button>
+                                                </form>
+                                                <form asp-controller="Item" asp-action="Reject" method="post" style="display:inline; margin-left:6px;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                                    <button type="submit" class="permintaan-reject-btn">Tolak</button>
                                                 </form>
                                             }
                                         </div>
@@ -231,7 +246,74 @@
         {
             <div class="profile-inner">
                 <p class="profile-section-title">Request Saya</p>
-                <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada request.</p>
+                @if (requests == null || !requests.Any())
+                {
+                    <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada request.</p>
+                }
+                else
+                {
+                    @foreach (var r in requests)
+                    {
+                        <div class="profile-item-row">
+                            @if (r.Item?.Images.Any() == true)
+                            {
+                                <img src="@r.Item.Images.First().FilePath" style="width:44px;height:44px;border-radius:6px;object-fit:cover;" />
+                            }
+                            <div style="flex:1;">
+                                <p class="profile-item-name">@r.Item?.NamaBarang</p>
+                                <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
+                            </div>
+                            <span class="profile-badge @(r.Status == ClaimRequestStatus.Accepted ? "profile-badge-claimed" : r.Status == ClaimRequestStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
+                        </div>
+                    }
+                }
+            </div>
+        }
+
+        @if (section == "notifikasi")
+        {
+            <div class="profile-inner">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                    <p class="profile-section-title" style="margin:0;">Notifikasi</p>
+                    @if (notifications != null && notifications.Any(n => !n.IsRead))
+                    {
+                        <form asp-controller="Profile" asp-action="MarkAllRead" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="permintaan-accept-btn">Tandai semua dibaca</button>
+                        </form>
+                    }
+                </div>
+
+                @if (notifications == null || !notifications.Any())
+                {
+                    <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Tidak ada notifikasi.</p>
+                }
+                else
+                {
+                    @foreach (var n in notifications)
+                    {
+                        <div class="notif-row @(n.IsRead ? "" : "notif-unread")">
+                            <div style="flex:1;">
+                                <p class="notif-message">@n.Message</p>
+                                <p class="notif-time">@((DateTime.UtcNow - n.CreatedAt).Days) hari lalu</p>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                @if (n.Link != null)
+                                {
+                                    <a href="@n.Link" class="notif-link-btn">Lihat</a>
+                                }
+                                @if (!n.IsRead)
+                                {
+                                    <form asp-controller="Profile" asp-action="MarkRead" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="notificationId" value="@n.Id" />
+                                        <button type="submit" class="notif-read-btn">✓</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
             </div>
         }
 
