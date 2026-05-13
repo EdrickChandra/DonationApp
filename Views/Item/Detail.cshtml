@@ -52,7 +52,7 @@
 
         <div class="detail-row">
             <p class="detail-row-label">Sisa waktu</p>
-            <p class="detail-row-value"> @daysLeft hari lagi</p>
+            <p class="detail-row-value">@daysLeft hari lagi</p>
         </div>
 
         <div class="detail-action">
@@ -63,6 +63,12 @@
             else if (hasRequested)
             {
                 <button class="submit-btn" disabled style="opacity:0.5;">Sudah Diminta</button>
+                <form asp-controller="Item" asp-action="Chat" method="post" style="margin-top:8px;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="itemId" value="@Model.Id" />
+                    <input type="hidden" name="otherUserId" value="@Model.UserId" />
+                    <button type="submit" class="submit-btn" style="background:#0ea5e9;">Chat dengan Donor</button>
+                </form>
             }
             else if (User.Identity != null && User.Identity.IsAuthenticated)
             {

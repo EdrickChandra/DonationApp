@@ -120,12 +120,14 @@ public class ItemController : BaseController
 
         if (!existing)
         {
-            _context.ClaimRequests.Add(new ClaimRequest
+            var claimRequest = new ClaimRequest
             {
                 ItemId = itemId,
                 UserId = userId,
                 CreatedAt = DateTime.UtcNow
-            });
+            };
+
+            _context.ClaimRequests.Add(claimRequest);
 
             var requester = await _userManager.FindByIdAsync(userId);
             var requesterName = requester != null ? requester.NamaDepan + " " + requester.NamaBelakang : "Seseorang";
@@ -142,6 +144,55 @@ public class ItemController : BaseController
         }
 
         return RedirectToAction("Detail", new { id = itemId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Chat(int itemId, string otherUserId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var item = await _context.Items.FindAsync(itemId);
+        if (item == null)
+            return RedirectToAction("Index", "Home");
+
+        var isOwner = item.UserId == userId;
+        var hasRequest = await _context.ClaimRequests
+            .AnyAsync(r => r.ItemId == itemId && r.UserId == userId);
+
+        if (!isOwner && !hasRequest)
+            return RedirectToAction("Detail", new { id = itemId });
+
+        var requesterId = isOwner ? otherUserId : userId;
+        var donorId = isOwner ? userId : item.UserId;
+
+        var existing = await _context.Conversations
+            .FirstOrDefaultAsync(c => c.ItemId == itemId &&
+                c.RequesterId == requesterId &&
+                c.DonorId == donorId);
+
+        if (existing != null)
+            return RedirectToAction("Index", "Profile", new { section = "pesan", convId = existing.Id });
+
+        var claimRequest = await _context.ClaimRequests
+            .FirstOrDefaultAsync(r => r.ItemId == itemId && r.UserId == requesterId);
+
+        if (claimRequest == null)
+            return RedirectToAction("Detail", new { id = itemId });
+
+        var conversation = new Conversation
+        {
+            ItemId = itemId,
+            ClaimRequestId = claimRequest.Id,
+            RequesterId = requesterId,
+            DonorId = donorId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.Conversations.Add(conversation);
+        await _context.SaveChangesAsync();
+
+        return RedirectToAction("Index", "Profile", new { section = "pesan", convId = conversation.Id });
     }
 
     [HttpPost]

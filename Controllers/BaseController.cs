@@ -25,14 +25,22 @@ public class BaseController : Controller
             var userId = _userManager.GetUserId(User);
             if (userId != null)
             {
-                var unreadCount = await _context.Notifications
+                var unreadNotifCount = await _context.Notifications
                     .CountAsync(n => n.UserId == userId && !n.IsRead);
-                ViewBag.UnreadCount = unreadCount;
+                ViewBag.UnreadCount = unreadNotifCount;
+
+                var unreadMessageCount = await _context.ChatMessages
+                    .Where(m => m.SenderId != userId && !m.IsRead &&
+                        _context.Conversations.Any(c => c.Id == m.ConversationId &&
+                            (c.RequesterId == userId || c.DonorId == userId)))
+                    .CountAsync();
+                ViewBag.UnreadMessageCount = unreadMessageCount;
             }
         }
         else
         {
             ViewBag.UnreadCount = 0;
+            ViewBag.UnreadMessageCount = 0;
         }
 
         await next();

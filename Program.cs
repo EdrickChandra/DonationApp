@@ -1,5 +1,6 @@
 using DonationApp.Data;
 using DonationApp.Models;
+using DonationApp.Hubs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/Login";
 });
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -43,5 +46,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.Run();

@@ -5,12 +5,17 @@
     var donations = ViewBag.Donations as List<Item>;
     var requests = ViewBag.Requests as List<ClaimRequest>;
     var notifications = ViewBag.Notifications as List<Notification>;
+    var conversations = ViewBag.Conversations as List<Conversation>;
+    var currentUserId = ViewBag.CurrentUserId as string ?? "";
     var section = ViewBag.Section as string ?? "overview";
+    var initialConvId = ViewBag.InitialConvId as int?;
     var avatarLetter = user?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
     var unreadCount = ViewBag.UnreadCount as int? ?? 0;
+    var unreadMessageCount = ViewBag.UnreadMessageCount as int? ?? 0;
 }
 
 <link rel="stylesheet" href="/css/profile.css" />
+<link rel="stylesheet" href="/css/chat.css" />
 
 <div class="profile-grid">
 
@@ -21,7 +26,7 @@
             <p class="profile-email">@user?.Email</p>
         </div>
 
-        @foreach (var nav in new[] { ("overview", "Overview"), ("donasi", "Donasi"), ("permintaan", "Permintaan Masuk"), ("request", "Request"), ("notifikasi", "Notifikasi"), ("profil", "Profil") })
+        @foreach (var nav in new[] { ("overview", "Overview"), ("donasi", "Donasi"), ("permintaan", "Permintaan Masuk"), ("request", "Request"), ("pesan", "Pesan"), ("notifikasi", "Notifikasi"), ("profil", "Profil") })
         {
             <a asp-controller="Profile" asp-action="Index" asp-route-section="@nav.Item1"
                class="profile-nav-item @(section == nav.Item1 ? "active" : "")">
@@ -29,6 +34,10 @@
                 @if (nav.Item1 == "notifikasi" && unreadCount > 0)
                 {
                     <span class="profile-nav-badge">@unreadCount</span>
+                }
+                @if (nav.Item1 == "pesan" && unreadMessageCount > 0)
+                {
+                    <span class="profile-nav-badge">@unreadMessageCount</span>
                 }
             </a>
         }
@@ -228,6 +237,12 @@
                                                     <button type="submit" class="permintaan-reject-btn">Tolak</button>
                                                 </form>
                                             }
+                                            <form asp-controller="Item" asp-action="Chat" method="post" style="display:inline; margin-left:6px;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="itemId" value="@selectedItem.Id" />
+                                                <input type="hidden" name="otherUserId" value="@r.UserId" />
+                                                <button type="submit" class="permintaan-accept-btn" style="background:#0ea5e9;">Chat</button>
+                                            </form>
                                         </div>
                                     </div>
                                 }
@@ -267,6 +282,77 @@
                         </div>
                     }
                 }
+            </div>
+        }
+
+        @if (section == "pesan")
+        {
+            <div class="profile-inner" style="padding:0; overflow:hidden;">
+                <div class="chat-shell">
+                    <div class="chat-list">
+                        <div class="chat-list-header">Percakapan</div>
+                        @if (conversations == null || !conversations.Any())
+                        {
+                            <p style="font-size:12px;color:#94a3b8;text-align:center;padding:20px 12px;">Belum ada percakapan.</p>
+                        }
+                        else
+                        {
+                            @foreach (var conv in conversations)
+                            {
+                                var otherParty = conv.RequesterId == currentUserId ? conv.Donor : conv.Requester;
+                                var otherName = otherParty != null ? otherParty.NamaDepan + " " + otherParty.NamaBelakang : "Unknown";
+                                var thumb = conv.Item?.Images.FirstOrDefault()?.FilePath;
+                                var lastMsg = conv.Messages.FirstOrDefault();
+                                var lastPreview = lastMsg != null
+                                    ? (lastMsg.SenderId == currentUserId ? "Anda: " : "") + lastMsg.Content
+                                    : "Mulai percakapan";
+                                var hasUnread = conv.Messages.Any(m => m.SenderId != currentUserId && !m.IsRead);
+
+                                <div class="chat-list-item" data-conv-id="@conv.Id"
+                                     data-item-name="@conv.Item?.NamaBarang"
+                                     data-other-name="@otherName"
+                                     data-thumb="@(thumb ?? "")"
+                                     onclick="selectConversation(this)">
+                                    @if (thumb != null)
+                                    {
+                                        <img src="@thumb" class="chat-list-thumb" />
+                                    }
+                                    else
+                                    {
+                                        <div class="chat-list-thumb-placeholder"></div>
+                                    }
+                                    <div class="chat-list-meta">
+                                        <p class="chat-list-name">@conv.Item?.NamaBarang</p>
+                                        <p class="chat-list-preview">@lastPreview</p>
+                                    </div>
+                                    @if (hasUnread)
+                                    {
+                                        <div class="chat-list-unread-dot"></div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="chat-window">
+                        <div class="chat-window-header" id="chatHeader" style="display:none;">
+                            <img id="chatHeaderThumb" src="" class="chat-window-header-thumb" style="display:none;" />
+                            <div class="chat-window-header-info">
+                                <p class="chat-window-header-name" id="chatHeaderName"></p>
+                                <p class="chat-window-header-sub" id="chatHeaderSub"></p>
+                            </div>
+                        </div>
+
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-no-select" id="chatNoSelect">Pilih percakapan untuk memulai.</div>
+                        </div>
+
+                        <div class="chat-input-bar" id="chatInputBar" style="display:none;">
+                            <textarea class="chat-input" id="chatInput" placeholder="Tulis pesan..." rows="1"></textarea>
+                            <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()">Kirim</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
 
@@ -414,4 +500,152 @@
             return true;
         }
     </script>
+
+    @if (section == "pesan")
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+        <script>
+            var currentUserId = '@currentUserId';
+            var activeConvId = null;
+            var connection = null;
+            var initialConvId = @(initialConvId.HasValue ? initialConvId.Value.ToString() : "null");
+
+            function initSignalR() {
+            connection = new signalR.HubConnectionBuilder()
+            .withUrl('/chatHub')
+            .withAutomaticReconnect()
+            .build();
+
+            connection.on('ReceiveMessage', function (msg) {
+            if (msg.conversationId === activeConvId) {
+            appendMessage(msg);
+            scrollToBottom();
+            }
+            });
+
+            connection.start().then(function () {
+            if (initialConvId !== null) {
+            var target = document.querySelector('[data-conv-id="' + initialConvId + '"]');
+            if (target) selectConversation(target);
+            }
+            }).catch(function (err) {
+            console.error('SignalR error:', err);
+            });
+            }
+
+            function selectConversation(el) {
+            document.querySelectorAll('.chat-list-item').forEach(function (i) {
+            i.classList.remove('active');
+            });
+            el.classList.add('active');
+
+            var dot = el.querySelector('.chat-list-unread-dot');
+            if (dot) dot.remove();
+
+            var convId = parseInt(el.dataset.convId);
+            var itemName = el.dataset.itemName;
+            var otherName = el.dataset.otherName;
+            var thumb = el.dataset.thumb;
+
+            if (activeConvId !== null && connection) {
+            connection.invoke('LeaveConversation', activeConvId).catch(function () {});
+            }
+
+            activeConvId = convId;
+
+            var header = document.getElementById('chatHeader');
+            var headerThumb = document.getElementById('chatHeaderThumb');
+            var headerName = document.getElementById('chatHeaderName');
+            var headerSub = document.getElementById('chatHeaderSub');
+
+            header.style.display = 'flex';
+            headerName.textContent = itemName;
+            headerSub.textContent = 'dengan ' + otherName;
+
+            if (thumb) {
+            headerThumb.src = thumb;
+            headerThumb.style.display = 'block';
+            } else {
+            headerThumb.style.display = 'none';
+            }
+
+            document.getElementById('chatNoSelect').style.display = 'none';
+            document.getElementById('chatInputBar').style.display = 'flex';
+
+            loadMessages(convId);
+
+            if (connection && connection.state === signalR.HubConnectionState.Connected) {
+            connection.invoke('JoinConversation', convId).catch(function (err) {
+            console.error(err);
+            });
+            }
+            }
+
+            function loadMessages(convId) {
+            var messagesEl = document.getElementById('chatMessages');
+            messagesEl.innerHTML = '';
+
+            fetch('/Chat/GetMessages?conversationId=' + convId)
+            .then(function (r) { return r.json(); })
+            .then(function (msgs) {
+            msgs.forEach(function (m) { appendMessage(m); });
+            scrollToBottom();
+            });
+            }
+
+            function appendMessage(msg) {
+            var messagesEl = document.getElementById('chatMessages');
+            var isMine = msg.senderId === currentUserId;
+
+            var row = document.createElement('div');
+            row.className = 'chat-bubble-row ' + (isMine ? 'mine' : 'theirs');
+
+            var bubble = document.createElement('div');
+            bubble.className = 'chat-bubble';
+            bubble.textContent = msg.content;
+
+            var time = document.createElement('div');
+            time.className = 'chat-bubble-time';
+            var d = new Date(msg.sentAt);
+            time.textContent = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            row.appendChild(bubble);
+            row.appendChild(time);
+            messagesEl.appendChild(row);
+            }
+
+            function scrollToBottom() {
+            var el = document.getElementById('chatMessages');
+            el.scrollTop = el.scrollHeight;
+            }
+
+            function sendMessage() {
+            var input = document.getElementById('chatInput');
+            var content = input.value.trim();
+            if (!content || activeConvId === null) return;
+            if (!connection || connection.state !== signalR.HubConnectionState.Connected) return;
+
+            document.getElementById('chatSendBtn').disabled = true;
+
+            connection.invoke('SendMessage', activeConvId, content)
+            .then(function () {
+            input.value = '';
+            document.getElementById('chatSendBtn').disabled = false;
+            })
+            .catch(function (err) {
+            console.error(err);
+            document.getElementById('chatSendBtn').disabled = false;
+            });
+            }
+
+            document.getElementById('chatInput')?.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+            }
+            });
+
+            initSignalR();
+        </script>
+    }
 }

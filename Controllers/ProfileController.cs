@@ -20,7 +20,7 @@ public class ProfileController : BaseController
         _context = context;
     }
 
-    public async Task<IActionResult> Index(string section = "overview")
+    public async Task<IActionResult> Index(string section = "overview", int? convId = null)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return RedirectToAction("Login", "Account");
@@ -69,11 +69,24 @@ public class ProfileController : BaseController
             .OrderByDescending(n => n.CreatedAt)
             .ToListAsync();
 
+        var conversations = await _context.Conversations
+            .Include(c => c.Item)
+                .ThenInclude(i => i!.Images)
+            .Include(c => c.Requester)
+            .Include(c => c.Donor)
+            .Include(c => c.Messages.OrderByDescending(m => m.SentAt).Take(1))
+            .Where(c => c.RequesterId == userId || c.DonorId == userId)
+            .OrderByDescending(c => c.Messages.Max(m => (DateTime?)m.SentAt) ?? c.CreatedAt)
+            .ToListAsync();
+
         ViewBag.Section = section;
         ViewBag.User = user;
         ViewBag.Donations = donations;
         ViewBag.Requests = requests;
         ViewBag.Notifications = notifications;
+        ViewBag.Conversations = conversations;
+        ViewBag.CurrentUserId = userId;
+        ViewBag.InitialConvId = convId;
 
         return View("Profile");
     }
