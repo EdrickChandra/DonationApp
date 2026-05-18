@@ -1,0 +1,91 @@
+@using DonationApp.Models
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var reviews = ViewBag.RecentReviews as List<UserReputation>;
+    var avgRating = (double)(ViewBag.AvgRating ?? 0.0);
+    var totalReviews = (int)(ViewBag.TotalReviews ?? 0);
+}
+
+<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div class="ppage">
+    <div class="ppage-inner">
+
+        <div class="pstat-grid">
+            <div class="pstat-card">
+                <div class="pstat-label">Total donasi</div>
+                <div class="pstat-value">@ViewBag.TotalDonasi</div>
+                <div class="pstat-sub">@ViewBag.ActiveDonasi aktif</div>
+            </div>
+            <div class="pstat-card">
+                <div class="pstat-label">Total request</div>
+                <div class="pstat-value">@ViewBag.TotalRequest</div>
+                <div class="pstat-sub">@ViewBag.OpenRequest open</div>
+            </div>
+            <div class="pstat-card">
+                <div class="pstat-label">Rating donor</div>
+                <div class="pstat-value">@(totalReviews > 0 ? avgRating.ToString("0.0") : "-")</div>
+                @if (totalReviews > 0)
+                {
+                    <div class="pstars" style="margin-top:4px;">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span style="color:@(i <= Math.Round(avgRating) ? "#EF9F27" : "var(--color-border-tertiary)");">★</span>
+                        }
+                    </div>
+                    <div class="pstat-sub">dari @totalReviews ulasan</div>
+                }
+                else
+                {
+                    <div class="pstat-sub">Belum ada ulasan</div>
+                }
+            </div>
+        </div>
+
+        @if (reviews != null && reviews.Any())
+        {
+            <div class="preview-card">
+                <div class="preview-header">Ulasan terbaru</div>
+                @foreach (var r in reviews)
+                {
+                    var rAvatar = r.Reviewer?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+                    var rName = r.Reviewer != null ? r.Reviewer.NamaDepan + " " + r.Reviewer.NamaBelakang : "Unknown";
+                    var daysAgo = (DateTime.UtcNow - r.CreatedAt).Days;
+                    <div class="preview-item">
+                        <div class="preview-avatar">@rAvatar</div>
+                        <div style="flex:1;">
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                                <span class="preview-name">@rName</span>
+                                <span class="pstars" style="font-size:12px;">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span style="color:@(i <= r.Rating ? "#EF9F27" : "var(--color-border-tertiary)");">★</span>
+                                    }
+                                </span>
+                                <span class="preview-time">@daysAgo hari lalu</span>
+                            </div>
+                            @if (!string.IsNullOrEmpty(r.Komentar))
+                            {
+                                <div class="preview-text">@r.Komentar</div>
+                            }
+                            @if (r.ClaimRequest?.Item != null)
+                            {
+                                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px;">untuk "@r.ClaimRequest.Item.NamaBarang"</div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="preview-card">
+                <div class="preview-header">Ulasan terbaru</div>
+                <div style="padding:32px;text-align:center;font-size:13px;color:var(--color-text-secondary);">Belum ada ulasan.</div>
+            </div>
+        }
+
+    </div>
+</div>

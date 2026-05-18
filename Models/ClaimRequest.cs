@@ -7,7 +7,9 @@ public enum ClaimRequestStatus
 {
     Pending,
     Accepted,
-    Rejected
+    Rejected,
+    Shipped,
+    Delivered
 }
 
 public class ClaimRequest
@@ -29,4 +31,8 @@ public class ClaimRequest
     public ClaimRequestStatus Status { get; set; } = ClaimRequestStatus.Pending;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    public DateTime? UpdatedAt { get; set; }
+
+    public ICollection<UserReputation> Reputations { get; set; } = new List<UserReputation>();
 }

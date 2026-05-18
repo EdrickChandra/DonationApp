@@ -1,0 +1,268 @@
+@using DonationApp.Models
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var conversations = ViewBag.Conversations as List<Conversation>;
+    var currentUserId = ViewBag.CurrentUserId as string ?? "";
+    var initialConvId = ViewBag.InitialConvId as int?;
+}
+
+<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div class="ppage" style="padding:0;">
+    <div class="pchat-shell" style="min-height:calc(100vh - 52px);border:none;border-radius:0;">
+
+        <div class="pchat-list">
+            <div class="pchat-list-header">Percakapan</div>
+            @if (conversations == null || !conversations.Any())
+            {
+                <div style="padding:24px;text-align:center;font-size:13px;color:var(--color-text-secondary);">Belum ada percakapan.</div>
+            }
+            else
+            {
+                @foreach (var conv in conversations)
+                {
+                    var otherParty = conv.RequesterId == currentUserId ? conv.Donor : conv.Requester;
+                    var otherName = otherParty != null ? otherParty.NamaDepan + " " + otherParty.NamaBelakang : "Unknown";
+                    var thumb = conv.Item?.Images.FirstOrDefault()?.FilePath;
+                    var lastMsg = conv.Messages.FirstOrDefault();
+                    var lastPreview = lastMsg != null
+                        ? (lastMsg.SenderId == currentUserId ? "Anda: " : "") + (lastMsg.ImagePath != null ? "📷 Foto" : lastMsg.Content)
+                        : "Mulai percakapan";
+                    var hasUnread = conv.Messages.Any(m => m.SenderId != currentUserId && !m.IsRead);
+
+                    <div class="pchat-item" data-conv-id="@conv.Id"
+                         data-item-name="@conv.Item?.NamaBarang"
+                         data-other-name="@otherName"
+                         data-thumb="@(thumb ?? "")"
+                         onclick="selectConversation(this)">
+                        @if (thumb != null)
+                        {
+                            <img src="@thumb" class="pchat-thumb" />
+                        }
+                        else
+                        {
+                            <div class="pchat-thumb-placeholder"></div>
+                        }
+                        <div style="flex:1;min-width:0;">
+                            <div class="pchat-name">@conv.Item?.NamaBarang</div>
+                            <div class="pchat-preview">@lastPreview</div>
+                        </div>
+                        @if (hasUnread)
+                        {
+                            <div class="pchat-unread-dot"></div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="pchat-window">
+            <div class="pchat-header" id="chatHeader" style="display:none;">
+                <img id="chatHeaderThumb" src="" class="pchat-header-thumb" style="display:none;" />
+                <div>
+                    <p class="pchat-header-name" id="chatHeaderName"></p>
+                    <p class="pchat-header-sub" id="chatHeaderSub"></p>
+                </div>
+            </div>
+
+            <div class="pchat-messages" id="chatMessages">
+                <div class="pchat-no-select" id="chatNoSelect">Pilih percakapan untuk memulai.</div>
+            </div>
+
+            <div class="pchat-input-bar" id="chatInputBar" style="display:none;">
+                <div class="pchat-image-preview" id="chatImagePreview">
+                    <div class="pchat-image-preview-inner">
+                        <img id="chatImagePreviewImg" src="" />
+                        <button type="button" class="pchat-image-preview-del" onclick="clearChatImage()">✕</button>
+                    </div>
+                </div>
+                <div class="pchat-input-row">
+                    <input type="file" id="chatImageInput" accept=".jpg,.jpeg,.png,.gif" style="display:none;" onchange="previewChatImage(this)" />
+                    <button type="button" class="pchat-img-btn" onclick="document.getElementById('chatImageInput').click()" title="Kirim Foto">
+                        <i class="ti ti-photo" aria-hidden="true"></i>
+                    </button>
+                    <textarea class="pchat-textarea" id="chatInput" placeholder="Tulis pesan..." rows="1"></textarea>
+                    <button class="pchat-send-btn" id="chatSendBtn" onclick="sendMessage()">Kirim</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        var currentUserId = '@currentUserId';
+        var activeConvId = null;
+        var connection = null;
+        var initialConvId = @(initialConvId.HasValue ? initialConvId.Value.ToString() : "null");
+
+        function initSignalR() {
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl('/chatHub')
+                .withAutomaticReconnect()
+                .build();
+
+            connection.on('ReceiveMessage', function(msg) {
+                if (msg.conversationId === activeConvId) {
+                    appendMessage(msg);
+                    scrollToBottom();
+                }
+            });
+
+            connection.start().then(function() {
+                if (initialConvId !== null) {
+                    var target = document.querySelector('[data-conv-id="' + initialConvId + '"]');
+                    if (target) selectConversation(target);
+                }
+            }).catch(function(err) { console.error('SignalR error:', err); });
+        }
+
+        function selectConversation(el) {
+            document.querySelectorAll('.pchat-item').forEach(function(i) { i.classList.remove('active'); });
+            el.classList.add('active');
+            var dot = el.querySelector('.pchat-unread-dot');
+            if (dot) dot.remove();
+
+            var convId = parseInt(el.dataset.convId);
+            if (activeConvId !== null && connection)
+                connection.invoke('LeaveConversation', activeConvId).catch(function() {});
+            activeConvId = convId;
+
+            var header = document.getElementById('chatHeader');
+            header.style.display = 'flex';
+            document.getElementById('chatHeaderName').textContent = el.dataset.itemName;
+            document.getElementById('chatHeaderSub').textContent = 'dengan ' + el.dataset.otherName;
+
+            var headerThumb = document.getElementById('chatHeaderThumb');
+            if (el.dataset.thumb) {
+                headerThumb.src = el.dataset.thumb;
+                headerThumb.style.display = 'block';
+            } else {
+                headerThumb.style.display = 'none';
+            }
+
+            document.getElementById('chatNoSelect').style.display = 'none';
+            document.getElementById('chatInputBar').style.display = 'flex';
+
+            loadMessages(convId);
+
+            if (connection && connection.state === signalR.HubConnectionState.Connected)
+                connection.invoke('JoinConversation', convId).catch(function(err) { console.error(err); });
+        }
+
+        function loadMessages(convId) {
+            var messagesEl = document.getElementById('chatMessages');
+            messagesEl.innerHTML = '';
+            fetch('/Chat/GetMessages?conversationId=' + convId)
+                .then(function(r) { return r.json(); })
+                .then(function(msgs) {
+                    msgs.forEach(function(m) { appendMessage(m); });
+                    scrollToBottom();
+                });
+        }
+
+        function appendMessage(msg) {
+            var messagesEl = document.getElementById('chatMessages');
+            var isMine = msg.senderId === currentUserId;
+
+            var row = document.createElement('div');
+            row.className = 'pchat-bubble-row ' + (isMine ? 'mine' : 'theirs');
+
+            var bubble = document.createElement('div');
+            bubble.className = 'pchat-bubble';
+
+            if (msg.imagePath) {
+                var img = document.createElement('img');
+                img.src = msg.imagePath;
+                img.style.cssText = 'max-width:200px;max-height:200px;border-radius:var(--border-radius-md);display:block;cursor:pointer;';
+                img.onclick = function() { window.open(msg.imagePath, '_blank'); };
+                bubble.appendChild(img);
+            }
+
+            if (msg.content) {
+                var text = document.createElement('p');
+                text.style.marginTop = msg.imagePath ? '6px' : '0';
+                text.textContent = msg.content;
+                bubble.appendChild(text);
+            }
+
+            var time = document.createElement('div');
+            time.className = 'pchat-bubble-time';
+            time.textContent = new Date(msg.sentAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+            row.appendChild(bubble);
+            row.appendChild(time);
+            messagesEl.appendChild(row);
+        }
+
+        function scrollToBottom() {
+            var el = document.getElementById('chatMessages');
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function previewChatImage(input) {
+            var file = input.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('chatImagePreviewImg').src = e.target.result;
+                document.getElementById('chatImagePreview').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearChatImage() {
+            document.getElementById('chatImageInput').value = '';
+            document.getElementById('chatImagePreview').style.display = 'none';
+            document.getElementById('chatImagePreviewImg').src = '';
+        }
+
+        async function uploadChatImage(convId) {
+            var input = document.getElementById('chatImageInput');
+            if (!input.files || input.files.length === 0) return null;
+            var formData = new FormData();
+            formData.append('conversationId', convId);
+            formData.append('image', input.files[0]);
+            var token = document.querySelector('input[name="__RequestVerificationToken"]');
+            var headers = token ? { 'RequestVerificationToken': token.value } : {};
+            var response = await fetch('/Chat/UploadImage', { method: 'POST', headers: headers, body: formData });
+            var data = await response.json();
+            return data.success ? data.path : null;
+        }
+
+        async function sendMessage() {
+            var input = document.getElementById('chatInput');
+            var content = input.value.trim();
+            var hasImage = document.getElementById('chatImageInput').files.length > 0;
+            if (!content && !hasImage) return;
+            if (activeConvId === null) return;
+            if (!connection || connection.state !== signalR.HubConnectionState.Connected) return;
+
+            document.getElementById('chatSendBtn').disabled = true;
+            var imagePath = null;
+            if (hasImage) {
+                imagePath = await uploadChatImage(activeConvId);
+                clearChatImage();
+            }
+
+            connection.invoke('SendMessage', activeConvId, content, imagePath)
+                .then(function() {
+                    input.value = '';
+                    document.getElementById('chatSendBtn').disabled = false;
+                })
+                .catch(function(err) {
+                    console.error(err);
+                    document.getElementById('chatSendBtn').disabled = false;
+                });
+        }
+
+        document.getElementById('chatInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        });
+
+        initSignalR();
+    </script>
+}

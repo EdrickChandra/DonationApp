@@ -8,94 +8,64 @@ using DonationApp.Models;
 namespace DonationApp.Controllers;
 
 [Authorize]
-public class ProfileController : BaseController
+public class ProfileController : ProfileBaseController
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly AppDbContext _context;
+    private readonly UserManager<ApplicationUser> _um;
 
-    public ProfileController(UserManager<ApplicationUser> userManager, AppDbContext context)
-        : base(context, userManager)
+    public ProfileController(AppDbContext db, UserManager<ApplicationUser> userManager)
+        : base(db, userManager)
     {
-        _userManager = userManager;
-        _context = context;
+        _um = userManager;
     }
 
-    public async Task<IActionResult> Index(string section = "overview", int? convId = null)
+    public async Task<IActionResult> Overview()
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
+        var userId = _um.GetUserId(User)!;
 
-        var userId = user.Id;
+        var totalDonasi = await _db.Items.CountAsync(i => i.UserId == userId);
+        var activeDonasi = await _db.Items.CountAsync(i => i.UserId == userId && i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
 
-        var donations = await _context.Items
-            .Include(i => i.Images)
-            .Include(i => i.ClaimRequests)
-                .ThenInclude(r => r.User)
-            .Where(i => i.UserId == userId)
-            .OrderByDescending(i => i.CreatedAt)
-            .ToListAsync();
+        var totalRequest = await _db.ItemRequests.CountAsync(r => r.UserId == userId);
+        var openRequest = await _db.ItemRequests.CountAsync(r => r.UserId == userId && r.Status == ItemRequestStatus.Open);
 
-        var requests = await _context.ClaimRequests
-            .Include(r => r.Item)
-                .ThenInclude(i => i!.Images)
-            .Where(r => r.UserId == userId)
+        var avgRating = await _db.UserReputations
+            .Where(r => r.ReviewedUserId == userId)
+            .AverageAsync(r => (double?)r.Rating) ?? 0;
+
+        var totalReviews = await _db.UserReputations.CountAsync(r => r.ReviewedUserId == userId);
+
+        var recentReviews = await _db.UserReputations
+            .Include(r => r.Reviewer)
+            .Include(r => r.ClaimRequest)
+                .ThenInclude(c => c!.Item)
+            .Where(r => r.ReviewedUserId == userId)
             .OrderByDescending(r => r.CreatedAt)
+            .Take(5)
             .ToListAsync();
 
-        foreach (var item in donations)
-        {
-            if (item.Status == ItemStatus.Available && item.ExpiresAt <= DateTime.UtcNow)
-            {
-                var alreadyNotified = await _context.Notifications
-                    .AnyAsync(n => n.UserId == userId && n.Link == "/Profile?section=donasi" && n.Message.Contains(item.NamaBarang) && n.Message.Contains("kedaluwarsa"));
+        ViewBag.TotalDonasi = totalDonasi;
+        ViewBag.ActiveDonasi = activeDonasi;
+        ViewBag.TotalRequest = totalRequest;
+        ViewBag.OpenRequest = openRequest;
+        ViewBag.AvgRating = Math.Round(avgRating, 1);
+        ViewBag.TotalReviews = totalReviews;
+        ViewBag.RecentReviews = recentReviews;
 
-                if (!alreadyNotified)
-                {
-                    _context.Notifications.Add(new Notification
-                    {
-                        UserId = userId,
-                        Message = $"Barang \"{item.NamaBarang}\" Anda telah kedaluwarsa dan tidak lagi ditampilkan.",
-                        Link = "/Profile?section=donasi",
-                        CreatedAt = DateTime.UtcNow
-                    });
-                }
-            }
-        }
+        return View();
+    }
 
-        await _context.SaveChangesAsync();
-
-        var notifications = await _context.Notifications
-            .Where(n => n.UserId == userId)
-            .OrderByDescending(n => n.CreatedAt)
-            .ToListAsync();
-
-        var conversations = await _context.Conversations
-            .Include(c => c.Item)
-                .ThenInclude(i => i!.Images)
-            .Include(c => c.Requester)
-            .Include(c => c.Donor)
-            .Include(c => c.Messages.OrderByDescending(m => m.SentAt).Take(1))
-            .Where(c => c.RequesterId == userId || c.DonorId == userId)
-            .OrderByDescending(c => c.Messages.Max(m => (DateTime?)m.SentAt) ?? c.CreatedAt)
-            .ToListAsync();
-
-        ViewBag.Section = section;
-        ViewBag.User = user;
-        ViewBag.Donations = donations;
-        ViewBag.Requests = requests;
-        ViewBag.Notifications = notifications;
-        ViewBag.Conversations = conversations;
-        ViewBag.CurrentUserId = userId;
-        ViewBag.InitialConvId = convId;
-
-        return View("Profile");
+    public async Task<IActionResult> Edit()
+    {
+        var user = await _um.GetUserAsync(User);
+        if (user == null) return RedirectToAction("Login", "Account");
+        return View(user);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateProfile(string NamaDepan, string NamaBelakang, string NomorTelepon, string Alamat, string Provinsi, string KodePos)
+    public async Task<IActionResult> Edit(string NamaDepan, string NamaBelakang, string NomorTelepon, string Alamat, string Provinsi, string KodePos)
     {
-        var user = await _userManager.GetUserAsync(User);
+        var user = await _um.GetUserAsync(User);
         if (user == null) return RedirectToAction("Login", "Account");
 
         user.NamaDepan = NamaDepan;
@@ -106,42 +76,8 @@ public class ProfileController : BaseController
         user.KodePos = KodePos;
         user.UserName = NamaDepan;
 
-        await _userManager.UpdateAsync(user);
-        return RedirectToAction("Index", new { section = "profil" });
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> MarkRead(int notificationId)
-    {
-        var userId = _userManager.GetUserId(User)!;
-
-        var notification = await _context.Notifications
-            .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId);
-
-        if (notification != null)
-        {
-            notification.IsRead = true;
-            await _context.SaveChangesAsync();
-        }
-
-        return RedirectToAction("Index", new { section = "notifikasi" });
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> MarkAllRead()
-    {
-        var userId = _userManager.GetUserId(User)!;
-
-        var unread = await _context.Notifications
-            .Where(n => n.UserId == userId && !n.IsRead)
-            .ToListAsync();
-
-        foreach (var n in unread)
-            n.IsRead = true;
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction("Index", new { section = "notifikasi" });
+        await _um.UpdateAsync(user);
+        TempData["EditSuccess"] = "Profil berhasil diperbarui.";
+        return RedirectToAction("Edit");
     }
 }

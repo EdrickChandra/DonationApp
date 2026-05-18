@@ -86,6 +86,9 @@ namespace DonationApp.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("TrustScore")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("INTEGER");
 
@@ -117,6 +120,9 @@ namespace DonationApp.Migrations
 
                     b.Property<int>("ConversationId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("INTEGER");
@@ -151,6 +157,9 @@ namespace DonationApp.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -214,6 +223,9 @@ namespace DonationApp.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DetailTambahan")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("TEXT");
 
@@ -231,6 +243,11 @@ namespace DonationApp.Migrations
                     b.Property<string>("NamaBarang")
                         .IsRequired()
                         .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Provinsi")
+                        .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
@@ -267,6 +284,63 @@ namespace DonationApp.Migrations
                     b.ToTable("ItemImages");
                 });
 
+            modelBuilder.Entity("DonationApp.Models.ItemRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Deskripsi")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DetailTambahan")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Jumlah")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kategori")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("KondisiMinimum")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Lokasi")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Provinsi")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ItemRequests");
+                });
+
             modelBuilder.Entity("DonationApp.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -295,6 +369,115 @@ namespace DonationApp.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RequestImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ItemRequestId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemRequestId");
+
+                    b.ToTable("RequestImages");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RequestOffer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Deskripsi")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ItemRequestId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemRequestId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RequestOffers");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RequestOfferImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RequestOfferId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestOfferId");
+
+                    b.ToTable("RequestOfferImages");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.UserReputation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ClaimRequestId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Komentar")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReviewedUserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReviewerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClaimRequestId");
+
+                    b.HasIndex("ReviewedUserId");
+
+                    b.HasIndex("ReviewerId");
+
+                    b.ToTable("UserReputations");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -520,6 +703,17 @@ namespace DonationApp.Migrations
                     b.Navigation("Item");
                 });
 
+            modelBuilder.Entity("DonationApp.Models.ItemRequest", b =>
+                {
+                    b.HasOne("DonationApp.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DonationApp.Models.Notification", b =>
                 {
                     b.HasOne("DonationApp.Models.ApplicationUser", "User")
@@ -529,6 +723,74 @@ namespace DonationApp.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RequestImage", b =>
+                {
+                    b.HasOne("DonationApp.Models.ItemRequest", "ItemRequest")
+                        .WithMany("Images")
+                        .HasForeignKey("ItemRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemRequest");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RequestOffer", b =>
+                {
+                    b.HasOne("DonationApp.Models.ItemRequest", "ItemRequest")
+                        .WithMany("Offers")
+                        .HasForeignKey("ItemRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DonationApp.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemRequest");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RequestOfferImage", b =>
+                {
+                    b.HasOne("DonationApp.Models.RequestOffer", "RequestOffer")
+                        .WithMany("Images")
+                        .HasForeignKey("RequestOfferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestOffer");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.UserReputation", b =>
+                {
+                    b.HasOne("DonationApp.Models.ClaimRequest", "ClaimRequest")
+                        .WithMany("Reputations")
+                        .HasForeignKey("ClaimRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DonationApp.Models.ApplicationUser", "ReviewedUser")
+                        .WithMany()
+                        .HasForeignKey("ReviewedUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DonationApp.Models.ApplicationUser", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ClaimRequest");
+
+                    b.Navigation("ReviewedUser");
+
+                    b.Navigation("Reviewer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -582,6 +844,11 @@ namespace DonationApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("DonationApp.Models.ClaimRequest", b =>
+                {
+                    b.Navigation("Reputations");
+                });
+
             modelBuilder.Entity("DonationApp.Models.Conversation", b =>
                 {
                     b.Navigation("Messages");
@@ -591,6 +858,18 @@ namespace DonationApp.Migrations
                 {
                     b.Navigation("ClaimRequests");
 
+                    b.Navigation("Images");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.ItemRequest", b =>
+                {
+                    b.Navigation("Images");
+
+                    b.Navigation("Offers");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RequestOffer", b =>
+                {
                     b.Navigation("Images");
                 });
 #pragma warning restore 612, 618

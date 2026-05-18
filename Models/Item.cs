@@ -14,7 +14,12 @@ public enum ItemCategory
     Semua,
     Pakaian,
     Elektronik,
-    Buku
+    Buku,
+    PerabotRumah,
+    MainanHobi,
+    AlatTulis,
+    AlatMusik,
+    PeralatanDapur
 }
 
 public enum ItemStatus
@@ -41,8 +46,13 @@ public class Item
     [MaxLength(200)]
     public string Lokasi { get; set; } = string.Empty;
 
+    [MaxLength(100)]
+    public string Provinsi { get; set; } = string.Empty;
+
     [Required]
     public string Deskripsi { get; set; } = string.Empty;
+
+    public string? DetailTambahan { get; set; }
 
     public ItemStatus Status { get; set; } = ItemStatus.Available;
 

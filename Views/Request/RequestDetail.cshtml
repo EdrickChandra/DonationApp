@@ -1,0 +1,281 @@
+@model DonationApp.Models.ItemRequest
+@using DonationApp.Models
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var images = Model.Images.ToList();
+    var daysLeft = (Model.ExpiresAt - DateTime.UtcNow).Days;
+    var isOwner = (bool)ViewBag.IsOwner;
+    var hasOffered = (bool)ViewBag.HasOffered;
+    var avatarLetter = Model.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+}
+
+<link rel="stylesheet" href="~/css/item.css" asp-append-version="true" />
+
+<a class="back-btn" asp-controller="Request" asp-action="Index">← Kembali</a>
+
+<div class="detail-grid">
+
+    <div>
+        @if (images.Any())
+        {
+            <div class="detail-image-wrap">
+                <img id="mainImage" src="@images[0].FilePath" class="detail-main-img" onclick="openZoom()" style="cursor:pointer;" />
+                @if (images.Count > 1)
+                {
+                    <button onclick="slideImage(-1)" class="detail-slide-btn" style="left:8px;">‹</button>
+                    <button onclick="slideImage(1)" class="detail-slide-btn" style="right:8px;">›</button>
+                    <div id="imageCounter" class="detail-counter">1 / @images.Count</div>
+                }
+            </div>
+            @if (images.Count > 1)
+            {
+                <div class="detail-thumbs">
+                    @for (int i = 0; i < images.Count; i++)
+                    {
+                        <div onclick="setImage(@i)" class="detail-thumb @(i == 0 ? "active" : "")" id="thumb-@i">
+                            <img src="@images[i].FilePath" />
+                        </div>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="detail-image-wrap detail-image-empty">
+                <span class="detail-image-empty-icon">?</span>
+            </div>
+        }
+    </div>
+
+    <div class="detail-info">
+        <div>
+            <div class="detail-badges">
+                <span class="detail-badge-kategori">Request</span>
+                <span class="detail-badge-kondisi">@Model.Kategori</span>
+            </div>
+            <p class="detail-name">@Model.Title</p>
+            <div class="detail-poster-row">
+                <div class="detail-poster-avatar">@avatarLetter</div>
+                <span class="detail-poster-name">@Model.User?.NamaDepan @Model.User?.NamaBelakang</span>
+            </div>
+        </div>
+
+        <div class="detail-row">
+            <p class="detail-row-label">Deskripsi</p>
+            <p class="detail-row-value">@Model.Deskripsi</p>
+        </div>
+
+        <div class="detail-row">
+            <p class="detail-row-label">Sisa waktu</p>
+            <p class="detail-row-value">@daysLeft hari lagi</p>
+        </div>
+
+        <div class="detail-row">
+            <p class="detail-row-label">Penawaran masuk</p>
+            <p class="detail-row-value">@Model.Offers.Count penawaran</p>
+        </div>
+
+        <div class="detail-action">
+            @if (!User.Identity!.IsAuthenticated)
+            {
+                <a asp-controller="Account" asp-action="Login" class="submit-btn" style="display:block;text-align:center;text-decoration:none;">Masuk untuk Menawarkan</a>
+            }
+            else if (isOwner)
+            {
+                <button class="submit-btn" disabled style="opacity:0.5;">Request Anda</button>
+            }
+            else if (Model.Status != ItemRequestStatus.Open)
+            {
+                <button class="submit-btn" disabled style="opacity:0.5;">Request Sudah Ditutup</button>
+            }
+            else if (hasOffered)
+            {
+                <button class="submit-btn" disabled style="opacity:0.5;">Sudah Ditawarkan</button>
+            }
+            else
+            {
+                <button class="submit-btn" onclick="toggleOfferForm()">Tawarkan Barang</button>
+            }
+        </div>
+
+        @if (User.Identity!.IsAuthenticated && !isOwner && !hasOffered && Model.Status == ItemRequestStatus.Open)
+        {
+            <div id="offerForm" style="display:none;margin-top:16px;">
+                <form asp-controller="Request" asp-action="Offer" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="itemRequestId" value="@Model.Id" />
+
+                    <div class="form-group">
+                        <label class="form-label">Deskripsi Penawaran</label>
+                        <textarea class="form-input" name="deskripsi" rows="3" placeholder="Jelaskan barang yang Anda tawarkan..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Foto Barang <span class="form-label-hint">(maks. 3, 5MB, JPG/PNG)</span></label>
+                        <input type="file" id="offer-file-input" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
+                        <div class="upload-zone" onclick="document.getElementById('offer-file-input').click()">
+                            <p style="font-size:12px;margin:0;">+ Tambah Foto</p>
+                        </div>
+                        <div id="offer-preview" class="image-preview-grid"></div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="background:#0ea5e9;">Kirim Penawaran</button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+@if (Model.Offers.Any())
+{
+    <div class="offers-section">
+        <p class="offers-section-title">Penawaran (@Model.Offers.Count)</p>
+
+        @foreach (var offer in Model.Offers.OrderByDescending(o => o.CreatedAt))
+        {
+            var offerAvatar = offer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+            var offerName = offer.User != null ? offer.User.NamaDepan + " " + offer.User.NamaBelakang : "Unknown";
+            <div class="offer-card">
+                <div class="offer-card-header">
+                    <div class="detail-poster-avatar">@offerAvatar</div>
+                    <div style="flex:1;">
+                        <p class="offer-card-name">@offerName</p>
+                        <p class="offer-card-time">@((DateTime.UtcNow - offer.CreatedAt).Days) hari lalu</p>
+                    </div>
+                    @if (offer.Status == RequestOfferStatus.Accepted)
+                    {
+                        <span class="profile-badge profile-badge-claimed">Diterima</span>
+                    }
+                    else if (offer.Status == RequestOfferStatus.Rejected)
+                    {
+                        <span class="profile-badge profile-badge-rejected">Ditolak</span>
+                    }
+                    else if (isOwner && Model.Status == ItemRequestStatus.Open)
+                    {
+                        <div style="display:flex;gap:6px;">
+                            <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="offerId" value="@offer.Id" />
+                                <button type="submit" class="permintaan-accept-btn">Terima</button>
+                            </form>
+                            <form asp-controller="Request" asp-action="RejectOffer" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="offerId" value="@offer.Id" />
+                                <button type="submit" class="permintaan-reject-btn">Tolak</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+
+                <p class="offer-card-desc">@offer.Deskripsi</p>
+
+                @if (offer.Images.Any())
+                {
+                    <div class="offer-card-images">
+                        @foreach (var img in offer.Images)
+                        {
+                            <img src="@img.FilePath" class="offer-card-img" />
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+<div class="modal-overlay" id="zoomModal">
+    <div class="zoom-modal-inner">
+        <button onclick="closeZoom()" class="zoom-close-btn">✕</button>
+        <img id="zoomImage" src="" class="zoom-img" />
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var images = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(images.Select(i => i.FilePath).ToList()));
+        var currentIndex = 0;
+        var offerImageStore = [];
+
+        function setImage(index) {
+            currentIndex = index;
+            document.getElementById('mainImage').src = images[index];
+            var counter = document.getElementById('imageCounter');
+            if (counter) counter.textContent = (index + 1) + ' / ' + images.length;
+            document.querySelectorAll('[id^="thumb-"]').forEach(function(el, i) {
+                el.classList.toggle('active', i === index);
+            });
+        }
+
+        function slideImage(dir) {
+            setImage((currentIndex + dir + images.length) % images.length);
+        }
+
+        function openZoom() {
+            if (images.length === 0) return;
+            document.getElementById('zoomImage').src = images[currentIndex];
+            document.getElementById('zoomModal').classList.add('open');
+        }
+
+        function closeZoom() {
+            document.getElementById('zoomModal').classList.remove('open');
+        }
+
+        var zoomModal = document.getElementById('zoomModal');
+        if (zoomModal) {
+            zoomModal.addEventListener('click', function(e) {
+                if (e.target === this) closeZoom();
+            });
+        }
+
+        function toggleOfferForm() {
+            var form = document.getElementById('offerForm');
+            if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function renderOfferPreviews() {
+            var container = document.getElementById('offer-preview');
+            if (!container) return;
+            container.innerHTML = '';
+            offerImageStore.forEach(function(file, index) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var wrap = document.createElement('div');
+                    wrap.style.cssText = 'position:relative;width:72px;height:72px;';
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.cssText = 'width:72px;height:72px;border-radius:8px;object-fit:cover;';
+                    var del = document.createElement('button');
+                    del.type = 'button';
+                    del.textContent = '✕';
+                    del.style.cssText = 'position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:#fff;border:none;cursor:pointer;font-size:10px;line-height:1;display:flex;align-items:center;justify-content:center;';
+                    del.onclick = (function(i) { return function() {
+                        offerImageStore.splice(i, 1);
+                        syncOfferInput();
+                        renderOfferPreviews();
+                    }; })(index);
+                    wrap.appendChild(img);
+                    wrap.appendChild(del);
+                    container.appendChild(wrap);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function syncOfferInput() {
+            var input = document.getElementById('offer-file-input');
+            if (!input) return;
+            var dt = new DataTransfer();
+            offerImageStore.forEach(function(f) { dt.items.add(f); });
+            input.files = dt.files;
+        }
+
+        document.getElementById('offer-file-input')?.addEventListener('change', function() {
+            Array.from(this.files).forEach(function(file) {
+                if (offerImageStore.length < 3) offerImageStore.push(file);
+            });
+            this.value = '';
+            syncOfferInput();
+            renderOfferPreviews();
+        });
+    </script>
+}

@@ -14,4 +14,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Notification> Notifications { get; set; }
     public DbSet<Conversation> Conversations { get; set; }
     public DbSet<ChatMessage> ChatMessages { get; set; }
+    public DbSet<ItemRequest> ItemRequests { get; set; }
+    public DbSet<RequestImage> RequestImages { get; set; }
+    public DbSet<RequestOffer> RequestOffers { get; set; }
+    public DbSet<RequestOfferImage> RequestOfferImages { get; set; }
+    public DbSet<UserReputation> UserReputations { get; set; }
 }

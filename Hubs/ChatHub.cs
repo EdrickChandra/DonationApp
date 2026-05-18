@@ -38,10 +38,10 @@ public class ChatHub : Hub
         await _context.SaveChangesAsync();
     }
 
-    public async Task SendMessage(int conversationId, string content)
+    public async Task SendMessage(int conversationId, string content, string? imagePath = null)
     {
         var userId = Context.UserIdentifier;
-        if (string.IsNullOrWhiteSpace(content)) return;
+        if (string.IsNullOrWhiteSpace(content) && string.IsNullOrWhiteSpace(imagePath)) return;
 
         var conversation = await _context.Conversations
             .FirstOrDefaultAsync(c => c.Id == conversationId &&
@@ -53,9 +53,10 @@ public class ChatHub : Hub
         {
             ConversationId = conversationId,
             SenderId = userId!,
-            Content = content.Trim(),
+            Content = content?.Trim() ?? "",
             SentAt = DateTime.UtcNow,
-            IsRead = false
+            IsRead = false,
+            ImagePath = imagePath
         };
 
         _context.ChatMessages.Add(message);
@@ -72,7 +73,8 @@ public class ChatHub : Hub
             senderName,
             content = message.Content,
             sentAt = message.SentAt.ToString("o"),
-            isRead = message.IsRead
+            isRead = message.IsRead,
+            imagePath = message.ImagePath
         });
     }
 

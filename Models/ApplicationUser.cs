@@ -10,4 +10,5 @@ public class ApplicationUser : IdentityUser
     public string Alamat { get; set; } = string.Empty;
     public string Provinsi { get; set; } = string.Empty;
     public string KodePos { get; set; } = string.Empty;
+    public decimal TrustScore { get; set; } = 0;
 }

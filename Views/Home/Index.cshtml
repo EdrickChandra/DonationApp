@@ -9,14 +9,11 @@
 
 <div class="category-label">Kategori</div>
 <div class="pills">
-    <a class="pill @(selected == ItemCategory.Semua ? "active" : "inactive")"
-       asp-controller="Home" asp-action="Index" asp-route-kategori="Semua">Semua</a>
-    <a class="pill @(selected == ItemCategory.Pakaian ? "active" : "inactive")"
-       asp-controller="Home" asp-action="Index" asp-route-kategori="Pakaian">Pakaian</a>
-    <a class="pill @(selected == ItemCategory.Elektronik ? "active" : "inactive")"
-       asp-controller="Home" asp-action="Index" asp-route-kategori="Elektronik">Elektronik</a>
-    <a class="pill @(selected == ItemCategory.Buku ? "active" : "inactive")"
-       asp-controller="Home" asp-action="Index" asp-route-kategori="Buku">Buku</a>
+    @foreach (var cat in CategoryHelper.AllCategories())
+    {
+        <a class="pill @(selected == cat ? "active" : "inactive")"
+           asp-controller="Home" asp-action="Index" asp-route-kategori="@cat">@CategoryHelper.DisplayName(cat)</a>
+    }
 </div>
 
 <div class="section-title">Barang Tersedia :</div>
@@ -28,15 +25,19 @@
         var images = item.Images.ToList();
         <a class="item-card" asp-controller="Item" asp-action="Detail" asp-route-id="@item.Id">
             <div class="card-image">
-                <img src="@images.First().FilePath" style="width:100%;height:100%;object-fit:cover;" />
+                <img src="@images.First().FilePath" class="card-image-fill" />
             </div>
             <div class="card-info">
                 <div class="card-row">
                     <span class="card-name">@item.NamaBarang</span>
                     <span class="card-lokasi">@item.Lokasi</span>
                 </div>
-                <div class="card-timer"> @daysLeft hari lagi</div>
+                <div class="card-timer">@daysLeft hari lagi</div>
             </div>
         </a>
+    }
+    @if (!Model.Any())
+    {
+        <p class="card-grid-empty">Belum ada barang tersedia.</p>
     }
 </div>

@@ -1,0 +1,212 @@
+@using DonationApp.Models
+@using DonationApp.Services
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var claimRequests = ViewBag.ClaimRequests as List<ClaimRequest>;
+    var selected = ViewBag.Selected as ClaimRequest;
+    var currentUserId = ViewBag.CurrentUserId as string ?? "";
+}
+
+<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div class="ppage">
+    <div class="ppage-inner" style="max-width:100%;padding:0;">
+
+        <div style="padding:16px 20px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+            <div class="ptab-bar" style="margin:0;border:none;">
+                <a asp-controller="Request" asp-action="MyRequests" class="ptab">Request Saya</a>
+                <a asp-controller="Request" asp-action="Permintaan" class="ptab active">Permintaan Donasi</a>
+                <a asp-controller="Request" asp-action="CreateView" class="ptab">Buat Request</a>
+            </div>
+        </div>
+
+        @if (claimRequests == null || !claimRequests.Any())
+        {
+            <div style="padding:48px;text-align:center;font-size:13px;color:var(--color-text-secondary);">Belum ada permintaan donasi.</div>
+        }
+        else
+        {
+            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
+
+                <div class="plist">
+                    @foreach (var r in claimRequests)
+                    {
+                        var (statusLabel, statusClass) = r.Status switch {
+                            ClaimRequestStatus.Pending => ("Menunggu", "pbadge-muted"),
+                            ClaimRequestStatus.Accepted => ("Diterima", "pbadge-claimed"),
+                            ClaimRequestStatus.Rejected => ("Ditolak", "pbadge-rejected"),
+                            ClaimRequestStatus.Shipped => ("Dikirim", "pbadge-pending"),
+                            ClaimRequestStatus.Delivered => ("Selesai", "pbadge-available"),
+                            _ => ("Unknown", "pbadge-muted")
+                        };
+                        <a class="plist-item @(selected?.Id == r.Id ? "active" : "")"
+                           asp-controller="Request" asp-action="Permintaan" asp-route-selectedId="@r.Id">
+                            @if (r.Item?.Images.Any() == true)
+                            {
+                                <img src="@r.Item.Images.First().FilePath" class="plist-thumb" style="object-fit:cover;" />
+                            }
+                            else
+                            {
+                                <div class="plist-thumb"><i class="ti ti-package" aria-hidden="true"></i></div>
+                            }
+                            <div style="flex:1;min-width:0;">
+                                <div class="plist-name">@r.Item?.NamaBarang</div>
+                                <div class="plist-sub">@((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</div>
+                            </div>
+                            <span class="pbadge @statusClass">@statusLabel</span>
+                        </a>
+                    }
+                </div>
+
+                <div class="pdetail">
+                    @if (selected == null)
+                    {
+                        <div class="pdetail-empty">Pilih permintaan untuk melihat detail.</div>
+                    }
+                    else
+                    {
+                        var alreadyReviewed = selected.Reputations.Any(r => r.ReviewerId == currentUserId);
+
+                        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+                            @if (selected.Item?.Images.Any() == true)
+                            {
+                                <img src="@selected.Item.Images.First().FilePath" style="width:60px;height:60px;border-radius:var(--border-radius-md);object-fit:cover;flex-shrink:0;" />
+                            }
+                            <div>
+                                <div class="pdetail-title" style="margin-bottom:8px;">@selected.Item?.NamaBarang</div>
+                                <div style="display:flex;gap:6px;">
+                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Item?.Kategori ?? ItemCategory.Semua)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="psec">
+                            <div class="psec-label">Donor</div>
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div class="preview-avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
+                                <div>
+                                    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
+                                    <div style="font-size:11px;color:var(--color-text-secondary);">@selected.Item?.User?.Alamat</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="psec">
+                            <div class="psec-label">Status Pengiriman</div>
+                            <div class="pstepper">
+                                <div class="pstep @(selected.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
+                                    <div class="pstep-dot @(selected.Status >= ClaimRequestStatus.Accepted ? "done" : "")"><i class="ti ti-check" aria-hidden="true"></i></div>
+                                    <div class="pstep-label">Disetujui</div>
+                                </div>
+                                <div class="pstep-line @(selected.Status >= ClaimRequestStatus.Shipped ? "done" : "")"></div>
+                                <div class="pstep @(selected.Status >= ClaimRequestStatus.Shipped ? "done" : "")">
+                                    <div class="pstep-dot @(selected.Status >= ClaimRequestStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
+                                    <div class="pstep-label">Dikirim</div>
+                                </div>
+                                <div class="pstep-line @(selected.Status >= ClaimRequestStatus.Delivered ? "done" : "")"></div>
+                                <div class="pstep @(selected.Status >= ClaimRequestStatus.Delivered ? "done" : "")">
+                                    <div class="pstep-dot @(selected.Status >= ClaimRequestStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
+                                    <div class="pstep-label">Diterima</div>
+                                </div>
+                                <div class="pstep-line @(alreadyReviewed ? "done" : "")"></div>
+                                <div class="pstep @(alreadyReviewed ? "done" : "")">
+                                    <div class="pstep-dot @(alreadyReviewed ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
+                                    <div class="pstep-label">Feedback</div>
+                                </div>
+                            </div>
+
+                            @if (selected.Status == ClaimRequestStatus.Shipped)
+                            {
+                                <form asp-controller="Item" asp-action="MarkDelivered" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="claimRequestId" value="@selected.Id" />
+                                    <button type="submit" class="pbtn pbtn-success pbtn-block">
+                                        <i class="ti ti-package" aria-hidden="true"></i> Tandai Sudah Diterima
+                                    </button>
+                                </form>
+                            }
+                            else if (selected.Status == ClaimRequestStatus.Accepted)
+                            {
+                                <p style="font-size:12px;color:var(--color-text-secondary);text-align:center;margin-top:8px;">Menunggu donor mengirim barang...</p>
+                            }
+                            else if (selected.Status == ClaimRequestStatus.Pending)
+                            {
+                                <p style="font-size:12px;color:var(--color-text-secondary);text-align:center;margin-top:8px;">Menunggu konfirmasi donor...</p>
+                            }
+                        </div>
+
+                        @if (selected.Status == ClaimRequestStatus.Delivered && !alreadyReviewed)
+                        {
+                            <div class="psec">
+                                <div class="psec-label">Beri Feedback untuk Donor</div>
+                                <form asp-controller="Reputation" asp-action="Submit" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="claimRequestId" value="@selected.Id" />
+                                    <input type="hidden" name="rating" id="ratingValue" value="0" />
+
+                                    <div style="display:flex;gap:4px;margin-bottom:12px;" id="starContainer">
+                                        @for (int star = 1; star <= 5; star++)
+                                        {
+                                            <button type="button" class="pstar-btn" data-value="@star">★</button>
+                                        }
+                                    </div>
+
+                                    <div class="pform-group">
+                                        <textarea class="pform-input" name="komentar" rows="3" placeholder="Ceritakan pengalaman Anda dengan donor ini..." style="resize:vertical;"></textarea>
+                                    </div>
+
+                                    <button type="submit" class="pbtn pbtn-primary pbtn-block">Kirim Feedback</button>
+                                </form>
+                            </div>
+                        }
+                        else if (alreadyReviewed)
+                        {
+                            var myReview = selected.Reputations.First(r => r.ReviewerId == currentUserId);
+                            <div class="psec">
+                                <div class="psec-label">Feedback Anda</div>
+                                <div style="display:flex;gap:2px;margin-bottom:8px;">
+                                    @for (int star = 1; star <= 5; star++)
+                                    {
+                                        <span style="font-size:20px;color:@(star <= myReview.Rating ? "#EF9F27" : "var(--color-border-tertiary)");">★</span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrEmpty(myReview.Komentar))
+                                {
+                                    <p style="font-size:13px;color:var(--color-text-secondary);">@myReview.Komentar</p>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.pstar-btn').forEach(function(btn) {
+            btn.addEventListener('mouseover', function() {
+                var val = parseInt(this.dataset.value);
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) {
+                    s.classList.toggle('active', i < val);
+                });
+            });
+            btn.addEventListener('mouseout', function() {
+                var selected = parseInt(document.getElementById('ratingValue').value);
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) {
+                    s.classList.toggle('active', i < selected);
+                });
+            });
+            btn.addEventListener('click', function() {
+                var val = parseInt(this.dataset.value);
+                document.getElementById('ratingValue').value = val;
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) {
+                    s.classList.toggle('active', i < val);
+                });
+            });
+        });
+    </script>
+}

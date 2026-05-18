@@ -1,0 +1,76 @@
+@model DonationApp.Models.ApplicationUser
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div class="ppage">
+    <div class="ppage-inner" style="max-width:560px;">
+
+        <div class="ppage-header">
+            <h1 class="ppage-title">Edit Profil</h1>
+        </div>
+
+        @if (TempData["EditSuccess"] != null)
+        {
+            <div style="background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:16px;font-size:13px;">
+                @TempData["EditSuccess"]
+            </div>
+        }
+
+        <div class="preview-card" style="padding:20px;">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="pform-group">
+                        <label class="pform-label">Nama Depan</label>
+                        <input class="pform-input" name="NamaDepan" value="@Model.NamaDepan" required />
+                    </div>
+                    <div class="pform-group">
+                        <label class="pform-label">Nama Belakang</label>
+                        <input class="pform-input" name="NamaBelakang" value="@Model.NamaBelakang" />
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="pform-group">
+                        <label class="pform-label">Email</label>
+                        <input class="pform-input" value="@Model.Email" disabled />
+                    </div>
+                    <div class="pform-group">
+                        <label class="pform-label">Nomor Telepon</label>
+                        <input class="pform-input" name="NomorTelepon" value="@Model.NomorTelepon" />
+                    </div>
+                </div>
+
+                <div class="pform-group">
+                    <label class="pform-label">Alamat</label>
+                    <input class="pform-input" name="Alamat" value="@Model.Alamat" placeholder="Kota / Kecamatan..." />
+                </div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="pform-group">
+                        <label class="pform-label">Provinsi</label>
+                        <select class="pform-input" name="Provinsi">
+                            @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
+                            {
+                                <option selected="@(Model.Provinsi == prov)">@prov</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="pform-group">
+                        <label class="pform-label">Kode Pos</label>
+                        <input class="pform-input" name="KodePos" value="@Model.KodePos" maxlength="5" />
+                    </div>
+                </div>
+
+                <button type="submit" class="pbtn pbtn-primary pbtn-block" style="margin-top:8px;">Simpan Perubahan</button>
+            </form>
+        </div>
+
+    </div>
+</div>

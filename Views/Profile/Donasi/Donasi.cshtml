@@ -1,0 +1,221 @@
+@using DonationApp.Models
+@using DonationApp.Services
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var donations = ViewBag.Donations as List<Item>;
+    var selected = ViewBag.Selected as Item;
+    var matchesJson = ViewBag.Matches as string;
+    var matchCount = ViewBag.MatchCount as int? ?? 0;
+    var matchContext = ViewBag.MatchContext as string ?? "";
+}
+
+<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div class="ppage">
+    <div class="ppage-inner" style="max-width:100%;padding:0;">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary);">
+            <div class="ptab-bar" style="margin:0;border:none;">
+                <a asp-controller="Donasi" asp-action="Index" class="ptab active">Donasi Saya</a>
+                <a asp-controller="Donasi" asp-action="Create" class="ptab">Buat Donasi</a>
+            </div>
+            <a asp-controller="Donasi" asp-action="Create" class="pbtn pbtn-primary" style="font-size:12px;padding:6px 14px;">
+                <i class="ti ti-plus" aria-hidden="true" style="font-size:14px;"></i> Buat Donasi
+            </a>
+        </div>
+
+        @if (donations == null || !donations.Any())
+        {
+            <div style="padding:48px;text-align:center;font-size:13px;color:var(--color-text-secondary);">
+                Belum ada donasi.
+                <a asp-controller="Donasi" asp-action="Create" class="pbtn pbtn-primary" style="display:inline-flex;margin-top:12px;">Buat Donasi Pertama</a>
+            </div>
+        }
+        else
+        {
+            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
+
+                <div class="plist">
+                    @foreach (var d in donations)
+                    {
+                        var accepted = d.ClaimRequests.FirstOrDefault(r =>
+                            r.Status == ClaimRequestStatus.Accepted ||
+                            r.Status == ClaimRequestStatus.Shipped ||
+                            r.Status == ClaimRequestStatus.Delivered);
+
+                        var (statusLabel, statusClass) = accepted?.Status switch {
+                            ClaimRequestStatus.Accepted => ("Diterima", "pbadge-claimed"),
+                            ClaimRequestStatus.Shipped => ("Dikirim", "pbadge-pending"),
+                            ClaimRequestStatus.Delivered => ("Selesai", "pbadge-available"),
+                            _ => d.Status == ItemStatus.Available ? ("Tersedia", "pbadge-available") : ("Diambil", "pbadge-claimed")
+                        };
+
+                        <a class="plist-item @(selected?.Id == d.Id ? "active" : "")"
+                           asp-controller="Donasi" asp-action="Index" asp-route-selectedId="@d.Id">
+                            @if (d.Images.Any())
+                            {
+                                <img src="@d.Images.First().FilePath" class="plist-thumb" style="object-fit:cover;" />
+                            }
+                            else
+                            {
+                                <div class="plist-thumb"><i class="ti ti-gift" aria-hidden="true"></i></div>
+                            }
+                            <div style="flex:1;min-width:0;">
+                                <div class="plist-name">@d.NamaBarang</div>
+                                <div class="plist-sub">@CategoryHelper.DisplayName(d.Kategori) · @((d.ExpiresAt - DateTime.UtcNow).Days) hari lagi</div>
+                            </div>
+                            <span class="pbadge @statusClass">@statusLabel</span>
+                        </a>
+                    }
+                </div>
+
+                <div class="pdetail">
+                    @if (selected == null)
+                    {
+                        <div class="pdetail-empty">Pilih donasi untuk melihat detail.</div>
+                    }
+                    else
+                    {
+                        var accepted = selected.ClaimRequests.FirstOrDefault(r =>
+                            r.Status == ClaimRequestStatus.Accepted ||
+                            r.Status == ClaimRequestStatus.Shipped ||
+                            r.Status == ClaimRequestStatus.Delivered);
+
+                        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+                            @if (selected.Images.Any())
+                            {
+                                <img src="@selected.Images.First().FilePath" style="width:60px;height:60px;border-radius:var(--border-radius-md);object-fit:cover;flex-shrink:0;" />
+                            }
+                            <div>
+                                <div class="pdetail-title" style="margin-bottom:8px;">@selected.NamaBarang</div>
+                                <div style="display:flex;gap:6px;">
+                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
+                                    <span class="pbadge pbadge-muted">@selected.Kondisi</span>
+                                    <span class="pbadge pbadge-muted">@selected.Lokasi</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (accepted != null)
+                        {
+                            <div class="psec">
+                                <div class="psec-label">Penerima</div>
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <div class="preview-avatar">@(accepted.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
+                                    <div>
+                                        <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);">@accepted.User?.NamaDepan @accepted.User?.NamaBelakang</div>
+                                        <div style="font-size:11px;color:var(--color-text-secondary);">@accepted.User?.Alamat</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="psec">
+                                <div class="psec-label">Status Pengiriman</div>
+                                <div class="pstepper">
+                                    <div class="pstep @(accepted.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
+                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
+                                            @if (accepted.Status >= ClaimRequestStatus.Accepted) { <i class="ti ti-check" aria-hidden="true"></i> } else { <i class="ti ti-check" aria-hidden="true"></i> }
+                                        </div>
+                                        <div class="pstep-label">Disetujui</div>
+                                    </div>
+                                    <div class="pstep-line @(accepted.Status >= ClaimRequestStatus.Shipped ? "done" : "")"></div>
+                                    <div class="pstep @(accepted.Status >= ClaimRequestStatus.Shipped ? "done" : "")">
+                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Shipped ? "done" : "")">
+                                            <i class="ti ti-truck" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="pstep-label">Dikirim</div>
+                                    </div>
+                                    <div class="pstep-line @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")"></div>
+                                    <div class="pstep @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")">
+                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")">
+                                            <i class="ti ti-package" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="pstep-label">Diterima</div>
+                                    </div>
+                                    <div class="pstep-line @(accepted.Status == ClaimRequestStatus.Delivered && accepted.Reputations.Any() ? "done" : "")"></div>
+                                    <div class="pstep @(accepted.Reputations.Any() ? "done" : "")">
+                                        <div class="pstep-dot @(accepted.Reputations.Any() ? "done" : "")">
+                                            <i class="ti ti-star" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="pstep-label">Feedback</div>
+                                    </div>
+                                </div>
+
+                                @if (accepted.Status == ClaimRequestStatus.Accepted)
+                                {
+                                    <form asp-controller="Item" asp-action="MarkShipped" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="claimRequestId" value="@accepted.Id" />
+                                        <button type="submit" class="pbtn pbtn-primary pbtn-block">
+                                            <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
+                                        </button>
+                                    </form>
+                                }
+                                else if (accepted.Status == ClaimRequestStatus.Shipped)
+                                {
+                                    <p style="font-size:12px;color:var(--color-text-secondary);text-align:center;margin-top:8px;">Menunggu konfirmasi penerima...</p>
+                                }
+                                else if (accepted.Status == ClaimRequestStatus.Delivered)
+                                {
+                                    <p style="font-size:12px;color:var(--color-text-success);text-align:center;margin-top:8px;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="psec">
+                                <div class="psec-label">Permintaan Masuk (@selected.ClaimRequests.Count)</div>
+                                @if (!selected.ClaimRequests.Any())
+                                {
+                                    <p style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:12px 0;">Belum ada permintaan.</p>
+                                }
+                                @foreach (var r in selected.ClaimRequests)
+                                {
+                                    var rAvatar = r.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+                                    var rName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
+                                    <div class="preq-row">
+                                        <div class="preq-avatar">@rAvatar</div>
+                                        <span class="preq-name">@rName</span>
+                                        <div class="preq-actions">
+                                            @if (r.Status == ClaimRequestStatus.Rejected)
+                                            {
+                                                <span class="pbadge pbadge-rejected">Ditolak</span>
+                                            }
+                                            else if (selected.Status == ItemStatus.Available)
+                                            {
+                                                <form asp-controller="Item" asp-action="Accept" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                                    <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
+                                                </form>
+                                                <form asp-controller="Item" asp-action="Reject" method="post" style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="requestId" value="@r.Id" />
+                                                    <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>
+                                                </form>
+                                            }
+                                            <form asp-controller="Item" asp-action="Chat" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="itemId" value="@selected.Id" />
+                                                <input type="hidden" name="otherUserId" value="@r.UserId" />
+                                                <button type="submit" class="pbtn pbtn-primary" style="font-size:12px;padding:4px 10px;">Chat</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_MatchModal.cshtml", new ViewDataDictionary(Html.MetadataProvider, Html.ViewData.ModelState) {
+    { "MatchesJson", matchesJson },
+    { "MatchCount", matchCount },
+    { "MatchContext", matchContext }
+})

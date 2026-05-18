@@ -1,0 +1,101 @@
+@{
+    var matchesJson = ViewData["MatchesJson"] as string;
+    var matchCount = (int)(ViewData["MatchCount"] ?? 0);
+    var matchContext = ViewData["MatchContext"] as string ?? "";
+}
+
+@if (!string.IsNullOrEmpty(matchesJson))
+{
+    <div id="matchModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-xl);width:100%;max-width:400px;overflow:hidden;">
+            <div style="padding:16px 20px 12px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:flex-start;justify-content:space-between;">
+                <div>
+                    <p style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0 0 3px;">Kecocokan ditemukan!</p>
+                    <p style="font-size:12px;color:var(--color-text-secondary);margin:0;">
+                        @matchCount @(matchContext == "donasi" ? "request" : "donasi") cocok dengan postingan Anda
+                    </p>
+                </div>
+                <button onclick="closeMatchModal()" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:18px;line-height:1;padding:0;">
+                    <i class="ti ti-x" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div style="padding:16px 20px;">
+                <div id="matchCard" style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;">
+                    <div style="position:relative;height:180px;background:var(--color-background-secondary);">
+                        <div id="matchCardImageInner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                            <i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:var(--color-text-secondary);"></i>
+                        </div>
+                        <div id="matchCardBadges" style="position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:2;"></div>
+                    </div>
+                    <div style="padding:14px 16px 4px;">
+                        <p id="matchCardTitle" style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px;"></p>
+                        <p id="matchCardLocation" style="font-size:12px;color:var(--color-text-secondary);margin:0 0 8px;"></p>
+                        <p id="matchCardDesc" style="font-size:13px;color:var(--color-text-secondary);margin:0 0 10px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;"></p>
+                        <div id="matchCardReasons" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                            <div id="matchCardAvatar" style="width:22px;height:22px;border-radius:50%;background:var(--color-background-info);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--color-text-info);flex-shrink:0;"></div>
+                            <span id="matchCardPoster" style="font-size:12px;color:var(--color-text-secondary);"></span>
+                        </div>
+                    </div>
+                    <div style="padding:0 16px 14px;display:flex;gap:8px;">
+                        <button onclick="prevMatch()" id="matchPrevBtn" class="pbtn" style="flex:1;font-size:12px;padding:7px 0;">← Prev</button>
+                        <a id="matchViewBtn" href="#" class="pbtn pbtn-primary" style="flex:2;font-size:12px;padding:7px 0;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">Lihat →</a>
+                        <button onclick="nextMatch()" id="matchNextBtn" class="pbtn" style="flex:1;font-size:12px;padding:7px 0;">Next →</button>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;" id="matchDots"></div>
+                <p id="matchCounter" style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin:6px 0 0;"></p>
+            </div>
+            <div style="padding:0 20px 16px;">
+                <button onclick="closeMatchModal()" class="pbtn pbtn-block" style="font-size:13px;padding:8px 0;">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var matchData = @Html.Raw(matchesJson);
+        var matchIndex = 0;
+        var matchContext = '@matchContext';
+
+        function renderMatchCard() {
+            if (!matchData.length) return;
+            var m = matchData[matchIndex];
+            var imgEl = document.getElementById('matchCardImageInner');
+            if (m.firstImage) {
+                imgEl.innerHTML = '<img src="' + m.firstImage + '" style="width:100%;height:100%;object-fit:cover;" />';
+            } else {
+                imgEl.innerHTML = '<i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:var(--color-text-secondary);"></i>';
+            }
+            var scoreColor = m.score >= 80 ? 'var(--color-text-info)' : m.score >= 60 ? 'var(--color-text-success)' : 'var(--color-text-secondary)';
+            document.getElementById('matchCardBadges').innerHTML =
+                '<span style="background:var(--color-background-info);color:var(--color-text-info);font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;">' + m.kategori + '</span>' +
+                '<span style="background:var(--color-background-secondary);color:' + scoreColor + ';font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;border:0.5px solid var(--color-border-tertiary);">' + m.score + ' pts</span>';
+            document.getElementById('matchCardTitle').textContent = m.title;
+            document.getElementById('matchCardLocation').textContent = (m.lokasi || '') + (m.provinsi ? ' · ' + m.provinsi : '');
+            document.getElementById('matchCardDesc').textContent = m.deskripsi;
+            document.getElementById('matchCardReasons').innerHTML = (m.reasons || []).map(function(r) {
+                return '<span style="font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);padding:2px 8px;border-radius:99px;">' + r + '</span>';
+            }).join('');
+            document.getElementById('matchCardAvatar').textContent = m.posterAvatar;
+            document.getElementById('matchCardPoster').textContent = m.posterName + ' · ' + m.createdAgo + ' hari lalu';
+            var baseUrl = matchContext === 'donasi' ? '/Request/Detail/' : '/Item/Detail/';
+            document.getElementById('matchViewBtn').href = baseUrl + m.id;
+            document.getElementById('matchDots').innerHTML = matchData.map(function(_, i) {
+                return '<div style="width:8px;height:8px;border-radius:50%;background:' + (i === matchIndex ? 'var(--color-text-info)' : 'var(--color-border-tertiary)') + ';cursor:pointer;" onclick="goToMatch(' + i + ')"></div>';
+            }).join('');
+            document.getElementById('matchCounter').textContent = (matchIndex + 1) + ' dari ' + matchData.length + ' kecocokan';
+            document.getElementById('matchPrevBtn').style.opacity = matchIndex === 0 ? '0.4' : '1';
+            document.getElementById('matchNextBtn').style.opacity = matchIndex === matchData.length - 1 ? '0.4' : '1';
+        }
+
+        function goToMatch(i) { matchIndex = i; renderMatchCard(); }
+        function prevMatch() { if (matchIndex > 0) { matchIndex--; renderMatchCard(); } }
+        function nextMatch() { if (matchIndex < matchData.length - 1) { matchIndex++; renderMatchCard(); } }
+        function closeMatchModal() { var m = document.getElementById('matchModal'); if (m) m.style.display = 'none'; }
+
+        if (matchData.length > 0) {
+            renderMatchCard();
+            document.getElementById('matchModal').addEventListener('click', function(e) { if (e.target === this) closeMatchModal(); });
+        }
+    </script>
+}

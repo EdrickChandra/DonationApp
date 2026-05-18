@@ -1,0 +1,66 @@
+@using DonationApp.Models
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower() ?? "";
+    var user = ViewBag.NavUser as ApplicationUser;
+    var unreadNotif = ViewBag.UnreadCount as int? ?? 0;
+    var unreadMessages = ViewBag.UnreadMessageCount as int? ?? 0;
+    var averageRating = ViewBag.AverageRating as double? ?? 0;
+    var avatarLetter = user?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+
+    bool IsActive(string controller) => currentController == controller.ToLower();
+}
+
+<nav class="pnav">
+    <div class="pnav-user">
+        <a asp-controller="Profile" asp-action="Edit" class="pnav-avatar-link">
+            <div class="pnav-avatar">@avatarLetter</div>
+            <span class="pnav-username">@user?.NamaDepan</span>
+        </a>
+    </div>
+
+    <div class="pnav-links">
+        <a asp-controller="Profile" asp-action="Overview"
+           class="pnav-link @(IsActive("profile") ? "active" : "")">
+            <i class="ti ti-layout-dashboard" aria-hidden="true"></i>
+            Overview
+        </a>
+        <a asp-controller="Donasi" asp-action="Index"
+           class="pnav-link @(IsActive("donasi") ? "active" : "")">
+            <i class="ti ti-gift" aria-hidden="true"></i>
+            Donasi
+        </a>
+        <a asp-controller="Request" asp-action="MyRequests"
+           class="pnav-link @(IsActive("request") && currentAction != "index" && currentAction != "detail" ? "active" : "")">
+            <i class="ti ti-list-search" aria-hidden="true"></i>
+            Request
+        </a>
+        <a asp-controller="Pesan" asp-action="Index"
+           class="pnav-link @(IsActive("pesan") ? "active" : "")">
+            <i class="ti ti-message-2" aria-hidden="true"></i>
+            Pesan
+            @if (unreadMessages > 0)
+            {
+                <span class="pnav-badge">@unreadMessages</span>
+            }
+        </a>
+        <a asp-controller="Notifikasi" asp-action="Index"
+           class="pnav-link @(IsActive("notifikasi") ? "active" : "")">
+            <i class="ti ti-bell" aria-hidden="true"></i>
+            Notifikasi
+            @if (unreadNotif > 0)
+            {
+                <span class="pnav-badge">@unreadNotif</span>
+            }
+        </a>
+    </div>
+
+    <div class="pnav-actions">
+        <form asp-controller="Account" asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="pnav-logout" title="Keluar">
+                <i class="ti ti-logout" aria-hidden="true"></i>
+            </button>
+        </form>
+    </div>
+</nav>

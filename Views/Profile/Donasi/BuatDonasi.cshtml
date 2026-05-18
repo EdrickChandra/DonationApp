@@ -1,0 +1,245 @@
+@using DonationApp.Models
+@using DonationApp.Services
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div class="ppage">
+    <div class="ppage-inner" style="max-width:600px;">
+
+        <div class="ppage-header">
+            <h1 class="ppage-title">Buat Donasi</h1>
+            <a asp-controller="Donasi" asp-action="Index" class="pbtn" style="font-size:12px;">
+                <i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali
+            </a>
+        </div>
+
+        @if (TempData["DonasiError"] != null)
+        {
+            <div class="pform-error-banner">@TempData["DonasiError"]</div>
+        }
+
+        <div class="preview-card" style="padding:20px;">
+            <form id="donasi-form" asp-action="Create" method="post" enctype="multipart/form-data" novalidate>
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="DetailTambahanJson" name="DetailTambahanJson" />
+
+                <div class="pform-group">
+                    <label class="pform-label">Nama Barang</label>
+                    <input class="pform-input" name="NamaBarang" placeholder="Masukkan nama barang..." required />
+                    <span class="pform-error" data-for="NamaBarang">Nama barang wajib diisi.</span>
+                </div>
+
+                <div class="pform-group">
+                    <label class="pform-label">Kategori</label>
+                    <select class="pform-input" name="Kategori" id="donasi-kategori" onchange="showDonasFields(this.value)" required>
+                        <option value="">Pilih Kategori</option>
+                        @foreach (var cat in CategoryHelper.AllCategories().Where(c => c != ItemCategory.Semua))
+                        {
+                            <option value="@((int)cat)">@CategoryHelper.DisplayName(cat)</option>
+                        }
+                    </select>
+                    <span class="pform-error" data-for="Kategori">Kategori wajib dipilih.</span>
+                </div>
+
+                <div id="donasi-detail-fields"></div>
+
+                <div class="pform-group">
+                    <label class="pform-label">Kondisi Barang</label>
+                    <input type="hidden" id="kondisiInput" name="Kondisi" value="@((int)ItemCondition.Baru)" />
+                    <div class="pcond-group">
+                        <button type="button" class="pcond-btn selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                        <button type="button" class="pcond-btn" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                    </div>
+                </div>
+
+                <div class="pform-group">
+                    <label class="pform-label">Lokasi</label>
+                    <input class="pform-input" name="Lokasi" placeholder="Kota / Kecamatan..." required />
+                    <span class="pform-error" data-for="Lokasi">Lokasi wajib diisi.</span>
+                </div>
+
+                <div class="pform-group">
+                    <label class="pform-label">Deskripsi</label>
+                    <textarea class="pform-input" name="Deskripsi" rows="4" placeholder="Ceritakan kondisi barang secara detail..." required style="resize:vertical;"></textarea>
+                    <span class="pform-error" data-for="Deskripsi">Deskripsi wajib diisi.</span>
+                </div>
+
+                <div class="pform-group">
+                    <label class="pform-label">
+                        Foto Barang
+                        <span class="pform-hint">(maks. 5, 5MB, JPG/PNG)</span>
+                    </label>
+                    <input type="file" id="donasi-file-input" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
+                    <div class="pupload-zone" onclick="document.getElementById('donasi-file-input').click()">
+                        <i class="ti ti-photo-plus" aria-hidden="true" style="font-size:20px;display:block;margin-bottom:6px;"></i>
+                        Klik untuk unggah foto
+                    </div>
+                    <span class="pform-error" id="donasi-image-error">Minimal 1 foto harus diunggah.</span>
+                    <div id="donasi-preview" class="pimage-grid"></div>
+                </div>
+
+                <button type="submit" class="pbtn pbtn-primary pbtn-block" onclick="return validateDonasi()">
+                    Posting Donasi
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var categoryFields = {
+            "@((int)ItemCategory.Pakaian)": [
+                { key:"Ukuran", label:"Ukuran", type:"select", options:["XS","S","M","L","XL","XXL"] },
+                { key:"JenisKelamin", label:"Jenis Kelamin", type:"select", options:["Pria","Wanita","Unisex"] }
+            ],
+            "@((int)ItemCategory.Elektronik)": [
+                { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Samsung, Apple" },
+                { key:"Model", label:"Model / Tipe", type:"text", placeholder:"e.g. Galaxy S21" },
+                { key:"Tahun", label:"Tahun", type:"text", placeholder:"e.g. 2020" }
+            ],
+            "@((int)ItemCategory.PerabotRumah)": [
+                { key:"Material", label:"Material", type:"select", options:["Kayu","Besi","Plastik","Kain","Lainnya"] },
+                { key:"Dimensi", label:"Dimensi", type:"text", placeholder:"e.g. 120x60x75 cm" }
+            ],
+            "@((int)ItemCategory.MainanHobi)": [
+                { key:"UsiaRekomendasi", label:"Usia Rekomendasi", type:"select", options:["0-1 tahun","1-3 tahun","3-5 tahun","5-12 tahun","12+ tahun"] },
+                { key:"KondisiDetail", label:"Kondisi Detail", type:"text", placeholder:"e.g. ada goresan kecil" }
+            ],
+            "@((int)ItemCategory.AlatMusik)": [
+                { key:"JenisInstrumen", label:"Jenis Instrumen", type:"select", options:["Gitar","Bass","Piano/Keyboard","Drum/Perkusi","Biola/String","Tiup Kayu","Tiup Logam","Vokal/Mikrofon","DJ/Elektronik","Lainnya"] },
+                { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Yamaha, Roland" }
+            ]
+        };
+
+        function showDonasFields(val) {
+            var container = document.getElementById('donasi-detail-fields');
+            container.innerHTML = '';
+            var fields = categoryFields[val];
+            if (!fields) return;
+            fields.forEach(function(f) {
+                var div = document.createElement('div');
+                div.className = 'pform-group';
+                var label = document.createElement('label');
+                label.className = 'pform-label';
+                label.textContent = f.label;
+                div.appendChild(label);
+                var input;
+                if (f.type === 'select') {
+                    input = document.createElement('select');
+                    input.className = 'pform-input';
+                    input.dataset.key = f.key;
+                    input.id = 'donasi-field-' + f.key;
+                    var empty = document.createElement('option');
+                    empty.value = ''; empty.textContent = 'Pilih ' + f.label;
+                    input.appendChild(empty);
+                    f.options.forEach(function(o) {
+                        var opt = document.createElement('option');
+                        opt.value = o; opt.textContent = o;
+                        input.appendChild(opt);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.className = 'pform-input';
+                    input.type = 'text';
+                    input.placeholder = f.placeholder || '';
+                    input.dataset.key = f.key;
+                    input.id = 'donasi-field-' + f.key;
+                }
+                div.appendChild(input);
+                container.appendChild(div);
+            });
+        }
+
+        document.querySelectorAll('.pcond-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.pcond-btn').forEach(function(b) { b.classList.remove('selected'); });
+                this.classList.add('selected');
+                document.getElementById('kondisiInput').value = this.dataset.value;
+            });
+        });
+
+        var imageStore = [];
+
+        document.getElementById('donasi-file-input').addEventListener('change', function() {
+            Array.from(this.files).forEach(function(f) { if (imageStore.length < 5) imageStore.push(f); });
+            this.value = '';
+            renderPreviews();
+            syncInput();
+        });
+
+        function renderPreviews() {
+            var container = document.getElementById('donasi-preview');
+            container.innerHTML = '';
+            imageStore.forEach(function(file, i) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var wrap = document.createElement('div');
+                    wrap.className = 'pimage-thumb';
+                    var img = document.createElement('img');
+                    img.src = e.target.result;
+                    var del = document.createElement('button');
+                    del.type = 'button';
+                    del.className = 'pimage-del';
+                    del.textContent = '✕';
+                    del.onclick = (function(idx) { return function() { imageStore.splice(idx, 1); renderPreviews(); syncInput(); }; })(i);
+                    wrap.appendChild(img); wrap.appendChild(del); container.appendChild(wrap);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function syncInput() {
+            var dt = new DataTransfer();
+            imageStore.forEach(function(f) { dt.items.add(f); });
+            document.getElementById('donasi-file-input').files = dt.files;
+        }
+
+        function validateDonasi() {
+            var valid = true;
+            var required = [
+                { name: 'NamaBarang' },
+                { name: 'Kategori' },
+                { name: 'Lokasi' },
+                { name: 'Deskripsi' }
+            ];
+            required.forEach(function(f) {
+                var el = document.querySelector('#donasi-form [name="' + f.name + '"]');
+                var err = document.querySelector('#donasi-form [data-for="' + f.name + '"]');
+                if (el && !el.value.trim()) {
+                    el.classList.add('error');
+                    if (err) err.style.display = 'block';
+                    valid = false;
+                } else {
+                    if (el) el.classList.remove('error');
+                    if (err) err.style.display = 'none';
+                }
+            });
+            var imgErr = document.getElementById('donasi-image-error');
+            if (imageStore.length === 0) {
+                imgErr.style.display = 'block';
+                valid = false;
+            } else {
+                imgErr.style.display = 'none';
+            }
+            if (valid) {
+                var katEl = document.getElementById('donasi-kategori');
+                var fields = categoryFields[katEl.value];
+                var result = {};
+                if (fields) {
+                    fields.forEach(function(f) {
+                        var el = document.getElementById('donasi-field-' + f.key);
+                        if (el && el.value) result[f.key] = el.value;
+                    });
+                }
+                document.getElementById('DetailTambahanJson').value = Object.keys(result).length > 0 ? JSON.stringify(result) : '';
+            }
+            return valid;
+        }
+    </script>
+}

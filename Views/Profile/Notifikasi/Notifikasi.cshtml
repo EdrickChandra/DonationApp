@@ -1,0 +1,97 @@
+@using DonationApp.Models
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var unread = ViewBag.Unread as List<Notification>;
+    var read = ViewBag.Read as List<Notification>;
+    var tab = ViewBag.Tab as string ?? "unread";
+}
+
+<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div class="ppage">
+    <div class="ppage-inner" style="max-width:680px;">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+            <div class="ptab-bar" style="margin:0;border:none;">
+                <a asp-controller="Notifikasi" asp-action="Index" asp-route-tab="unread"
+                   class="ptab @(tab == "unread" ? "active" : "")">
+                    Belum Dibaca
+                    @if (unread != null && unread.Any())
+                    {
+                        <span class="pnav-badge">@unread.Count</span>
+                    }
+                </a>
+                <a asp-controller="Notifikasi" asp-action="Index" asp-route-tab="read"
+                   class="ptab @(tab == "read" ? "active" : "")">Sudah Dibaca</a>
+            </div>
+            @if (tab == "unread" && unread != null && unread.Any())
+            {
+                <form asp-controller="Notifikasi" asp-action="MarkAllRead" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="pbtn" style="font-size:12px;padding:5px 12px;">Tandai semua dibaca</button>
+                </form>
+            }
+        </div>
+
+        @if (tab == "unread")
+        {
+            @if (unread == null || !unread.Any())
+            {
+                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:var(--color-text-secondary);">Tidak ada notifikasi baru.</div>
+            }
+            else
+            {
+                @foreach (var n in unread)
+                {
+                    <div class="pnotif-item unread">
+                        <div class="pnotif-dot"></div>
+                        <div style="flex:1;">
+                            <div class="pnotif-msg">@n.Message</div>
+                            <div class="pnotif-time">@((DateTime.UtcNow - n.CreatedAt).Days) hari lalu</div>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+                            @if (n.Link != null)
+                            {
+                                <a href="@n.Link" class="pnotif-link">Lihat</a>
+                            }
+                            <form asp-controller="Notifikasi" asp-action="MarkRead" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@n.Id" />
+                                <button type="submit" class="pnotif-mark" title="Tandai dibaca">
+                                    <i class="ti ti-check" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            @if (read == null || !read.Any())
+            {
+                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:var(--color-text-secondary);">Tidak ada notifikasi yang sudah dibaca.</div>
+            }
+            else
+            {
+                @foreach (var n in read)
+                {
+                    <div class="pnotif-item" style="opacity:0.6;">
+                        <div style="width:8px;height:8px;flex-shrink:0;margin-top:4px;"></div>
+                        <div style="flex:1;">
+                            <div class="pnotif-msg">@n.Message</div>
+                            <div class="pnotif-time">@((DateTime.UtcNow - n.CreatedAt).Days) hari lalu</div>
+                        </div>
+                        @if (n.Link != null)
+                        {
+                            <a href="@n.Link" class="pnotif-link" style="flex-shrink:0;">Lihat</a>
+                        }
+                    </div>
+                }
+            }
+        }
+
+    </div>
+</div>

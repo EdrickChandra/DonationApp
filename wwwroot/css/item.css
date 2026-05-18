@@ -307,3 +307,274 @@
     border-radius: 8px;
     object-fit: contain;
 }
+
+.detail-image-empty {
+    background: var(--card-bg, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-image-empty-icon {
+    font-size: 64px;
+    color: var(--text-muted, #475569);
+}
+
+.detail-poster-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.detail-poster-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.detail-poster-name {
+    font-size: 12px;
+    color: var(--text-secondary, #94a3b8);
+}
+
+.form-label-hint {
+    font-weight: 400;
+    color: var(--text-muted, #94a3b8);
+}
+
+.offers-section {
+    max-width: 820px;
+    margin: 32px auto 0;
+}
+
+.offers-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #e2e8f0);
+    margin-bottom: 12px;
+}
+
+.offer-card {
+    background: var(--card-bg, #111827);
+    border: 1px solid var(--border, #1e293b);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.offer-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.offer-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary, #e2e8f0);
+    margin: 0;
+}
+
+.offer-card-time {
+    font-size: 11px;
+    color: var(--text-muted, #64748b);
+    margin: 0;
+}
+
+.offer-card-desc {
+    font-size: 13px;
+    color: var(--text-secondary, #94a3b8);
+    margin: 0 0 10px;
+}
+
+.offer-card-images {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.offer-card-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--border, #1e293b);
+}
+.detail-image-empty {
+    background: var(--card-bg, #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.detail-image-empty-icon {
+    font-size: 64px;
+    color: var(--text-muted, #475569);
+}
+
+.detail-poster-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.detail-poster-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.detail-poster-name {
+    font-size: 12px;
+    color: var(--text-secondary, #94a3b8);
+}
+
+.form-label-hint {
+    font-weight: 400;
+    color: var(--text-muted, #94a3b8);
+}
+
+.offers-section {
+    max-width: 820px;
+    margin: 32px auto 0;
+}
+
+.offers-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #e2e8f0);
+    margin-bottom: 12px;
+}
+
+.offer-card {
+    background: var(--card-bg, #111827);
+    border: 1px solid var(--border, #1e293b);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.offer-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.offer-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary, #e2e8f0);
+    margin: 0;
+}
+
+.offer-card-time {
+    font-size: 11px;
+    color: var(--text-muted, #64748b);
+    margin: 0;
+}
+
+.offer-card-desc {
+    font-size: 13px;
+    color: var(--text-secondary, #94a3b8);
+    margin: 0 0 10px;
+}
+
+.offer-card-images {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.offer-card-img {
+    width: 72px;
+    height: 72px;
+    border-radius: 6px;
+    object-fit: cover;
+    border: 1px solid var(--border, #1e293b);
+}
+
+.card-image-fill {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.card-image-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card-bg, #1e293b);
+}
+
+.card-image-empty-icon {
+    font-size: 32px;
+    color: var(--text-muted, #475569);
+}
+
+.card-badge-request {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: #0ea5e9;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 99px;
+}
+
+.card-poster-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.card-poster-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.card-poster-name {
+    font-size: 11px;
+    color: var(--text-secondary, #94a3b8);
+}
+
+.card-grid-empty {
+    font-size: 13px;
+    color: var(--text-muted, #64748b);
+    padding: 24px 0;
+    grid-column: 1 / -1;
+    text-align: center;
+}

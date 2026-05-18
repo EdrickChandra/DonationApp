@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DonationApp.Data;
 using DonationApp.Models;
+using DonationApp.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
 
 namespace DonationApp.Controllers;
 
@@ -13,13 +15,15 @@ public class ItemController : BaseController
     private readonly AppDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _environment;
+    private readonly MatchingService _matchingService;
 
-    public ItemController(AppDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment)
+    public ItemController(AppDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment, MatchingService matchingService)
         : base(context, userManager)
     {
         _context = context;
         _userManager = userManager;
         _environment = environment;
+        _matchingService = matchingService;
     }
 
     public IActionResult Create()
@@ -29,7 +33,7 @@ public class ItemController : BaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Item item, List<IFormFile> Images)
+    public async Task<IActionResult> Create(Item item, List<IFormFile> Images, string? DetailTambahanJson)
     {
         ModelState.Remove("UserId");
         ModelState.Remove("User");
@@ -37,19 +41,25 @@ public class ItemController : BaseController
 
         if (Images == null || Images.Count == 0)
         {
-            ModelState.AddModelError("Images", "Minimal 1 foto harus diunggah.");
-            return View(item);
+            TempData["DonasiError"] = "Minimal 1 foto harus diunggah.";
+            return RedirectToAction("Index", "Donasi");
         }
 
         if (!ModelState.IsValid)
-            return View(item);
+        {
+            TempData["DonasiError"] = "Pastikan semua field wajib sudah diisi dengan benar.";
+            return RedirectToAction("Index", "Donasi");
+        }
 
         var userId = _userManager.GetUserId(User)!;
+        var user = await _userManager.FindByIdAsync(userId);
 
         item.CreatedAt = DateTime.UtcNow;
         item.ExpiresAt = DateTime.UtcNow.AddDays(7);
         item.Status = ItemStatus.Available;
         item.UserId = userId;
+        item.Provinsi = user?.Provinsi ?? string.Empty;
+        item.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
         _context.Items.Add(item);
         await _context.SaveChangesAsync();
@@ -83,7 +93,43 @@ public class ItemController : BaseController
         }
 
         await _context.SaveChangesAsync();
-        return RedirectToAction("Index", "Profile", new { section = "overview" });
+
+        var savedItem = await _context.Items
+            .Include(i => i.Images)
+            .Include(i => i.User)
+            .FirstOrDefaultAsync(i => i.Id == item.Id);
+
+        if (savedItem != null)
+        {
+            var matches = await _matchingService.FindMatchesForItem(savedItem);
+            if (matches.Any())
+            {
+                var matchData = matches.Select(m => new
+                {
+                    id = m.ItemRequest.Id,
+                    title = m.ItemRequest.Title,
+                    kategori = m.ItemRequest.Kategori.ToString(),
+                    lokasi = m.ItemRequest.Lokasi,
+                    provinsi = m.ItemRequest.Provinsi,
+                    deskripsi = m.ItemRequest.Deskripsi,
+                    score = m.Score,
+                    reasons = m.MatchReasons,
+                    posterName = m.ItemRequest.User != null
+                        ? m.ItemRequest.User.NamaDepan + " " + m.ItemRequest.User.NamaBelakang
+                        : "Unknown",
+                    posterAvatar = m.ItemRequest.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
+                    createdAgo = (DateTime.UtcNow - m.ItemRequest.CreatedAt).Days,
+                    firstImage = m.ItemRequest.Images.FirstOrDefault()?.FilePath,
+                    type = "request"
+                }).ToList();
+
+                TempData["Matches"] = JsonSerializer.Serialize(matchData);
+                TempData["MatchCount"] = matches.Count.ToString();
+                TempData["MatchContext"] = "donasi";
+            }
+        }
+
+        return RedirectToAction("Index", "Donasi");
     }
 
     [AllowAnonymous]
@@ -136,7 +182,7 @@ public class ItemController : BaseController
             {
                 UserId = item.UserId,
                 Message = $"{requesterName} meminta barang \"{item.NamaBarang}\" milik Anda.",
-                Link = "/Profile?section=permintaan&itemId=" + itemId,
+                Link = "/Donasi/Index?selectedId=" + itemId,
                 CreatedAt = DateTime.UtcNow
             });
 
@@ -172,7 +218,7 @@ public class ItemController : BaseController
                 c.DonorId == donorId);
 
         if (existing != null)
-            return RedirectToAction("Index", "Profile", new { section = "pesan", convId = existing.Id });
+            return RedirectToAction("Index", "Pesan", new { convId = existing.Id });
 
         var claimRequest = await _context.ClaimRequests
             .FirstOrDefaultAsync(r => r.ItemId == itemId && r.UserId == requesterId);
@@ -192,35 +238,69 @@ public class ItemController : BaseController
         _context.Conversations.Add(conversation);
         await _context.SaveChangesAsync();
 
-        return RedirectToAction("Index", "Profile", new { section = "pesan", convId = conversation.Id });
+        return RedirectToAction("Index", "Pesan", new { convId = conversation.Id });
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Accept(int requestId)
+    public async Task<IActionResult> MarkShipped(int claimRequestId)
     {
         var userId = _userManager.GetUserId(User)!;
 
         var request = await _context.ClaimRequests
             .Include(r => r.Item)
-            .FirstOrDefaultAsync(r => r.Id == requestId);
+            .FirstOrDefaultAsync(r => r.Id == claimRequestId);
 
         if (request == null || request.Item == null || request.Item.UserId != userId)
-            return RedirectToAction("Index", "Profile", new { section = "permintaan" });
+            return RedirectToAction("Index", "Donasi");
 
-        request.Status = ClaimRequestStatus.Accepted;
-        request.Item.Status = ItemStatus.Claimed;
+        if (request.Status != ClaimRequestStatus.Accepted)
+            return RedirectToAction("Index", "Donasi");
+
+        request.Status = ClaimRequestStatus.Shipped;
+        request.UpdatedAt = DateTime.UtcNow;
 
         _context.Notifications.Add(new Notification
         {
             UserId = request.UserId,
-            Message = $"Permintaan Anda untuk barang \"{request.Item.NamaBarang}\" telah diterima!",
-            Link = "/Item/Detail/" + request.Item.Id,
+            Message = $"Barang \"{request.Item.NamaBarang}\" telah dikirim oleh donor. Silakan konfirmasi penerimaan.",
+            Link = "/Request/Permintaan",
             CreatedAt = DateTime.UtcNow
         });
 
         await _context.SaveChangesAsync();
-        return RedirectToAction("Index", "Profile", new { section = "permintaan" });
+        return RedirectToAction("Index", "Donasi");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkDelivered(int claimRequestId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var request = await _context.ClaimRequests
+            .Include(r => r.Item)
+            .FirstOrDefaultAsync(r => r.Id == claimRequestId);
+
+        if (request == null || request.Item == null || request.UserId != userId)
+            return RedirectToAction("MyRequests", "Request");
+
+        if (request.Status != ClaimRequestStatus.Shipped)
+            return RedirectToAction("MyRequests", "Request");
+
+        request.Status = ClaimRequestStatus.Delivered;
+        request.UpdatedAt = DateTime.UtcNow;
+
+        _context.Notifications.Add(new Notification
+        {
+            UserId = request.Item.UserId,
+            Message = $"Barang \"{request.Item.NamaBarang}\" telah dikonfirmasi diterima oleh penerima.",
+            Link = "/Donasi/Index",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+        return RedirectToAction("Permintaan", "Request");
     }
 
     [HttpPost]
@@ -234,7 +314,7 @@ public class ItemController : BaseController
             .FirstOrDefaultAsync(r => r.Id == requestId);
 
         if (request == null || request.Item == null || request.Item.UserId != userId)
-            return RedirectToAction("Index", "Profile", new { section = "permintaan" });
+            return RedirectToAction("Index", "Donasi");
 
         request.Status = ClaimRequestStatus.Rejected;
 
@@ -247,6 +327,6 @@ public class ItemController : BaseController
         });
 
         await _context.SaveChangesAsync();
-        return RedirectToAction("Index", "Profile", new { section = "permintaan" });
+        return RedirectToAction("Index", "Donasi");
     }
 }

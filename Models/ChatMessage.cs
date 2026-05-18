@@ -25,4 +25,6 @@ public class ChatMessage
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
 
     public bool IsRead { get; set; } = false;
+
+    public string? ImagePath { get; set; }
 }
