@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,15 +27,39 @@ public class PesanController : ProfileBaseController
                 .ThenInclude(i => i!.Images)
             .Include(c => c.Requester)
             .Include(c => c.Donor)
-            .Include(c => c.Messages.OrderByDescending(m => m.SentAt).Take(1))
             .Where(c => c.RequesterId == userId || c.DonorId == userId)
-            .OrderByDescending(c => c.Messages.Max(m => (DateTime?)m.SentAt) ?? c.CreatedAt)
             .ToListAsync();
+
+        var conversationIds = conversations.Select(c => c.Id).ToList();
+
+        var lastMessages = await _db.ChatMessages
+            .Where(m => conversationIds.Contains(m.ConversationId))
+            .GroupBy(m => m.ConversationId)
+            .Select(g => g.OrderByDescending(m => m.SentAt).First())
+            .ToListAsync();
+
+        foreach (var conv in conversations)
+        {
+            var lastMsg = lastMessages.FirstOrDefault(m => m.ConversationId == conv.Id);
+            conv.Messages = lastMsg != null ? new List<ChatMessage> { lastMsg } : new List<ChatMessage>();
+        }
+
+        conversations = conversations
+            .OrderByDescending(c =>
+            {
+                var lastMsg = lastMessages.FirstOrDefault(m => m.ConversationId == c.Id);
+                return lastMsg?.SentAt ?? c.CreatedAt;
+            })
+            .ToList();
 
         ViewBag.Conversations = conversations;
         ViewBag.CurrentUserId = userId;
         ViewBag.InitialConvId = convId;
 
-        return View("~/Views/Profile/Pesan/Pesan.cshtml");
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Pesan/Pesan.cshtml");
+
+        ViewBag.InitialSection = "pesan";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 }

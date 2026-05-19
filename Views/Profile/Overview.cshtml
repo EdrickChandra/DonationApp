@@ -1,14 +1,9 @@
 @using DonationApp.Models
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var reviews = ViewBag.RecentReviews as List<UserReputation>;
     var avgRating = (double)(ViewBag.AvgRating ?? 0.0);
     var totalReviews = (int)(ViewBag.TotalReviews ?? 0);
 }
-
-<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
-
-@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
 
 <div class="ppage">
     <div class="ppage-inner">

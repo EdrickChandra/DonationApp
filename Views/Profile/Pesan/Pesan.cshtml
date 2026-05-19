@@ -1,14 +1,11 @@
 @using DonationApp.Models
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var conversations = ViewBag.Conversations as List<Conversation>;
     var currentUserId = ViewBag.CurrentUserId as string ?? "";
     var initialConvId = ViewBag.InitialConvId as int?;
 }
 
-<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
 
-@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
 
 <div class="ppage" style="padding:0;">
     <div class="pchat-shell" style="min-height:calc(100vh - 52px);border:none;border-radius:0;">

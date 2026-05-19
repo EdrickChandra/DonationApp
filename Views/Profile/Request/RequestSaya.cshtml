@@ -1,16 +1,13 @@
 @using DonationApp.Models
 @using DonationApp.Services
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var myRequests = ViewBag.MyRequests as List<ItemRequest>;
     var matchesJson = ViewBag.Matches as string;
     var matchCount = ViewBag.MatchCount as int? ?? 0;
     var matchContext = ViewBag.MatchContext as string ?? "";
 }
 
-<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
 
-@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
 
 <div class="ppage">
     <div class="ppage-inner">

@@ -1,7 +1,6 @@
 @using DonationApp.Models
 @using DonationApp.Services
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var donations = ViewBag.Donations as List<Item>;
     var selected = ViewBag.Selected as Item;
     var matchesJson = ViewBag.Matches as string;
@@ -9,9 +8,7 @@
     var matchContext = ViewBag.MatchContext as string ?? "";
 }
 
-<link rel="stylesheet" href="~/css/profile-new.css" asp-append-version="true" />
 
-@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
 
 <div class="ppage">
     <div class="ppage-inner" style="max-width:100%;padding:0;">
@@ -116,7 +113,7 @@
                                 <div class="pstepper">
                                     <div class="pstep @(accepted.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
                                         <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
-                                            @if (accepted.Status >= ClaimRequestStatus.Accepted) { <i class="ti ti-check" aria-hidden="true"></i> } else { <i class="ti ti-check" aria-hidden="true"></i> }
+                                            <i class="ti ti-check" aria-hidden="true"></i>
                                         </div>
                                         <div class="pstep-label">Disetujui</div>
                                     </div>

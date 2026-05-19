@@ -1,0 +1,152 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var initialSection = ViewBag.InitialSection as string ?? "overview";
+}
+
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+
+<div id="profile-content" style="min-height:calc(100vh - 52px);">
+    <div id="profile-loading" style="display:none;padding:48px;text-align:center;">
+        <div class="profile-spinner"></div>
+    </div>
+    <div id="profile-body"></div>
+</div>
+
+@section Scripts {
+    <style>
+        .profile-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--color-border-tertiary);
+            border-top-color: var(--color-text-info);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin: 0 auto;
+        }
+
+        @@keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        #profile-body {
+            animation: fadeIn 0.15s ease;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+    <script>
+        var currentUrl = null;
+
+        var profilePaths = [
+            '/Profile',
+            '/Donasi',
+            '/Pesan',
+            '/Notifikasi',
+            '/Request/MyRequests',
+            '/Request/Permintaan',
+            '/Request/CreateView'
+        ];
+
+        function isProfilePath(pathname) {
+            return profilePaths.some(function(p) {
+                return pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '?');
+            });
+        }
+
+        function loadSection(url, pushState) {
+            if (url === currentUrl) return;
+            currentUrl = url;
+
+            document.getElementById('profile-loading').style.display = 'block';
+            var body = document.getElementById('profile-body');
+            body.style.opacity = '0';
+
+            fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function(r) {
+                if (!r.ok) throw new Error('Failed');
+                return r.text();
+            })
+            .then(function(html) {
+                document.getElementById('profile-loading').style.display = 'none';
+                body.innerHTML = html;
+                body.style.opacity = '';
+
+                if (pushState) {
+                    window.history.pushState({ url: url }, '', url);
+                }
+
+                updateActiveNav(url);
+                reinitScripts(body);
+            })
+            .catch(function() {
+                window.location.href = url;
+            });
+        }
+
+        function updateActiveNav(url) {
+            document.querySelectorAll('.pnav-link').forEach(function(link) {
+                link.classList.remove('active');
+                var dataUrl = link.getAttribute('data-url');
+                if (dataUrl && url.startsWith(dataUrl)) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        function reinitScripts(container) {
+            container.querySelectorAll('script').forEach(function(oldScript) {
+                var newScript = document.createElement('script');
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.textContent = oldScript.textContent;
+                }
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            var link = e.target.closest('a[href]');
+            if (!link) return;
+
+            var pathname = link.pathname;
+            var search = link.search || '';
+
+            if (!pathname) return;
+            if (link.target === '_blank') return;
+            if (link.hostname !== window.location.hostname) return;
+
+            if (!isProfilePath(pathname)) return;
+
+            e.preventDefault();
+            loadSection(pathname + search, true);
+        });
+
+        window.addEventListener('popstate', function(e) {
+            if (e.state && e.state.url) {
+                loadSection(e.state.url, false);
+            }
+        });
+
+        var sectionUrls = {
+            'overview': '/Profile/Overview',
+            'donasi': '/Donasi/Index',
+            'request': '/Request/MyRequests',
+            'pesan': '/Pesan/Index',
+            'notifikasi': '/Notifikasi/Index',
+            'profil': '/Profile/Edit'
+        };
+
+        var initialUrl = sectionUrls['@initialSection'] || '/Profile/Overview';
+        window.history.replaceState({ url: initialUrl }, '', initialUrl);
+        loadSection(initialUrl, false);
+    </script>
+}

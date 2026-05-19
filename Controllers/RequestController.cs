@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -45,7 +45,11 @@ public class RequestController : ProfileBaseController
         ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
         ViewBag.MatchContext = TempData["MatchContext"] as string ?? "";
 
-        return View("~/Views/Profile/Request/RequestSaya.cshtml");
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Request/RequestSaya.cshtml");
+
+        ViewBag.InitialSection = "request";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
     [Authorize]
@@ -71,7 +75,11 @@ public class RequestController : ProfileBaseController
         ViewBag.Selected = selected;
         ViewBag.CurrentUserId = userId;
 
-        return View("~/Views/Profile/Request/Permintaan.cshtml");
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Request/Permintaan.cshtml");
+
+        ViewBag.InitialSection = "request";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
     [Authorize]
@@ -80,7 +88,12 @@ public class RequestController : ProfileBaseController
         var user = await _userManager.GetUserAsync(User);
         ViewBag.UserAlamat = user?.Alamat ?? "";
         ViewBag.UserProvinsi = user?.Provinsi ?? "";
-        return View("~/Views/Profile/Request/BuatRequest.cshtml");
+
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Request/BuatRequest.cshtml");
+
+        ViewBag.InitialSection = "request";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
     [AllowAnonymous]
@@ -170,23 +183,18 @@ public class RequestController : ProfileBaseController
             foreach (var image in Images)
             {
                 if (imageCount >= 5) break;
-
                 var extension = Path.GetExtension(image.FileName).ToLower();
                 if (!allowedExtensions.Contains(extension)) continue;
                 if (image.Length > 5 * 1024 * 1024) continue;
-
                 var fileName = Guid.NewGuid().ToString() + extension;
                 var filePath = Path.Combine(uploadFolder, fileName);
-
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await image.CopyToAsync(stream);
-
                 _context.RequestImages.Add(new RequestImage
                 {
                     ItemRequestId = itemRequest.Id,
                     FilePath = $"/uploads/requests/{userId}/{itemRequest.Id}/{fileName}"
                 });
-
                 imageCount++;
             }
 
@@ -213,9 +221,7 @@ public class RequestController : ProfileBaseController
                     deskripsi = m.Item.Deskripsi,
                     score = m.Score,
                     reasons = m.MatchReasons,
-                    posterName = m.Item.User != null
-                        ? m.Item.User.NamaDepan + " " + m.Item.User.NamaBelakang
-                        : "Unknown",
+                    posterName = m.Item.User != null ? m.Item.User.NamaDepan + " " + m.Item.User.NamaBelakang : "Unknown",
                     posterAvatar = m.Item.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
                     createdAgo = (DateTime.UtcNow - m.Item.CreatedAt).Days,
                     firstImage = m.Item.Images.FirstOrDefault()?.FilePath,
@@ -273,23 +279,18 @@ public class RequestController : ProfileBaseController
             foreach (var image in Images)
             {
                 if (imageCount >= 3) break;
-
                 var extension = Path.GetExtension(image.FileName).ToLower();
                 if (!allowedExtensions.Contains(extension)) continue;
                 if (image.Length > 5 * 1024 * 1024) continue;
-
                 var fileName = Guid.NewGuid().ToString() + extension;
                 var filePath = Path.Combine(uploadFolder, fileName);
-
                 using var stream = new FileStream(filePath, FileMode.Create);
                 await image.CopyToAsync(stream);
-
                 _context.RequestOfferImages.Add(new RequestOfferImage
                 {
                     RequestOfferId = offer.Id,
                     FilePath = $"/uploads/offers/{offer.Id}/{fileName}"
                 });
-
                 imageCount++;
             }
 

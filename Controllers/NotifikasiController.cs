@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +37,11 @@ public class NotifikasiController : ProfileBaseController
         ViewBag.Unread = unread;
         ViewBag.Read = read;
 
-        return View("~/Views/Profile/Notifikasi/Notifikasi.cshtml");
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Notifikasi/Notifikasi.cshtml");
+
+        ViewBag.InitialSection = "notifikasi";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
     [HttpPost]

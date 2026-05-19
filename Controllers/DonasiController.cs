@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +40,7 @@ public class DonasiController : ProfileBaseController
 
         var selected = selectedId.HasValue
             ? donations.FirstOrDefault(d => d.Id == selectedId.Value)
-            : donations.FirstOrDefault();
+            : donations.FirstOrDefault(d => d.Status != ItemStatus.Available || d.ExpiresAt > DateTime.UtcNow);
 
         ViewBag.Donations = donations;
         ViewBag.Selected = selected;
@@ -48,10 +48,21 @@ public class DonasiController : ProfileBaseController
         ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
         ViewBag.MatchContext = TempData["MatchContext"] as string ?? "";
 
-        return View("~/Views/Profile/Donasi/Donasi.cshtml");
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Donasi/Donasi.cshtml");
+
+        ViewBag.InitialSection = "donasi";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
-    public IActionResult Create() => View("~/Views/Profile/Donasi/BuatDonasi.cshtml");
+    public IActionResult Create()
+    {
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Donasi/BuatDonasi.cshtml");
+
+        ViewBag.InitialSection = "donasi";
+        return View("~/Views/Profile/Shell.cshtml");
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]

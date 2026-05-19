@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +16,12 @@ public class ProfileController : ProfileBaseController
         : base(db, userManager)
     {
         _um = userManager;
+    }
+
+    public IActionResult Index(string? section)
+    {
+        ViewBag.InitialSection = section ?? "overview";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
     public async Task<IActionResult> Overview()
@@ -51,14 +57,23 @@ public class ProfileController : ProfileBaseController
         ViewBag.TotalReviews = totalReviews;
         ViewBag.RecentReviews = recentReviews;
 
-        return View();
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Overview.cshtml");
+
+        ViewBag.InitialSection = "overview";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
     public async Task<IActionResult> Edit()
     {
         var user = await _um.GetUserAsync(User);
         if (user == null) return RedirectToAction("Login", "Account");
-        return View(user);
+
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Edit.cshtml", user);
+
+        ViewBag.InitialSection = "profil";
+        return View("~/Views/Profile/Shell.cshtml");
     }
 
     [HttpPost]
