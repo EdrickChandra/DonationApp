@@ -1,0 +1,212 @@
+@media (max-width: 768px) {
+    .pnav {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        height: auto;
+        min-height: 48px;
+        flex-wrap: nowrap;
+        width: 100%;
+        max-width: 100vw;
+    }
+
+        .pnav::-webkit-scrollbar {
+            display: none;
+        }
+
+    .pnav-user {
+        flex-shrink: 0;
+        padding: 0 12px;
+    }
+
+    .pnav-username {
+        display: none;
+    }
+
+    .pnav-links {
+        flex-shrink: 0;
+        padding: 0 4px;
+        gap: 0;
+    }
+
+    .pnav-link {
+        padding: 0 10px;
+        font-size: 12px;
+        gap: 4px;
+        flex-shrink: 0;
+    }
+
+        .pnav-link i {
+            font-size: 14px;
+        }
+
+    .pnav-actions {
+        flex-shrink: 0;
+        padding: 0 10px;
+    }
+
+    .ppage-inner {
+        padding: 16px 12px;
+    }
+
+    .pstat-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .pstat-value {
+        font-size: 22px;
+    }
+
+    .psplit {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        overflow: visible;
+    }
+
+    .plist {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-right: none;
+    }
+
+        .plist.hidden-mobile {
+            display: none;
+        }
+
+    .pdetail {
+        display: none;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+        .pdetail.visible-mobile {
+            display: block;
+        }
+
+    .pdetail-back-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--blue);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0 0 14px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+        .pdetail-back-btn i {
+            font-size: 16px;
+        }
+
+    .pchat-shell {
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .pchat-list {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        border-right: none;
+        border-bottom: 1px solid #cbd5e1;
+        max-height: 45vh;
+    }
+
+        .pchat-list.hidden-mobile {
+            display: none;
+            max-height: none;
+        }
+
+    .pchat-window {
+        display: none;
+        width: 100%;
+        max-width: 100%;
+    }
+
+        .pchat-window.visible-mobile {
+            display: flex;
+            flex: 1;
+        }
+
+    .pchat-back-btn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--blue);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px 0;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .ppage {
+        min-height: calc(100vh - 48px - 44px);
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .pform-input {
+        font-size: 16px;
+    }
+
+    .preview-card {
+        border-radius: 8px;
+    }
+
+    .ptab {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .pbtn {
+        font-size: 12px;
+        padding: 7px 12px;
+    }
+
+    .psec {
+        padding: 12px;
+        box-sizing: border-box;
+    }
+
+    .pstepper {
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+    }
+
+        .pstepper::-webkit-scrollbar {
+            display: none;
+        }
+
+    .pstep-label {
+        font-size: 9px;
+    }
+
+    .ppage-inner {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .preview-card {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .psplit {
+        border-radius: 0;
+    }
+}

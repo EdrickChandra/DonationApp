@@ -8,31 +8,11 @@
     <link rel="stylesheet" href="~/css/global.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/item.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/profile-mobile-append.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" />
-
-    <style>
-            main {
-                animation: fadeIn 0.15s ease;
-            }
-
-            @@keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(4px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-    </style>
-
 </head>
-<body hx-boost="true" hx-target="#main-content" hx-swap="innerHTML">
-
-
+<body>
     <nav>
         <a class="logo" asp-controller="Home" asp-action="Index">IDonasi</a>
 
@@ -41,7 +21,7 @@
             <input class="search-bar" type="text" placeholder="Search...">
         }
 
-        <div style="display:flex;align-items:center;gap:4px;margin-left:12px;">
+        <div class="nav-links-desktop" style="margin-left:12px;">
             <a class="nav-page-link" asp-controller="Home" asp-action="Index">Donasi</a>
             <a class="nav-page-link" asp-controller="Request" asp-action="Index">Request</a>
         </div>
@@ -66,10 +46,13 @@
                 <div class="nav-dropdown" id="navDropdown">
                     <div class="nav-user" onclick="toggleDropdown()" style="cursor:pointer;">
                         <div class="avatar">@(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "?")</div>
-                        @(User.Identity?.Name ?? "")
+                        <span class="nav-username">@(User.Identity?.Name ?? "")</span>
                         <span style="font-size:10px;">▼</span>
                     </div>
                     <div class="dropdown-menu" id="dropdownMenu">
+                        <a class="dropdown-item" asp-controller="Home" asp-action="Index">Donasi</a>
+                        <a class="dropdown-item" asp-controller="Request" asp-action="Index">Request</a>
+                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" asp-controller="Profile" asp-action="Edit">Profil</a>
                         <a class="dropdown-item" asp-controller="Donasi" asp-action="Index">Donasi Saya</a>
                         <a class="dropdown-item" asp-controller="Request" asp-action="MyRequests">Request Saya</a>
@@ -101,56 +84,39 @@
     </footer>
 
     <script>
-            document.querySelectorAll('.condition-btn').forEach(btn => {
-                btn.addEventListener('click', function () {
-                    this.closest('.condition-group').querySelectorAll('.condition-btn').forEach(b => b.classList.remove('selected'));
-                    this.classList.add('selected');
-                    const input = document.getElementById('kondisiInput');
-                    if (input) input.value = this.dataset.value;
-                });
+        document.querySelectorAll('.condition-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                this.closest('.condition-group').querySelectorAll('.condition-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                const input = document.getElementById('kondisiInput');
+                if (input) input.value = this.dataset.value;
             });
+        });
 
-            function toggleDropdown() {
-                document.getElementById('dropdownMenu').classList.toggle('open');
+        function toggleDropdown() {
+            document.getElementById('dropdownMenu').classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            var dropdown = document.getElementById('navDropdown');
+            if (dropdown && !dropdown.contains(e.target)) {
+                document.getElementById('dropdownMenu').classList.remove('open');
             }
-
-            document.addEventListener('click', function(e) {
-                var dropdown = document.getElementById('navDropdown');
-                if (dropdown && !dropdown.contains(e.target)) {
-                    document.getElementById('dropdownMenu').classList.remove('open');
-                }
-            });
-    </script>
-
-    <script>
-            document.querySelectorAll('a[href]').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    var href = this.getAttribute('href');
-                    if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
-                    if (this.closest('form')) return;
-                    e.preventDefault();
-                    document.querySelector('main').style.opacity = '0';
-                    document.querySelector('main').style.transform = 'translateY(4px)';
-                    document.querySelector('main').style.transition = 'opacity 0.1s ease, transform 0.1s ease';
-                    setTimeout(function() { window.location.href = href; }, 100);
-                });
-            });
+        });
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
     <script>
         NProgress.configure({ showSpinner: false, speed: 300 });
-
         document.querySelectorAll('a[href]').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-        var href = this.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
-        NProgress.start();
+            link.addEventListener('click', function(e) {
+                var href = this.getAttribute('href');
+                if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
+                NProgress.start();
+            });
         });
-        });
-
         window.addEventListener('pageshow', function() {
-        NProgress.done();
+            NProgress.done();
         });
     </script>
 

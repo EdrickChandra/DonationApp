@@ -6,36 +6,38 @@
     var matchesJson = ViewBag.Matches as string;
     var matchCount = ViewBag.MatchCount as int? ?? 0;
     var matchContext = ViewBag.MatchContext as string ?? "";
+
+    var visibleDonations = donations?
+        .Where(d => d.Status != ItemStatus.Available || d.ExpiresAt > DateTime.UtcNow)
+        .ToList();
 }
-
-
 
 <div class="ppage">
     <div class="ppage-inner" style="max-width:100%;padding:0;">
 
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary, #cbd5e1);">
             <div class="ptab-bar" style="margin:0;border:none;">
                 <a asp-controller="Donasi" asp-action="Index" class="ptab active">Donasi Saya</a>
                 <a asp-controller="Donasi" asp-action="Create" class="ptab">Buat Donasi</a>
             </div>
             <a asp-controller="Donasi" asp-action="Create" class="pbtn pbtn-primary" style="font-size:12px;padding:6px 14px;">
-                <i class="ti ti-plus" aria-hidden="true" style="font-size:14px;"></i> Buat Donasi
+                <i class="ti ti-plus" aria-hidden="true"></i> Buat Donasi
             </a>
         </div>
 
-        @if (donations == null || !donations.Any())
+        @if (visibleDonations == null || !visibleDonations.Any())
         {
-            <div style="padding:48px;text-align:center;font-size:13px;color:var(--color-text-secondary);">
+            <div style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
                 Belum ada donasi.
                 <a asp-controller="Donasi" asp-action="Create" class="pbtn pbtn-primary" style="display:inline-flex;margin-top:12px;">Buat Donasi Pertama</a>
             </div>
         }
         else
         {
-            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
+            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);" id="donasi-split">
 
-                <div class="plist">
-                    @foreach (var d in donations)
+                <div class="plist" id="donasi-list">
+                    @foreach (var d in visibleDonations)
                     {
                         var accepted = d.ClaimRequests.FirstOrDefault(r =>
                             r.Status == ClaimRequestStatus.Accepted ||
@@ -49,8 +51,12 @@
                             _ => d.Status == ItemStatus.Available ? ("Tersedia", "pbadge-available") : ("Diambil", "pbadge-claimed")
                         };
 
+                        var isClaimed = d.Status != ItemStatus.Available || accepted != null;
+                        var daysLeft = (d.ExpiresAt - DateTime.UtcNow).Days;
+
                         <a class="plist-item @(selected?.Id == d.Id ? "active" : "")"
-                           asp-controller="Donasi" asp-action="Index" asp-route-selectedId="@d.Id">
+                           href="/Donasi/Index?selectedId=@d.Id"
+                           data-item-id="@d.Id">
                             @if (d.Images.Any())
                             {
                                 <img src="@d.Images.First().FilePath" class="plist-thumb" style="object-fit:cover;" />
@@ -61,15 +67,22 @@
                             }
                             <div style="flex:1;min-width:0;">
                                 <div class="plist-name">@d.NamaBarang</div>
-                                <div class="plist-sub">@CategoryHelper.DisplayName(d.Kategori) · @((d.ExpiresAt - DateTime.UtcNow).Days) hari lagi</div>
+                                @if (!isClaimed)
+                                {
+                                    <div class="plist-sub">@CategoryHelper.DisplayName(d.Kategori) · @daysLeft hari lagi</div>
+                                }
+                                else
+                                {
+                                    <div class="plist-sub">@CategoryHelper.DisplayName(d.Kategori)</div>
+                                }
                             </div>
                             <span class="pbadge @statusClass">@statusLabel</span>
                         </a>
                     }
                 </div>
 
-                <div class="pdetail">
-                    @if (selected == null)
+                <div class="pdetail" id="donasi-detail">
+                    @if (selected == null || (selected.Status == ItemStatus.Available && selected.ExpiresAt <= DateTime.UtcNow))
                     {
                         <div class="pdetail-empty">Pilih donasi untuk melihat detail.</div>
                     }
@@ -83,7 +96,7 @@
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (selected.Images.Any())
                             {
-                                <img src="@selected.Images.First().FilePath" style="width:60px;height:60px;border-radius:var(--border-radius-md);object-fit:cover;flex-shrink:0;" />
+                                <img src="@selected.Images.First().FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
                             }
                             <div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.NamaBarang</div>
@@ -102,8 +115,8 @@
                                 <div style="display:flex;align-items:center;gap:10px;">
                                     <div class="preview-avatar">@(accepted.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
                                     <div>
-                                        <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);">@accepted.User?.NamaDepan @accepted.User?.NamaBelakang</div>
-                                        <div style="font-size:11px;color:var(--color-text-secondary);">@accepted.User?.Alamat</div>
+                                        <div style="font-size:13px;font-weight:500;color:#0f172a;">@accepted.User?.NamaDepan @accepted.User?.NamaBelakang</div>
+                                        <div style="font-size:11px;color:#64748b;">@accepted.User?.Alamat</div>
                                     </div>
                                 </div>
                             </div>
@@ -112,30 +125,22 @@
                                 <div class="psec-label">Status Pengiriman</div>
                                 <div class="pstepper">
                                     <div class="pstep @(accepted.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
-                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
-                                            <i class="ti ti-check" aria-hidden="true"></i>
-                                        </div>
+                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Accepted ? "done" : "")"><i class="ti ti-check" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Disetujui</div>
                                     </div>
                                     <div class="pstep-line @(accepted.Status >= ClaimRequestStatus.Shipped ? "done" : "")"></div>
                                     <div class="pstep @(accepted.Status >= ClaimRequestStatus.Shipped ? "done" : "")">
-                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Shipped ? "done" : "")">
-                                            <i class="ti ti-truck" aria-hidden="true"></i>
-                                        </div>
+                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Dikirim</div>
                                     </div>
                                     <div class="pstep-line @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")"></div>
                                     <div class="pstep @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")">
-                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")">
-                                            <i class="ti ti-package" aria-hidden="true"></i>
-                                        </div>
+                                        <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
                                     <div class="pstep-line @(accepted.Status == ClaimRequestStatus.Delivered && accepted.Reputations.Any() ? "done" : "")"></div>
                                     <div class="pstep @(accepted.Reputations.Any() ? "done" : "")">
-                                        <div class="pstep-dot @(accepted.Reputations.Any() ? "done" : "")">
-                                            <i class="ti ti-star" aria-hidden="true"></i>
-                                        </div>
+                                        <div class="pstep-dot @(accepted.Reputations.Any() ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Feedback</div>
                                     </div>
                                 </div>
@@ -152,23 +157,23 @@
                                 }
                                 else if (accepted.Status == ClaimRequestStatus.Shipped)
                                 {
-                                    <p style="font-size:12px;color:var(--color-text-secondary);text-align:center;margin-top:8px;">Menunggu konfirmasi penerima...</p>
+                                    <p style="font-size:12px;color:#64748b;text-align:center;margin-top:8px;">Menunggu konfirmasi penerima...</p>
                                 }
                                 else if (accepted.Status == ClaimRequestStatus.Delivered)
                                 {
-                                    <p style="font-size:12px;color:var(--color-text-success);text-align:center;margin-top:8px;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                    <p style="font-size:12px;color:#16a34a;text-align:center;margin-top:8px;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
                                 }
                             </div>
                         }
                         else
                         {
                             <div class="psec">
-                                <div class="psec-label">Permintaan Masuk (@selected.ClaimRequests.Count)</div>
-                                @if (!selected.ClaimRequests.Any())
+                                <div class="psec-label">Permintaan Masuk (@selected.ClaimRequests.Count(r => r.Status == ClaimRequestStatus.Pending))</div>
+                                @if (!selected.ClaimRequests.Any(r => r.Status == ClaimRequestStatus.Pending))
                                 {
-                                    <p style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:12px 0;">Belum ada permintaan.</p>
+                                    <p style="font-size:13px;color:#64748b;text-align:center;padding:12px 0;">Belum ada permintaan.</p>
                                 }
-                                @foreach (var r in selected.ClaimRequests)
+                                @foreach (var r in selected.ClaimRequests.Where(r => r.Status == ClaimRequestStatus.Pending))
                                 {
                                     var rAvatar = r.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                                     var rName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
@@ -176,23 +181,16 @@
                                         <div class="preq-avatar">@rAvatar</div>
                                         <span class="preq-name">@rName</span>
                                         <div class="preq-actions">
-                                            @if (r.Status == ClaimRequestStatus.Rejected)
-                                            {
-                                                <span class="pbadge pbadge-rejected">Ditolak</span>
-                                            }
-                                            else if (selected.Status == ItemStatus.Available)
-                                            {
-                                                <form asp-controller="Item" asp-action="Accept" method="post" style="display:inline;">
-                                                    @Html.AntiForgeryToken()
-                                                    <input type="hidden" name="requestId" value="@r.Id" />
-                                                    <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
-                                                </form>
-                                                <form asp-controller="Item" asp-action="Reject" method="post" style="display:inline;">
-                                                    @Html.AntiForgeryToken()
-                                                    <input type="hidden" name="requestId" value="@r.Id" />
-                                                    <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>
-                                                </form>
-                                            }
+                                            <form asp-controller="Item" asp-action="Accept" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="requestId" value="@r.Id" />
+                                                <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
+                                            </form>
+                                            <form asp-controller="Item" asp-action="Reject" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="requestId" value="@r.Id" />
+                                                <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>
+                                            </form>
                                             <form asp-controller="Item" asp-action="Chat" method="post" style="display:inline;">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="itemId" value="@selected.Id" />
@@ -216,3 +214,58 @@
     { "MatchCount", matchCount },
     { "MatchContext", matchContext }
 })
+
+<script>
+(function() {
+    function isMobile() { return window.innerWidth <= 768; }
+
+    var list = document.getElementById('donasi-list');
+    var detail = document.getElementById('donasi-detail');
+    if (!list || !detail) return;
+
+    if (isMobile()) {
+        var hasSelected = detail.querySelector('.pdetail-empty') === null;
+
+        if (!hasSelected) {
+            list.style.display = 'block';
+            detail.style.display = 'none';
+        } else {
+            list.style.display = 'none';
+            detail.style.display = 'block';
+
+            var backBtn = document.createElement('button');
+            backBtn.className = 'pdetail-back-btn';
+            backBtn.innerHTML = '<i class="ti ti-arrow-left" aria-hidden="true"></i> Donasi Saya';
+            backBtn.onclick = function() {
+                list.style.display = 'block';
+                detail.style.display = 'none';
+                window.history.pushState({}, '', '/Donasi/Index');
+            };
+            detail.insertBefore(backBtn, detail.firstChild);
+        }
+
+        list.querySelectorAll('.plist-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                var href = this.getAttribute('href');
+                if (!href) return;
+
+                fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    var body = document.getElementById('profile-body');
+                    if (body) {
+                        body.innerHTML = html;
+                        body.querySelectorAll('script').forEach(function(s) {
+                            var ns = document.createElement('script');
+                            ns.textContent = s.textContent;
+                            s.parentNode.replaceChild(ns, s);
+                        });
+                    }
+                    window.history.pushState({}, '', href);
+                });
+            });
+        });
+    }
+})();
+</script>

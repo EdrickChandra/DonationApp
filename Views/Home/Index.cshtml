@@ -5,39 +5,82 @@
     var selected = ViewBag.SelectedKategori != null ? (ItemCategory)ViewBag.SelectedKategori : ItemCategory.Semua;
 }
 
-<link rel="stylesheet" href="/css/item.css" />
-
-<div class="category-label">Kategori</div>
-<div class="pills">
-    @foreach (var cat in CategoryHelper.AllCategories())
-    {
-        <a class="pill @(selected == cat ? "active" : "inactive")"
-           asp-controller="Home" asp-action="Index" asp-route-kategori="@cat">@CategoryHelper.DisplayName(cat)</a>
-    }
+<div class="page-header">
+    <div class="page-header-inner">
+        <div class="pills">
+            @foreach (var cat in CategoryHelper.AllCategories())
+            {
+                var icon = cat switch {
+                    ItemCategory.Semua => "ti-layout-grid",
+                    ItemCategory.Pakaian => "ti-shirt",
+                    ItemCategory.Elektronik => "ti-device-laptop",
+                    ItemCategory.Buku => "ti-book",
+                    ItemCategory.PerabotRumah => "ti-sofa",
+                    ItemCategory.MainanHobi => "ti-fidget-spinner",
+                    ItemCategory.AlatTulis => "ti-pencil",
+                    ItemCategory.AlatMusik => "ti-guitar-pick",
+                    ItemCategory.PeralatanDapur => "ti-tools-kitchen-2",
+                    _ => "ti-tag"
+                };
+                <a class="pill @(selected == cat ? "active" : "")"
+                   asp-controller="Home" asp-action="Index" asp-route-kategori="@cat">
+                    <i class="ti @icon" aria-hidden="true"></i>
+                    @CategoryHelper.DisplayName(cat)
+                </a>
+            }
+        </div>
+    </div>
 </div>
 
-<div class="section-title">Barang Tersedia :</div>
+<div class="feed-wrap">
+    <div class="feed-tabs">
+        <a class="feed-tab active" asp-controller="Home" asp-action="Index">Donasi</a>
+        <a class="feed-tab" asp-controller="Request" asp-action="Index">Request</a>
+    </div>
 
-<div class="card-grid">
-    @foreach (var item in Model)
-    {
-        var daysLeft = (item.ExpiresAt - DateTime.UtcNow).Days;
-        var images = item.Images.ToList();
-        <a class="item-card" asp-controller="Item" asp-action="Detail" asp-route-id="@item.Id">
-            <div class="card-image">
-                <img src="@images.First().FilePath" class="card-image-fill" />
-            </div>
-            <div class="card-info">
-                <div class="card-row">
-                    <span class="card-name">@item.NamaBarang</span>
-                    <span class="card-lokasi">@item.Lokasi</span>
+    <div class="feed-header">
+        <span class="feed-title">Barang Tersedia</span>
+        <span class="feed-count">@Model.Count() item</span>
+    </div>
+
+    <div class="card-grid">
+        @foreach (var item in Model)
+        {
+            var daysLeft = (item.ExpiresAt - DateTime.UtcNow).Days;
+            var images = item.Images.ToList();
+            var posterInitial = item.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+            var posterName = item.User != null ? item.User.NamaDepan : "Unknown";
+            <a class="item-card" asp-controller="Item" asp-action="Detail" asp-route-id="@item.Id">
+                <div class="card-img">
+                    <img src="@images.First().FilePath" class="card-img-fill" />
+                    <span class="card-timer-badge">
+                        <i class="ti ti-clock" aria-hidden="true"></i>
+                        @daysLeft hari
+                    </span>
                 </div>
-                <div class="card-timer">@daysLeft hari lagi</div>
-            </div>
-        </a>
-    }
-    @if (!Model.Any())
-    {
-        <p class="card-grid-empty">Belum ada barang tersedia.</p>
-    }
+                <div class="card-body">
+                    <div class="card-name">@item.NamaBarang</div>
+                    <div class="card-meta">
+                        <span class="card-cat">@CategoryHelper.DisplayName(item.Kategori)</span>
+                        <span class="card-dot">·</span>
+                        <span class="card-loc">
+                            <i class="ti ti-map-pin" aria-hidden="true"></i>
+                            @item.Lokasi
+                        </span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-poster">
+                        <div class="card-poster-av">@posterInitial</div>
+                        <span class="card-poster-name">@posterName</span>
+                    </div>
+                    <span class="card-cta">Lihat →</span>
+                </div>
+            </a>
+        }
+        @if (!Model.Any())
+        {
+            <p class="card-grid-empty">Belum ada barang tersedia.</p>
+        }
+    </div>
 </div>

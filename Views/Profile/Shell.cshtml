@@ -5,22 +5,34 @@
 
 <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
 
-@await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
+<div id="profile-shell" style="min-height:calc(100vh - 52px);display:flex;flex-direction:column;">
+    @await Html.PartialAsync("~/Views/Profile/Bar/_ProfileNav.cshtml")
 
-<div id="profile-content" style="min-height:calc(100vh - 52px);">
-    <div id="profile-loading" style="display:none;padding:48px;text-align:center;">
-        <div class="profile-spinner"></div>
+    <div id="profile-content" style="flex:1;">
+        <div id="profile-loading" style="display:none;padding:48px;text-align:center;">
+            <div class="profile-spinner"></div>
+        </div>
+        <div id="profile-body"></div>
     </div>
-    <div id="profile-body"></div>
 </div>
 
 @section Scripts {
     <style>
+        #profile-shell {
+            margin: -24px -10%;
+        }
+
+        @@media (max-width: 768px) {
+            #profile-shell {
+                margin: -16px -4%;
+            }
+        }
+
         .profile-spinner {
             width: 24px;
             height: 24px;
-            border: 2px solid var(--color-border-tertiary);
-            border-top-color: var(--color-text-info);
+            border: 2px solid var(--color-border-tertiary, #cbd5e1);
+            border-top-color: var(--blue, #2563eb);
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
             margin: 0 auto;
@@ -85,6 +97,7 @@
 
                 updateActiveNav(url);
                 reinitScripts(body);
+                initMobileSplit();
             })
             .catch(function() {
                 window.location.href = url;
@@ -111,6 +124,75 @@
                 }
                 oldScript.parentNode.replaceChild(newScript, oldScript);
             });
+        }
+
+        function initMobileSplit() {
+            if (window.innerWidth > 768) return;
+
+            var plist = document.querySelector('.plist');
+            var pdetail = document.querySelector('.pdetail');
+            if (!plist || !pdetail) return;
+
+            var backBtn = document.createElement('button');
+            backBtn.className = 'pdetail-back-btn';
+            backBtn.innerHTML = '<i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali';
+            backBtn.addEventListener('click', function() {
+                plist.classList.remove('hidden-mobile');
+                pdetail.classList.remove('visible-mobile');
+            });
+            pdetail.insertBefore(backBtn, pdetail.firstChild);
+
+            document.querySelectorAll('.plist-item').forEach(function(item) {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var href = this.getAttribute('href');
+                    if (!href) return;
+
+                    fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(r) { return r.text(); })
+                    .then(function(html) {
+                        var body = document.getElementById('profile-body');
+                        body.innerHTML = html;
+                        reinitScripts(body);
+                        initMobileSplit();
+
+                        var newPlist = document.querySelector('.plist');
+                        var newPdetail = document.querySelector('.pdetail');
+                        if (newPlist && newPdetail) {
+                            newPlist.classList.add('hidden-mobile');
+                            newPdetail.classList.add('visible-mobile');
+                        }
+
+                        window.history.pushState({ url: href }, '', href);
+                        currentUrl = href;
+                    });
+                });
+            });
+
+            var chatList = document.querySelector('.pchat-list');
+            var chatWindow = document.querySelector('.pchat-window');
+            if (chatList && chatWindow) {
+                var chatBackBtn = document.createElement('button');
+                chatBackBtn.className = 'pchat-back-btn';
+                chatBackBtn.innerHTML = '<i class="ti ti-arrow-left" aria-hidden="true"></i> Percakapan';
+                chatBackBtn.style.cssText = 'display:none;';
+                chatWindow.insertBefore(chatBackBtn, chatWindow.firstChild);
+
+                chatBackBtn.addEventListener('click', function() {
+                    chatList.classList.remove('hidden-mobile');
+                    chatWindow.classList.remove('visible-mobile');
+                    chatBackBtn.style.display = 'none';
+                });
+
+                document.querySelectorAll('.pchat-item').forEach(function(item) {
+                    var origClick = item.onclick;
+                    item.addEventListener('click', function() {
+                        chatList.classList.add('hidden-mobile');
+                        chatWindow.classList.add('visible-mobile');
+                        chatBackBtn.style.display = 'flex';
+                    });
+                });
+            }
         }
 
         document.addEventListener('click', function(e) {

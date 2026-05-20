@@ -1,87 +1,107 @@
-﻿@model DonationApp.Models.Item
+@model DonationApp.Models.Item
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var images = Model.Images.ToList();
     var daysLeft = (Model.ExpiresAt - DateTime.UtcNow).Days;
     var isOwner = (bool)ViewBag.IsOwner;
     var hasRequested = (bool)ViewBag.HasRequested;
+    var posterInitial = Model.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+    var posterName = Model.User != null ? Model.User.NamaDepan + " " + Model.User.NamaBelakang : "Unknown";
 }
 
-<link rel="stylesheet" href="/css/item.css" />
+<div class="detail-page">
+    <a class="back-btn" asp-controller="Home" asp-action="Index">
+        <i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali
+    </a>
 
-<a class="back-btn" asp-controller="Home" asp-action="Index">← Kembali</a>
-
-<div class="detail-grid">
-
-    <div>
-        <div class="detail-image-wrap">
-            <img id="mainImage" src="@images[0].FilePath" class="detail-main-img" onclick="openZoom()" style="cursor:pointer;" />
-            <button onclick="slideImage(-1)" class="detail-slide-btn" style="left:8px;">‹</button>
-            <button onclick="slideImage(1)" class="detail-slide-btn" style="right:8px;">›</button>
-            <div id="imageCounter" class="detail-counter">1 / @images.Count</div>
-        </div>
-
-        <div class="detail-thumbs">
-            @for (int i = 0; i < images.Count; i++)
-            {
-                <div onclick="setImage(@i)" class="detail-thumb @(i == 0 ? "active" : "")" id="thumb-@i">
-                    <img src="@images[i].FilePath" />
-                </div>
-            }
-        </div>
-    </div>
-
-    <div class="detail-info">
-        <div>
-            <p class="detail-name">@Model.NamaBarang</p>
-            <div class="detail-badges">
-                <span class="detail-badge-kategori">@Model.Kategori</span>
-                <span class="detail-badge-kondisi">@Model.Kondisi</span>
+    <div class="detail-grid">
+        <div class="detail-media">
+            <div class="detail-img-wrap">
+                <img id="mainImage" src="@images[0].FilePath" class="detail-main-img" onclick="openZoom()" />
+                <button onclick="slideImage(-1)" class="detail-slide-btn left">‹</button>
+                <button onclick="slideImage(1)" class="detail-slide-btn right">›</button>
+                <span id="imageCounter" class="detail-counter">1 / @images.Count</span>
+            </div>
+            <div class="detail-thumbs">
+                @for (int i = 0; i < images.Count; i++)
+                {
+                    <div onclick="setImage(@i)" class="detail-thumb @(i == 0 ? "active" : "")" id="thumb-@i">
+                        <img src="@images[i].FilePath" />
+                    </div>
+                }
             </div>
         </div>
 
-        <div class="detail-row">
-            <p class="detail-row-label">Lokasi</p>
-            <p class="detail-row-value">@Model.Lokasi</p>
-        </div>
+        <div class="detail-info">
+            <div class="detail-badges">
+                <span class="detail-badge-blue">@CategoryHelper.DisplayName(Model.Kategori)</span>
+                <span class="detail-badge-green">@Model.Kondisi</span>
+            </div>
 
-        <div class="detail-row">
-            <p class="detail-row-label">Deskripsi</p>
-            <p class="detail-row-value">@Model.Deskripsi</p>
-        </div>
+            <h1 class="detail-name">@Model.NamaBarang</h1>
 
-        <div class="detail-row">
-            <p class="detail-row-label">Sisa waktu</p>
-            <p class="detail-row-value">@daysLeft hari lagi</p>
-        </div>
+            <div class="detail-poster">
+                <div class="detail-poster-av">@posterInitial</div>
+                <div>
+                    <div class="detail-poster-name">@posterName</div>
+                    <div class="detail-poster-loc">
+                        <i class="ti ti-map-pin" aria-hidden="true"></i>
+                        @Model.Lokasi
+                    </div>
+                </div>
+            </div>
 
-        <div class="detail-action">
-            @if (isOwner)
-            {
-                <button class="submit-btn" disabled style="opacity:0.5;">Barang Anda</button>
-            }
-            else if (hasRequested)
-            {
-                <button class="submit-btn" disabled style="opacity:0.5;">Sudah Diminta</button>
-                <form asp-controller="Item" asp-action="Chat" method="post" style="margin-top:8px;">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="itemId" value="@Model.Id" />
-                    <input type="hidden" name="otherUserId" value="@Model.UserId" />
-                    <button type="submit" class="submit-btn" style="background:#0ea5e9;">Chat dengan Donor</button>
-                </form>
-            }
-            else if (User.Identity != null && User.Identity.IsAuthenticated)
-            {
-                <form asp-controller="Item" asp-action="Request" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="itemId" value="@Model.Id" />
-                    <button type="submit" class="submit-btn">Minta Barang</button>
-                </form>
-            }
-            else
-            {
-                <a asp-controller="Account" asp-action="Login" class="submit-btn" style="display:block;text-align:center;text-decoration:none;">Masuk untuk Meminta</a>
-            }
+            <div class="detail-divider"></div>
+
+            <div class="detail-row">
+                <div class="detail-row-label">Deskripsi</div>
+                <div class="detail-row-value">@Model.Deskripsi</div>
+            </div>
+
+            <div class="detail-row">
+                <div class="detail-row-label">Sisa Waktu</div>
+                <div class="detail-row-value detail-timer">
+                    <i class="ti ti-clock" aria-hidden="true"></i>
+                    @daysLeft hari lagi
+                </div>
+            </div>
+
+            <div class="detail-action">
+                @if (isOwner)
+                {
+                    <button class="detail-btn detail-btn-disabled" disabled>Barang Anda</button>
+                }
+                else if (hasRequested)
+                {
+                    <button class="detail-btn detail-btn-disabled" disabled>Sudah Diminta</button>
+                    <form asp-controller="Item" asp-action="Chat" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="itemId" value="@Model.Id" />
+                        <input type="hidden" name="otherUserId" value="@Model.UserId" />
+                        <button type="submit" class="detail-btn-ghost">
+                            <i class="ti ti-message-2" aria-hidden="true"></i>
+                            Chat dengan Donor
+                        </button>
+                    </form>
+                }
+                else if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <form asp-controller="Item" asp-action="Request" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="itemId" value="@Model.Id" />
+                        <button type="submit" class="detail-btn">
+                            <i class="ti ti-hand-stop" aria-hidden="true"></i>
+                            Minta Barang
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="detail-btn">
+                        Masuk untuk Meminta
+                    </a>
+                }
+            </div>
         </div>
     </div>
 </div>

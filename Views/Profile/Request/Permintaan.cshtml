@@ -6,12 +6,10 @@
     var currentUserId = ViewBag.CurrentUserId as string ?? "";
 }
 
-
-
 <div class="ppage">
     <div class="ppage-inner" style="max-width:100%;padding:0;">
 
-        <div style="padding:16px 20px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+        <div style="padding:16px 20px 0;border-bottom:0.5px solid #cbd5e1;">
             <div class="ptab-bar" style="margin:0;border:none;">
                 <a asp-controller="Request" asp-action="MyRequests" class="ptab">Request Saya</a>
                 <a asp-controller="Request" asp-action="Permintaan" class="ptab active">Permintaan Donasi</a>
@@ -21,13 +19,13 @@
 
         @if (claimRequests == null || !claimRequests.Any())
         {
-            <div style="padding:48px;text-align:center;font-size:13px;color:var(--color-text-secondary);">Belum ada permintaan donasi.</div>
+            <div style="padding:48px;text-align:center;font-size:13px;color:#64748b;">Belum ada permintaan donasi.</div>
         }
         else
         {
             <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
 
-                <div class="plist">
+                <div class="plist" id="permintaan-list">
                     @foreach (var r in claimRequests)
                     {
                         var (statusLabel, statusClass) = r.Status switch {
@@ -39,7 +37,7 @@
                             _ => ("Unknown", "pbadge-muted")
                         };
                         <a class="plist-item @(selected?.Id == r.Id ? "active" : "")"
-                           asp-controller="Request" asp-action="Permintaan" asp-route-selectedId="@r.Id">
+                           href="/Request/Permintaan?selectedId=@r.Id">
                             @if (r.Item?.Images.Any() == true)
                             {
                                 <img src="@r.Item.Images.First().FilePath" class="plist-thumb" style="object-fit:cover;" />
@@ -57,7 +55,7 @@
                     }
                 </div>
 
-                <div class="pdetail">
+                <div class="pdetail" id="permintaan-detail">
                     @if (selected == null)
                     {
                         <div class="pdetail-empty">Pilih permintaan untuk melihat detail.</div>
@@ -69,7 +67,7 @@
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (selected.Item?.Images.Any() == true)
                             {
-                                <img src="@selected.Item.Images.First().FilePath" style="width:60px;height:60px;border-radius:var(--border-radius-md);object-fit:cover;flex-shrink:0;" />
+                                <img src="@selected.Item.Images.First().FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
                             }
                             <div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.Item?.NamaBarang</div>
@@ -84,8 +82,8 @@
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <div class="preview-avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
                                 <div>
-                                    <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
-                                    <div style="font-size:11px;color:var(--color-text-secondary);">@selected.Item?.User?.Alamat</div>
+                                    <div style="font-size:13px;font-weight:500;color:#0f172a;">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
+                                    <div style="font-size:11px;color:#64748b;">@selected.Item?.User?.Alamat</div>
                                 </div>
                             </div>
                         </div>
@@ -126,11 +124,11 @@
                             }
                             else if (selected.Status == ClaimRequestStatus.Accepted)
                             {
-                                <p style="font-size:12px;color:var(--color-text-secondary);text-align:center;margin-top:8px;">Menunggu donor mengirim barang...</p>
+                                <p style="font-size:12px;color:#64748b;text-align:center;margin-top:8px;">Menunggu donor mengirim barang...</p>
                             }
                             else if (selected.Status == ClaimRequestStatus.Pending)
                             {
-                                <p style="font-size:12px;color:var(--color-text-secondary);text-align:center;margin-top:8px;">Menunggu konfirmasi donor...</p>
+                                <p style="font-size:12px;color:#64748b;text-align:center;margin-top:8px;">Menunggu konfirmasi donor...</p>
                             }
                         </div>
 
@@ -142,18 +140,15 @@
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="claimRequestId" value="@selected.Id" />
                                     <input type="hidden" name="rating" id="ratingValue" value="0" />
-
-                                    <div style="display:flex;gap:4px;margin-bottom:12px;" id="starContainer">
+                                    <div style="display:flex;gap:4px;margin-bottom:12px;">
                                         @for (int star = 1; star <= 5; star++)
                                         {
                                             <button type="button" class="pstar-btn" data-value="@star">★</button>
                                         }
                                     </div>
-
                                     <div class="pform-group">
-                                        <textarea class="pform-input" name="komentar" rows="3" placeholder="Ceritakan pengalaman Anda dengan donor ini..." style="resize:vertical;"></textarea>
+                                        <textarea class="pform-input" name="komentar" rows="3" placeholder="Ceritakan pengalaman Anda..." style="resize:vertical;"></textarea>
                                     </div>
-
                                     <button type="submit" class="pbtn pbtn-primary pbtn-block">Kirim Feedback</button>
                                 </form>
                             </div>
@@ -166,12 +161,12 @@
                                 <div style="display:flex;gap:2px;margin-bottom:8px;">
                                     @for (int star = 1; star <= 5; star++)
                                     {
-                                        <span style="font-size:20px;color:@(star <= myReview.Rating ? "#EF9F27" : "var(--color-border-tertiary)");">★</span>
+                                        <span style="font-size:20px;color:@(star <= myReview.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
                                     }
                                 </div>
                                 @if (!string.IsNullOrEmpty(myReview.Komentar))
                                 {
-                                    <p style="font-size:13px;color:var(--color-text-secondary);">@myReview.Komentar</p>
+                                    <p style="font-size:13px;color:#64748b;">@myReview.Komentar</p>
                                 }
                             </div>
                         }
@@ -182,28 +177,74 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        document.querySelectorAll('.pstar-btn').forEach(function(btn) {
-            btn.addEventListener('mouseover', function() {
-                var val = parseInt(this.dataset.value);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) {
-                    s.classList.toggle('active', i < val);
-                });
-            });
-            btn.addEventListener('mouseout', function() {
-                var selected = parseInt(document.getElementById('ratingValue').value);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) {
-                    s.classList.toggle('active', i < selected);
-                });
-            });
-            btn.addEventListener('click', function() {
-                var val = parseInt(this.dataset.value);
-                document.getElementById('ratingValue').value = val;
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) {
-                    s.classList.toggle('active', i < val);
+<script>
+(function() {
+    function isMobile() { return window.innerWidth <= 768; }
+
+    var list = document.getElementById('permintaan-list');
+    var detail = document.getElementById('permintaan-detail');
+    if (!list || !detail) return;
+
+    if (isMobile()) {
+        var hasSelected = detail.querySelector('.pdetail-empty') === null;
+
+        if (!hasSelected) {
+            list.style.display = 'block';
+            detail.style.display = 'none';
+        } else {
+            list.style.display = 'none';
+            detail.style.display = 'block';
+
+            var backBtn = document.createElement('button');
+            backBtn.className = 'pdetail-back-btn';
+            backBtn.innerHTML = '<i class="ti ti-arrow-left" aria-hidden="true"></i> Permintaan';
+            backBtn.onclick = function() {
+                list.style.display = 'block';
+                detail.style.display = 'none';
+                window.history.pushState({}, '', '/Request/Permintaan');
+            };
+            detail.insertBefore(backBtn, detail.firstChild);
+        }
+
+        list.querySelectorAll('.plist-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                var href = this.getAttribute('href');
+                if (!href) return;
+
+                fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(function(r) { return r.text(); })
+                .then(function(html) {
+                    var body = document.getElementById('profile-body');
+                    if (body) {
+                        body.innerHTML = html;
+                        body.querySelectorAll('script').forEach(function(s) {
+                            var ns = document.createElement('script');
+                            ns.textContent = s.textContent;
+                            s.parentNode.replaceChild(ns, s);
+                        });
+                    }
+                    window.history.pushState({}, '', href);
                 });
             });
         });
-    </script>
-}
+    }
+
+    document.querySelectorAll('.pstar-btn').forEach(function(btn) {
+        btn.addEventListener('mouseover', function() {
+            var val = parseInt(this.dataset.value);
+            document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+        });
+        btn.addEventListener('mouseout', function() {
+            var sel = parseInt(document.getElementById('ratingValue')?.value || 0);
+            document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
+        });
+        btn.addEventListener('click', function() {
+            var val = parseInt(this.dataset.value);
+            var rv = document.getElementById('ratingValue');
+            if (rv) rv.value = val;
+            document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+        });
+    });
+})();
+</script>
