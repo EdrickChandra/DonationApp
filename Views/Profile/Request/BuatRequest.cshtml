@@ -5,9 +5,16 @@
     var userProvinsi = ViewBag.UserProvinsi as string ?? "";
 }
 
-
-
 <div class="ppage">
+
+    <div style="padding:16px 20px 0;border-bottom:0.5px solid #cbd5e1;">
+        <div class="ptab-bar" style="margin:0;border:none;">
+            <a asp-controller="Request" asp-action="MyRequests" class="ptab">Request Saya</a>
+            <a asp-controller="Request" asp-action="Permintaan" class="ptab">Permintaan Donasi</a>
+            <a asp-controller="Request" asp-action="CreateView" class="ptab active">Buat Request</a>
+        </div>
+    </div>
+
     <div class="ppage-inner" style="max-width:600px;">
 
         <div class="ppage-header">
@@ -63,18 +70,21 @@
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="pform-group">
-                        <label class="pform-label">Lokasi <span class="pform-hint">(dari profil)</span></label>
-                        <input class="pform-input" name="Lokasi" value="@userAlamat" placeholder="Kota / Kecamatan..." required />
-                        <span class="pform-error" data-for="Lokasi">Lokasi wajib diisi.</span>
-                    </div>
-                    <div class="pform-group">
                         <label class="pform-label">Provinsi</label>
-                        <select class="pform-input" name="Provinsi">
-                            @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
+                        <select class="pform-input" name="Provinsi" id="req-provinsi" onchange="updateReqKota(this.value)" required>
+                            <option value="">Pilih Provinsi</option>
+                            @foreach (var prov in new[] { "Aceh", "Bali", "Banten", "Bengkulu", "DI Yogyakarta", "DKI Jakarta", "Gorontalo", "Jambi", "Jawa Barat", "Jawa Tengah", "Jawa Timur", "Kalimantan Barat", "Kalimantan Selatan", "Kalimantan Tengah", "Kalimantan Timur", "Kalimantan Utara", "Kepulauan Bangka Belitung", "Kepulauan Riau", "Lampung", "Maluku", "Maluku Utara", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Papua", "Papua Barat", "Riau", "Sulawesi Barat", "Sulawesi Selatan", "Sulawesi Tengah", "Sulawesi Tenggara", "Sulawesi Utara", "Sumatera Barat", "Sumatera Selatan", "Sumatera Utara" })
                             {
                                 <option selected="@(userProvinsi == prov)">@prov</option>
                             }
                         </select>
+                    </div>
+                    <div class="pform-group">
+                        <label class="pform-label">Kota</label>
+                        <select class="pform-input" name="Lokasi" id="req-kota" required>
+                            <option value="">Pilih Provinsi dulu</option>
+                        </select>
+                        <span class="pform-error" data-for="Lokasi">Kota wajib dipilih.</span>
                     </div>
                 </div>
 
@@ -90,11 +100,7 @@
                         <span class="pform-hint">(opsional, maks. 5, 5MB, JPG/PNG)</span>
                     </label>
                     <input type="file" id="req-file-input" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
-                    <div class="pupload-zone" onclick="document.getElementById('req-file-input').click()">
-                        <i class="ti ti-photo-plus" aria-hidden="true" style="font-size:20px;display:block;margin-bottom:6px;"></i>
-                        Klik untuk unggah foto referensi
-                    </div>
-                    <div id="req-preview" class="pimage-grid"></div>
+                    <div id="req-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
                 </div>
 
                 <button type="submit" class="pbtn pbtn-primary pbtn-block" onclick="return validateReq()">
@@ -105,140 +111,168 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        var categoryFields = {
-            "@((int)ItemCategory.Pakaian)": [
-                { key:"Ukuran", label:"Ukuran", type:"select", options:["XS","S","M","L","XL","XXL"] },
-                { key:"JenisKelamin", label:"Jenis Kelamin", type:"select", options:["Pria","Wanita","Unisex"] }
-            ],
-            "@((int)ItemCategory.Elektronik)": [
-                { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Samsung, Apple" },
-                { key:"Model", label:"Model / Tipe", type:"text", placeholder:"e.g. Galaxy S21" },
-                { key:"Tahun", label:"Tahun", type:"text", placeholder:"e.g. 2020" }
-            ],
-            "@((int)ItemCategory.PerabotRumah)": [
-                { key:"Material", label:"Material", type:"select", options:["Kayu","Besi","Plastik","Kain","Lainnya"] },
-                { key:"Dimensi", label:"Dimensi", type:"text", placeholder:"e.g. 120x60x75 cm" }
-            ],
-            "@((int)ItemCategory.MainanHobi)": [
-                { key:"UsiaRekomendasi", label:"Usia Rekomendasi", type:"select", options:["0-1 tahun","1-3 tahun","3-5 tahun","5-12 tahun","12+ tahun"] },
-                { key:"KondisiDetail", label:"Kondisi Detail", type:"text", placeholder:"e.g. ada goresan kecil" }
-            ],
-            "@((int)ItemCategory.AlatMusik)": [
-                { key:"JenisInstrumen", label:"Jenis Instrumen", type:"select", options:["Gitar","Bass","Piano/Keyboard","Drum/Perkusi","Biola/String","Tiup Kayu","Tiup Logam","Vokal/Mikrofon","DJ/Elektronik","Lainnya"] },
-                { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Yamaha, Roland" }
-            ]
-        };
+<script>
+    var categoryFields = {
+        "@((int)ItemCategory.Pakaian)": [
+            { key:"Ukuran", label:"Ukuran", type:"select", options:["XS","S","M","L","XL","XXL"] },
+            { key:"JenisKelamin", label:"Jenis Kelamin", type:"select", options:["Pria","Wanita","Unisex"] }
+        ],
+        "@((int)ItemCategory.Elektronik)": [
+            { key:"Jenis", label:"Jenis Perangkat", type:"select", options:["Laptop","Smartphone","Tablet","Kamera","TV","Printer","Lainnya"] },
+            { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Samsung, Apple, Asus" }
+        ],
+        "@((int)ItemCategory.Buku)": [
+            { key:"Jenjang", label:"Jenjang", type:"select", options:["SD","SMP","SMA","Kuliah","Umum"] },
+            { key:"Subjek", label:"Subjek / Mata Pelajaran", type:"select", options:["Matematika","IPA","IPS","Bahasa","Agama","Umum","Lainnya"] }
+        ],
+        "@((int)ItemCategory.MainanHobi)": [
+            { key:"UsiaRekomendasi", label:"Usia Rekomendasi", type:"select", options:["0-1 tahun","1-3 tahun","3-5 tahun","5-12 tahun","12+ tahun"] },
+            { key:"Jenis", label:"Jenis Mainan", type:"select", options:["Edukatif","Action Figure","Boneka","Puzzle","Kendaraan","Lainnya"] }
+        ],
+        "@((int)ItemCategory.AlatMusik)": [
+            { key:"JenisInstrumen", label:"Jenis Instrumen", type:"select", options:["Gitar","Bass","Piano/Keyboard","Drum/Perkusi","Biola/String","Tiup Kayu","Tiup Logam","Vokal/Mikrofon","DJ/Elektronik","Lainnya"] },
+            { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Yamaha, Roland" }
+        ]
+    };
 
-        function showReqFields(val) {
-            var container = document.getElementById('req-detail-fields');
-            container.innerHTML = '';
-            var fields = categoryFields[val];
-            if (!fields) return;
-            fields.forEach(function(f) {
-                var div = document.createElement('div');
-                div.className = 'pform-group';
-                var label = document.createElement('label');
-                label.className = 'pform-label';
-                label.textContent = f.label;
-                div.appendChild(label);
-                var input;
-                if (f.type === 'select') {
-                    input = document.createElement('select');
-                    input.className = 'pform-input';
-                    input.id = 'req-field-' + f.key;
-                    input.dataset.key = f.key;
-                    var empty = document.createElement('option');
-                    empty.value = ''; empty.textContent = 'Pilih ' + f.label;
-                    input.appendChild(empty);
-                    f.options.forEach(function(o) {
-                        var opt = document.createElement('option');
-                        opt.value = o; opt.textContent = o;
-                        input.appendChild(opt);
-                    });
-                } else {
-                    input = document.createElement('input');
-                    input.className = 'pform-input';
-                    input.type = 'text';
-                    input.placeholder = f.placeholder || '';
-                    input.id = 'req-field-' + f.key;
-                    input.dataset.key = f.key;
-                }
-                div.appendChild(input);
-                container.appendChild(div);
-            });
-        }
-
-        var reqImageStore = [];
-
-        document.getElementById('req-file-input').addEventListener('change', function() {
-            Array.from(this.files).forEach(function(f) { if (reqImageStore.length < 5) reqImageStore.push(f); });
-            this.value = '';
-            renderReqPreviews();
-            syncReqInput();
-        });
-
-        function renderReqPreviews() {
-            var container = document.getElementById('req-preview');
-            container.innerHTML = '';
-            reqImageStore.forEach(function(file, i) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var wrap = document.createElement('div');
-                    wrap.className = 'pimage-thumb';
-                    var img = document.createElement('img');
-                    img.src = e.target.result;
-                    var del = document.createElement('button');
-                    del.type = 'button';
-                    del.className = 'pimage-del';
-                    del.textContent = '✕';
-                    del.onclick = (function(idx) { return function() { reqImageStore.splice(idx, 1); renderReqPreviews(); syncReqInput(); }; })(i);
-                    wrap.appendChild(img); wrap.appendChild(del); container.appendChild(wrap);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        function syncReqInput() {
-            var dt = new DataTransfer();
-            reqImageStore.forEach(function(f) { dt.items.add(f); });
-            document.getElementById('req-file-input').files = dt.files;
-        }
-
-        function validateReq() {
-            var valid = true;
-            var required = [
-                { name:'Title', for:'Title' },
-                { name:'Kategori', for:'Kategori' },
-                { name:'Lokasi', for:'Lokasi' },
-                { name:'Deskripsi', for:'Deskripsi' }
-            ];
-            required.forEach(function(f) {
-                var el = document.querySelector('#req-form [name="' + f.name + '"]');
-                var err = document.querySelector('#req-form [data-for="' + f.for + '"]');
-                if (el && !el.value.trim()) {
-                    el.classList.add('error');
-                    if (err) err.style.display = 'block';
-                    valid = false;
-                } else {
-                    if (el) el.classList.remove('error');
-                    if (err) err.style.display = 'none';
-                }
-            });
-            if (valid) {
-                var katEl = document.getElementById('req-kategori');
-                var fields = categoryFields[katEl.value];
-                var result = {};
-                if (fields) {
-                    fields.forEach(function(f) {
-                        var el = document.getElementById('req-field-' + f.key);
-                        if (el && el.value) result[f.key] = el.value;
-                    });
-                }
-                document.getElementById('ReqDetailTambahanJson').value = Object.keys(result).length > 0 ? JSON.stringify(result) : '';
+    function showReqFields(val) {
+        var container = document.getElementById('req-detail-fields');
+        container.innerHTML = '';
+        var fields = categoryFields[val];
+        if (!fields) return;
+        fields.forEach(function(f) {
+            var div = document.createElement('div');
+            div.className = 'pform-group';
+            var label = document.createElement('label');
+            label.className = 'pform-label';
+            label.textContent = f.label;
+            div.appendChild(label);
+            var input;
+            if (f.type === 'select') {
+                input = document.createElement('select');
+                input.className = 'pform-input';
+                input.id = 'req-field-' + f.key;
+                input.dataset.key = f.key;
+                var empty = document.createElement('option');
+                empty.value = ''; empty.textContent = 'Pilih ' + f.label;
+                input.appendChild(empty);
+                f.options.forEach(function(o) {
+                    var opt = document.createElement('option');
+                    opt.value = o; opt.textContent = o;
+                    input.appendChild(opt);
+                });
+            } else {
+                input = document.createElement('input');
+                input.className = 'pform-input';
+                input.type = 'text';
+                input.placeholder = f.placeholder || '';
+                input.id = 'req-field-' + f.key;
+                input.dataset.key = f.key;
             }
-            return valid;
+            div.appendChild(input);
+            container.appendChild(div);
+        });
+    }
+
+    function updateReqKota(provinsi) {
+        populateKota(provinsi, document.getElementById('req-kota'));
+    }
+
+    var userProvinsi = '@userProvinsi';
+    if (userProvinsi) {
+        var provSelect = document.getElementById('req-provinsi');
+        if (provSelect) provSelect.value = userProvinsi;
+        updateReqKota(userProvinsi);
+    }
+
+    var reqImageStore = [];
+
+    document.getElementById('req-file-input').addEventListener('change', function() {
+        Array.from(this.files).forEach(function(f) { if (reqImageStore.length < 5) reqImageStore.push(f); });
+        this.value = '';
+        renderReqPreviews();
+        syncReqInput();
+    });
+
+    renderReqPreviews();
+
+    function renderReqPreviews() {
+        var container = document.getElementById('req-preview');
+        container.innerHTML = '';
+        reqImageStore.forEach(function(file, i) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var wrap = document.createElement('div');
+                wrap.style.cssText = 'position:relative;width:88px;height:88px;border-radius:10px;overflow:hidden;flex-shrink:0;';
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
+                var del = document.createElement('button');
+                del.type = 'button';
+                del.style.cssText = 'position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;border:none;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;line-height:1;';
+                del.innerHTML = '✕';
+                del.onclick = (function(idx) { return function() { reqImageStore.splice(idx, 1); renderReqPreviews(); syncReqInput(); }; })(i);
+                wrap.appendChild(img);
+                wrap.appendChild(del);
+                container.appendChild(wrap);
+                if (reqImageStore.length < 5) appendReqAddTile(container);
+            };
+            reader.readAsDataURL(file);
+        });
+        if (reqImageStore.length === 0) appendReqAddTile(container);
+    }
+
+    function appendReqAddTile(container) {
+        var existing = container.querySelector('.req-add-tile');
+        if (existing) existing.remove();
+        var tile = document.createElement('div');
+        tile.className = 'req-add-tile';
+        tile.style.cssText = 'width:88px;height:88px;border-radius:10px;border:2px dashed #cbd5e1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#94a3b8;gap:4px;background:#f8fafc;flex-shrink:0;transition:all 0.15s;';
+        tile.innerHTML = '<i class="ti ti-plus" style="font-size:22px;"></i><span style="font-size:10px;font-family:Plus Jakarta Sans,sans-serif;font-weight:600;">Tambah</span>';
+        tile.onmouseenter = function() { tile.style.borderColor = 'var(--blue)'; tile.style.color = 'var(--blue)'; tile.style.background = '#eff6ff'; };
+        tile.onmouseleave = function() { tile.style.borderColor = '#cbd5e1'; tile.style.color = '#94a3b8'; tile.style.background = '#f8fafc'; };
+        tile.onclick = function() { document.getElementById('req-file-input').click(); };
+        container.appendChild(tile);
+    }
+
+    function syncReqInput() {
+        var dt = new DataTransfer();
+        reqImageStore.forEach(function(f) { dt.items.add(f); });
+        document.getElementById('req-file-input').files = dt.files;
+    }
+
+    function validateReq() {
+        var valid = true;
+        var required = [
+            { name:'Title', for:'Title' },
+            { name:'Kategori', for:'Kategori' },
+            { name:'Lokasi', for:'Lokasi' },
+            { name:'Deskripsi', for:'Deskripsi' }
+        ];
+        required.forEach(function(f) {
+            var el = document.querySelector('#req-form [name="' + f.name + '"]');
+            var err = document.querySelector('#req-form [data-for="' + f.for + '"]');
+            if (el && !el.value.trim()) {
+                el.classList.add('error');
+                if (err) err.style.display = 'block';
+                valid = false;
+            } else {
+                if (el) el.classList.remove('error');
+                if (err) err.style.display = 'none';
+            }
+        });
+        if (valid) {
+            var katEl = document.getElementById('req-kategori');
+            var fields = categoryFields[katEl.value];
+            var result = {};
+            if (fields) {
+                fields.forEach(function(f) {
+                    var el = document.getElementById('req-field-' + f.key);
+                    if (el && el.value) result[f.key] = el.value;
+                });
+            }
+            document.getElementById('ReqDetailTambahanJson').value = Object.keys(result).length > 0 ? JSON.stringify(result) : '';
         }
-    </script>
-}
+        return valid;
+    }
+</script>

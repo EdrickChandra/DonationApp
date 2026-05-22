@@ -58,7 +58,8 @@ public class ItemController : BaseController
         item.ExpiresAt = DateTime.UtcNow.AddDays(7);
         item.Status = ItemStatus.Available;
         item.UserId = userId;
-        item.Provinsi = user?.Provinsi ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(item.Provinsi))
+            item.Provinsi = user?.Provinsi ?? string.Empty;
         item.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
         _context.Items.Add(item);
@@ -239,6 +240,37 @@ public class ItemController : BaseController
         await _context.SaveChangesAsync();
 
         return RedirectToAction("Index", "Pesan", new { convId = conversation.Id });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Accept(int requestId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var request = await _context.ClaimRequests
+            .Include(r => r.Item)
+            .FirstOrDefaultAsync(r => r.Id == requestId);
+
+        if (request == null || request.Item == null || request.Item.UserId != userId)
+            return RedirectToAction("Index", "Donasi");
+
+        request.Status = ClaimRequestStatus.Accepted;
+        request.UpdatedAt = DateTime.UtcNow;
+
+        var item = request.Item;
+        item.Status = ItemStatus.Claimed;
+
+        _context.Notifications.Add(new Notification
+        {
+            UserId = request.UserId,
+            Message = $"Permintaan Anda untuk barang \"{item.NamaBarang}\" diterima!",
+            Link = "/Request/Permintaan",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _context.SaveChangesAsync();
+        return RedirectToAction("Index", "Donasi");
     }
 
     [HttpPost]

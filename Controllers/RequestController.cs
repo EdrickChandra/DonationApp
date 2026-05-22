@@ -69,7 +69,7 @@ public class RequestController : ProfileBaseController
 
         var selected = selectedId.HasValue
             ? claimRequests.FirstOrDefault(r => r.Id == selectedId.Value)
-            : claimRequests.FirstOrDefault();
+            : null;
 
         ViewBag.ClaimRequests = claimRequests;
         ViewBag.Selected = selected;

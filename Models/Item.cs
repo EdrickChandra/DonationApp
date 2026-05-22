@@ -54,6 +54,8 @@ public class Item
 
     public string? DetailTambahan { get; set; }
 
+    public int Jumlah { get; set; } = 1;
+
     public ItemStatus Status { get; set; } = ItemStatus.Available;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

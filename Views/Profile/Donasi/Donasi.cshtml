@@ -15,14 +15,11 @@
 <div class="ppage">
     <div class="ppage-inner" style="max-width:100%;padding:0;">
 
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary, #cbd5e1);">
+        <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary, #cbd5e1);">
             <div class="ptab-bar" style="margin:0;border:none;">
                 <a asp-controller="Donasi" asp-action="Index" class="ptab active">Donasi Saya</a>
                 <a asp-controller="Donasi" asp-action="Create" class="ptab">Buat Donasi</a>
             </div>
-            <a asp-controller="Donasi" asp-action="Create" class="pbtn pbtn-primary" style="font-size:12px;padding:6px 14px;">
-                <i class="ti ti-plus" aria-hidden="true"></i> Buat Donasi
-            </a>
         </div>
 
         @if (visibleDonations == null || !visibleDonations.Any())
@@ -34,7 +31,7 @@
         }
         else
         {
-            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);" id="donasi-split">
+            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
 
                 <div class="plist" id="donasi-list">
                     @foreach (var d in visibleDonations)
@@ -44,7 +41,8 @@
                             r.Status == ClaimRequestStatus.Shipped ||
                             r.Status == ClaimRequestStatus.Delivered);
 
-                        var (statusLabel, statusClass) = accepted?.Status switch {
+                        var (statusLabel, statusClass) = accepted?.Status switch
+                        {
                             ClaimRequestStatus.Accepted => ("Diterima", "pbadge-claimed"),
                             ClaimRequestStatus.Shipped => ("Dikirim", "pbadge-pending"),
                             ClaimRequestStatus.Delivered => ("Selesai", "pbadge-available"),
@@ -55,8 +53,7 @@
                         var daysLeft = (d.ExpiresAt - DateTime.UtcNow).Days;
 
                         <a class="plist-item @(selected?.Id == d.Id ? "active" : "")"
-                           href="/Donasi/Index?selectedId=@d.Id"
-                           data-item-id="@d.Id">
+                           href="/Donasi/Index?selectedId=@d.Id">
                             @if (d.Images.Any())
                             {
                                 <img src="@d.Images.First().FilePath" class="plist-thumb" style="object-fit:cover;" />
@@ -103,6 +100,7 @@
                                 <div style="display:flex;gap:6px;">
                                     <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
                                     <span class="pbadge pbadge-muted">@selected.Kondisi</span>
+                                    <span class="pbadge pbadge-muted">@selected.Jumlah pcs</span>
                                     <span class="pbadge pbadge-muted">@selected.Lokasi</span>
                                 </div>
                             </div>
@@ -118,6 +116,14 @@
                                         <div style="font-size:13px;font-weight:500;color:#0f172a;">@accepted.User?.NamaDepan @accepted.User?.NamaBelakang</div>
                                         <div style="font-size:11px;color:#64748b;">@accepted.User?.Alamat</div>
                                     </div>
+                                    <form asp-controller="Item" asp-action="Chat" method="post" style="margin-left:auto;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="itemId" value="@selected.Id" />
+                                        <input type="hidden" name="otherUserId" value="@accepted.UserId" />
+                                        <button type="submit" class="pbtn pbtn-primary" style="font-size:12px;padding:5px 12px;">
+                                            <i class="ti ti-message-2" aria-hidden="true"></i> Chat
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
@@ -214,58 +220,3 @@
     { "MatchCount", matchCount },
     { "MatchContext", matchContext }
 })
-
-<script>
-(function() {
-    function isMobile() { return window.innerWidth <= 768; }
-
-    var list = document.getElementById('donasi-list');
-    var detail = document.getElementById('donasi-detail');
-    if (!list || !detail) return;
-
-    if (isMobile()) {
-        var hasSelected = detail.querySelector('.pdetail-empty') === null;
-
-        if (!hasSelected) {
-            list.style.display = 'block';
-            detail.style.display = 'none';
-        } else {
-            list.style.display = 'none';
-            detail.style.display = 'block';
-
-            var backBtn = document.createElement('button');
-            backBtn.className = 'pdetail-back-btn';
-            backBtn.innerHTML = '<i class="ti ti-arrow-left" aria-hidden="true"></i> Donasi Saya';
-            backBtn.onclick = function() {
-                list.style.display = 'block';
-                detail.style.display = 'none';
-                window.history.pushState({}, '', '/Donasi/Index');
-            };
-            detail.insertBefore(backBtn, detail.firstChild);
-        }
-
-        list.querySelectorAll('.plist-item').forEach(function(item) {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                var href = this.getAttribute('href');
-                if (!href) return;
-
-                fetch(href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                .then(function(r) { return r.text(); })
-                .then(function(html) {
-                    var body = document.getElementById('profile-body');
-                    if (body) {
-                        body.innerHTML = html;
-                        body.querySelectorAll('script').forEach(function(s) {
-                            var ns = document.createElement('script');
-                            ns.textContent = s.textContent;
-                            s.parentNode.replaceChild(ns, s);
-                        });
-                    }
-                    window.history.pushState({}, '', href);
-                });
-            });
-        });
-    }
-})();
-</script>

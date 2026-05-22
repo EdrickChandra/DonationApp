@@ -8,16 +8,21 @@ public static class CategoryHelper
     {
         ItemCategory.Semua => "Semua",
         ItemCategory.Pakaian => "Pakaian",
-        ItemCategory.Elektronik => "Elektronik",
+        ItemCategory.Elektronik => "Perangkat Elektronik",
         ItemCategory.Buku => "Buku",
-        ItemCategory.PerabotRumah => "Perabot Rumah",
-        ItemCategory.MainanHobi => "Mainan & Hobi",
-        ItemCategory.AlatTulis => "Alat Tulis",
+        ItemCategory.MainanHobi => "Mainan Anak",
         ItemCategory.AlatMusik => "Alat Musik",
-        ItemCategory.PeralatanDapur => "Peralatan Dapur",
         _ => category.ToString()
     };
 
     public static IEnumerable<ItemCategory> AllCategories()
-        => Enum.GetValues<ItemCategory>();
+        => new[]
+        {
+            ItemCategory.Semua,
+            ItemCategory.Pakaian,
+            ItemCategory.Elektronik,
+            ItemCategory.Buku,
+            ItemCategory.MainanHobi,
+            ItemCategory.AlatMusik
+        };
 }

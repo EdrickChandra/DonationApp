@@ -1,10 +1,18 @@
-﻿.pnav {
+﻿main:has(.pnav) {
+    padding-top: 0;
+}
+
+.pnav {
+    position: sticky;
+    top: 52px;
+    z-index: 50;
     display: flex;
     align-items: center;
     height: 48px;
     border-bottom: 1px solid #1a2f52;
     background: var(--navy);
     gap: 0;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06);
 }
 
 .pnav-user {
@@ -14,6 +22,7 @@
     align-items: center;
     padding: 0 20px;
     flex-shrink: 0;
+    background: rgba(255,255,255,0.05);
 }
 
 .pnav-avatar-link {
@@ -64,6 +73,8 @@
     border-bottom: 2px solid transparent;
     white-space: nowrap;
     transition: color 0.15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
 }
 
     .pnav-link i {
@@ -77,6 +88,7 @@
     .pnav-link.active {
         color: var(--white);
         border-bottom-color: var(--blue-light);
+        font-weight: 600;
     }
 
 .pnav-badge {
@@ -1088,21 +1100,4 @@
 
     .ppage-form-inner .ppage-header {
         margin-bottom: 16px;
-    }
-
-.pnav {
-    box-shadow: 0 1px 0 rgba(255,255,255,0.06);
-}
-
-.pnav-user {
-    background: rgba(255,255,255,0.05);
-}
-
-.pnav-link {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 500;
-}
-
-    .pnav-link.active {
-        font-weight: 600;
     }

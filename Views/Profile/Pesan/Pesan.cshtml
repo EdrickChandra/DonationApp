@@ -90,218 +90,224 @@
 </div>
 
 <script>
-(function() {
-    function startChat() {
-    var currentUserId = '@currentUserId';
-    var activeConvId = null;
-    var connection = null;
-    var initialConvId = @(initialConvId.HasValue ? initialConvId.Value.ToString() : "null");
-    var isMobile = window.innerWidth <= 768;
+    (function() {
+        function startChat() {
+            var currentUserId = '@currentUserId';
+            var activeConvId = null;
+            var connection = null;
+            var initialConvId = @(initialConvId.HasValue ? initialConvId.Value.ToString() : "null");
+            var isMobile = window.innerWidth <= 768;
 
-    function initSignalR() {
-        connection = new signalR.HubConnectionBuilder()
-            .withUrl('/chatHub')
-            .withAutomaticReconnect()
-            .build();
+            function initSignalR() {
+                connection = new signalR.HubConnectionBuilder()
+                    .withUrl('/chatHub')
+                    .withAutomaticReconnect()
+                    .build();
 
-        connection.on('ReceiveMessage', function(msg) {
-            if (msg.conversationId === activeConvId) {
-                appendMessage(msg);
-                scrollToBottom();
+                connection.on('ReceiveMessage', function(msg) {
+                    if (msg.conversationId === activeConvId) {
+                        appendMessage(msg);
+                        scrollToBottom();
+                    }
+                });
+
+                connection.start().then(function() {
+                    if (initialConvId !== null && !isMobile) {
+                        var target = document.querySelector('[data-conv-id="' + initialConvId + '"]');
+                        if (target) selectConversation(target);
+                    }
+                }).catch(function(err) { console.error('SignalR error:', err); });
             }
-        });
 
-        connection.start().then(function() {
-            if (initialConvId !== null) {
-                var target = document.querySelector('[data-conv-id="' + initialConvId + '"]');
-                if (target) selectConversation(target);
+            function selectConversation(el) {
+                document.querySelectorAll('.pchat-item').forEach(function(i) { i.classList.remove('active'); });
+                el.classList.add('active');
+                var dot = el.querySelector('.pchat-unread-dot');
+                if (dot) dot.remove();
+
+                var convId = parseInt(el.dataset.convId);
+                if (activeConvId !== null && connection)
+                    connection.invoke('LeaveConversation', activeConvId).catch(function() {});
+                activeConvId = convId;
+
+                var header = document.getElementById('chatHeader');
+                header.style.display = 'flex';
+                document.getElementById('chatHeaderName').textContent = el.dataset.itemName;
+                document.getElementById('chatHeaderSub').textContent = 'dengan ' + el.dataset.otherName;
+
+                var headerThumb = document.getElementById('chatHeaderThumb');
+                if (el.dataset.thumb) {
+                    headerThumb.src = el.dataset.thumb;
+                    headerThumb.style.display = 'block';
+                } else {
+                    headerThumb.style.display = 'none';
+                }
+
+                document.getElementById('chatNoSelect') && (document.getElementById('chatNoSelect').style.display = 'none');
+                document.getElementById('chatInputBar').style.display = 'flex';
+
+                if (isMobile) {
+                    document.getElementById('chat-list').style.display = 'none';
+                    document.getElementById('chat-window').style.display = 'flex';
+                    document.getElementById('chatBackBtn').style.display = 'flex';
+                }
+
+                loadMessages(convId);
+
+                if (connection && connection.state === signalR.HubConnectionState.Connected)
+                    connection.invoke('JoinConversation', convId).catch(function(err) { console.error(err); });
             }
-        }).catch(function(err) { console.error('SignalR error:', err); });
-    }
 
-    function selectConversation(el) {
-        document.querySelectorAll('.pchat-item').forEach(function(i) { i.classList.remove('active'); });
-        el.classList.add('active');
-        var dot = el.querySelector('.pchat-unread-dot');
-        if (dot) dot.remove();
+            function closeChatMobile() {
+                var cl = document.getElementById('chat-list');
+                var cw = document.getElementById('chat-window');
+                var cb = document.getElementById('chatBackBtn');
+                var ch = document.getElementById('chatHeader');
+                var ib = document.getElementById('chatInputBar');
+                var ns = document.getElementById('chatNoSelect');
+                if (cl) cl.style.display = 'flex';
+                if (cw) cw.style.display = 'none';
+                if (cb) cb.style.display = 'none';
+                if (ch) ch.style.display = 'none';
+                if (ib) ib.style.display = 'none';
+                if (ns) ns.style.display = 'flex';
+                if (activeConvId !== null && connection)
+                    connection.invoke('LeaveConversation', activeConvId).catch(function() {});
+                activeConvId = null;
+                document.querySelectorAll('.pchat-item').forEach(function(i) { i.classList.remove('active'); });
+            }
 
-        var convId = parseInt(el.dataset.convId);
-        if (activeConvId !== null && connection)
-            connection.invoke('LeaveConversation', activeConvId).catch(function() {});
-        activeConvId = convId;
+            function loadMessages(convId) {
+                var messagesEl = document.getElementById('chatMessages');
+                messagesEl.innerHTML = '';
+                fetch('/Chat/GetMessages?conversationId=' + convId)
+                    .then(function(r) { return r.json(); })
+                    .then(function(msgs) {
+                        msgs.forEach(function(m) { appendMessage(m); });
+                        scrollToBottom();
+                    });
+            }
 
-        var header = document.getElementById('chatHeader');
-        header.style.display = 'flex';
-        document.getElementById('chatHeaderName').textContent = el.dataset.itemName;
-        document.getElementById('chatHeaderSub').textContent = 'dengan ' + el.dataset.otherName;
+            function appendMessage(msg) {
+                var messagesEl = document.getElementById('chatMessages');
+                var isMine = msg.senderId === currentUserId;
 
-        var headerThumb = document.getElementById('chatHeaderThumb');
-        if (el.dataset.thumb) {
-            headerThumb.src = el.dataset.thumb;
-            headerThumb.style.display = 'block';
+                var row = document.createElement('div');
+                row.className = 'pchat-bubble-row ' + (isMine ? 'mine' : 'theirs');
+
+                var bubble = document.createElement('div');
+                bubble.className = 'pchat-bubble';
+
+                if (msg.imagePath) {
+                    var img = document.createElement('img');
+                    img.src = msg.imagePath;
+                    img.style.cssText = 'max-width:200px;max-height:200px;border-radius:8px;display:block;cursor:pointer;';
+                    img.onclick = function() { window.open(msg.imagePath, '_blank'); };
+                    bubble.appendChild(img);
+                }
+
+                if (msg.content) {
+                    var text = document.createElement('p');
+                    text.style.marginTop = msg.imagePath ? '6px' : '0';
+                    text.textContent = msg.content;
+                    bubble.appendChild(text);
+                }
+
+                var time = document.createElement('div');
+                time.className = 'pchat-bubble-time';
+                time.textContent = new Date(msg.sentAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                row.appendChild(bubble);
+                row.appendChild(time);
+                messagesEl.appendChild(row);
+            }
+
+            function scrollToBottom() {
+                var el = document.getElementById('chatMessages');
+                el.scrollTop = el.scrollHeight;
+            }
+
+            function previewChatImage(input) {
+                var file = input.files[0];
+                if (!file) return;
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('chatImagePreviewImg').src = e.target.result;
+                    document.getElementById('chatImagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function clearChatImage() {
+                document.getElementById('chatImageInput').value = '';
+                document.getElementById('chatImagePreview').style.display = 'none';
+                document.getElementById('chatImagePreviewImg').src = '';
+            }
+
+            async function uploadChatImage(convId) {
+                var input = document.getElementById('chatImageInput');
+                if (!input.files || input.files.length === 0) return null;
+                var formData = new FormData();
+                formData.append('conversationId', convId);
+                formData.append('image', input.files[0]);
+                var token = document.querySelector('input[name="__RequestVerificationToken"]');
+                var headers = token ? { 'RequestVerificationToken': token.value } : {};
+                var response = await fetch('/Chat/UploadImage', { method: 'POST', headers: headers, body: formData });
+                var data = await response.json();
+                return data.success ? data.path : null;
+            }
+
+            async function sendMessage() {
+                var input = document.getElementById('chatInput');
+                var content = input.value.trim();
+                var hasImage = document.getElementById('chatImageInput').files.length > 0;
+                if (!content && !hasImage) return;
+                if (activeConvId === null) return;
+                if (!connection || connection.state !== signalR.HubConnectionState.Connected) return;
+
+                document.getElementById('chatSendBtn').disabled = true;
+                var imagePath = null;
+                if (hasImage) {
+                    imagePath = await uploadChatImage(activeConvId);
+                    clearChatImage();
+                }
+
+                connection.invoke('SendMessage', activeConvId, content, imagePath)
+                    .then(function() {
+                        input.value = '';
+                        document.getElementById('chatSendBtn').disabled = false;
+                    })
+                    .catch(function(err) {
+                        console.error(err);
+                        document.getElementById('chatSendBtn').disabled = false;
+                    });
+            }
+
+            document.getElementById('chatInput').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+            });
+
+            if (isMobile) {
+                var chatWindow = document.getElementById('chat-window');
+                if (chatWindow) chatWindow.style.display = 'none';
+            }
+
+            window.selectConversation = selectConversation;
+            window.closeChatMobile = closeChatMobile;
+            window.clearChatImage = clearChatImage;
+            window.previewChatImage = previewChatImage;
+            window.sendMessage = sendMessage;
+
+            initSignalR();
+        }
+
+        if (typeof signalR !== 'undefined') {
+            startChat();
         } else {
-            headerThumb.style.display = 'none';
+            var sr = document.createElement('script');
+            sr.src = 'https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js';
+            sr.onload = function() { startChat(); };
+            document.head.appendChild(sr);
         }
-
-        document.getElementById('chatNoSelect').style.display = 'none';
-        document.getElementById('chatInputBar').style.display = 'flex';
-
-        if (isMobile) {
-            document.getElementById('chat-list').style.display = 'none';
-            document.getElementById('chat-window').style.display = 'flex';
-            document.getElementById('chatBackBtn').style.display = 'flex';
-        }
-
-        loadMessages(convId);
-
-        if (connection && connection.state === signalR.HubConnectionState.Connected)
-            connection.invoke('JoinConversation', convId).catch(function(err) { console.error(err); });
-    }
-
-    function closeChatMobile() {
-        var cl = document.getElementById('chat-list');
-        var cw = document.getElementById('chat-window');
-        var cb = document.getElementById('chatBackBtn');
-        var ch = document.getElementById('chatHeader');
-        var ib = document.getElementById('chatInputBar');
-        var ns = document.getElementById('chatNoSelect');
-        if (cl) cl.style.display = 'flex';
-        if (cw) cw.style.display = 'none';
-        if (cb) cb.style.display = 'none';
-        if (ch) ch.style.display = 'none';
-        if (ib) ib.style.display = 'none';
-        if (ns) ns.style.display = 'flex';
-        if (activeConvId !== null && connection)
-            connection.invoke('LeaveConversation', activeConvId).catch(function() {});
-        activeConvId = null;
-        document.querySelectorAll('.pchat-item').forEach(function(i) { i.classList.remove('active'); });
-    }
-
-    function loadMessages(convId) {
-        var messagesEl = document.getElementById('chatMessages');
-        messagesEl.innerHTML = '';
-        fetch('/Chat/GetMessages?conversationId=' + convId)
-            .then(function(r) { return r.json(); })
-            .then(function(msgs) {
-                msgs.forEach(function(m) { appendMessage(m); });
-                scrollToBottom();
-            });
-    }
-
-    function appendMessage(msg) {
-        var messagesEl = document.getElementById('chatMessages');
-        var isMine = msg.senderId === currentUserId;
-
-        var row = document.createElement('div');
-        row.className = 'pchat-bubble-row ' + (isMine ? 'mine' : 'theirs');
-
-        var bubble = document.createElement('div');
-        bubble.className = 'pchat-bubble';
-
-        if (msg.imagePath) {
-            var img = document.createElement('img');
-            img.src = msg.imagePath;
-            img.style.cssText = 'max-width:200px;max-height:200px;border-radius:8px;display:block;cursor:pointer;';
-            img.onclick = function() { window.open(msg.imagePath, '_blank'); };
-            bubble.appendChild(img);
-        }
-
-        if (msg.content) {
-            var text = document.createElement('p');
-            text.style.marginTop = msg.imagePath ? '6px' : '0';
-            text.textContent = msg.content;
-            bubble.appendChild(text);
-        }
-
-        var time = document.createElement('div');
-        time.className = 'pchat-bubble-time';
-        time.textContent = new Date(msg.sentAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-        row.appendChild(bubble);
-        row.appendChild(time);
-        messagesEl.appendChild(row);
-    }
-
-    function scrollToBottom() {
-        var el = document.getElementById('chatMessages');
-        el.scrollTop = el.scrollHeight;
-    }
-
-    function previewChatImage(input) {
-        var file = input.files[0];
-        if (!file) return;
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('chatImagePreviewImg').src = e.target.result;
-            document.getElementById('chatImagePreview').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
-
-    function clearChatImage() {
-        document.getElementById('chatImageInput').value = '';
-        document.getElementById('chatImagePreview').style.display = 'none';
-        document.getElementById('chatImagePreviewImg').src = '';
-    }
-
-    async function uploadChatImage(convId) {
-        var input = document.getElementById('chatImageInput');
-        if (!input.files || input.files.length === 0) return null;
-        var formData = new FormData();
-        formData.append('conversationId', convId);
-        formData.append('image', input.files[0]);
-        var token = document.querySelector('input[name="__RequestVerificationToken"]');
-        var headers = token ? { 'RequestVerificationToken': token.value } : {};
-        var response = await fetch('/Chat/UploadImage', { method: 'POST', headers: headers, body: formData });
-        var data = await response.json();
-        return data.success ? data.path : null;
-    }
-
-    async function sendMessage() {
-        var input = document.getElementById('chatInput');
-        var content = input.value.trim();
-        var hasImage = document.getElementById('chatImageInput').files.length > 0;
-        if (!content && !hasImage) return;
-        if (activeConvId === null) return;
-        if (!connection || connection.state !== signalR.HubConnectionState.Connected) return;
-
-        document.getElementById('chatSendBtn').disabled = true;
-        var imagePath = null;
-        if (hasImage) {
-            imagePath = await uploadChatImage(activeConvId);
-            clearChatImage();
-        }
-
-        connection.invoke('SendMessage', activeConvId, content, imagePath)
-            .then(function() {
-                input.value = '';
-                document.getElementById('chatSendBtn').disabled = false;
-            })
-            .catch(function(err) {
-                console.error(err);
-                document.getElementById('chatSendBtn').disabled = false;
-            });
-    }
-
-    document.getElementById('chatInput').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-    });
-
-    if (isMobile) {
-        var chatWindow = document.getElementById('chat-window');
-        if (chatWindow) chatWindow.style.display = 'none';
-    }
-
-    initSignalR();
-    }
-
-    if (typeof signalR !== 'undefined') {
-        startChat();
-    } else {
-        var sr = document.createElement('script');
-        sr.src = 'https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js';
-        sr.onload = function() { startChat(); };
-        document.head.appendChild(sr);
-    }
-})();
+    })();
 </script>

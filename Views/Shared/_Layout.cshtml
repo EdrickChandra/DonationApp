@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="~/css/profile-mobile-append.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@tabler/icons-webfont@@latest/tabler-icons.min.css" />
+    <script src="~/js/location-data.js" asp-append-version="true"></script>
 </head>
 <body>
     <nav>
@@ -50,9 +51,6 @@
                         <span style="font-size:10px;">▼</span>
                     </div>
                     <div class="dropdown-menu" id="dropdownMenu">
-                        <a class="dropdown-item" asp-controller="Home" asp-action="Index">Donasi</a>
-                        <a class="dropdown-item" asp-controller="Request" asp-action="Index">Request</a>
-                        <div class="dropdown-divider"></div>
                         <a class="dropdown-item" asp-controller="Profile" asp-action="Edit">Profil</a>
                         <a class="dropdown-item" asp-controller="Donasi" asp-action="Index">Donasi Saya</a>
                         <a class="dropdown-item" asp-controller="Request" asp-action="MyRequests">Request Saya</a>
@@ -85,23 +83,23 @@
 
     <script>
         document.querySelectorAll('.condition-btn').forEach(btn => {
-            btn.addEventListener('click', function () {
-                this.closest('.condition-group').querySelectorAll('.condition-btn').forEach(b => b.classList.remove('selected'));
-                this.classList.add('selected');
-                const input = document.getElementById('kondisiInput');
-                if (input) input.value = this.dataset.value;
-            });
+        btn.addEventListener('click', function () {
+        this.closest('.condition-group').querySelectorAll('.condition-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        const input = document.getElementById('kondisiInput');
+        if (input) input.value = this.dataset.value;
+        });
         });
 
         function toggleDropdown() {
-            document.getElementById('dropdownMenu').classList.toggle('open');
+        document.getElementById('dropdownMenu').classList.toggle('open');
         }
 
         document.addEventListener('click', function(e) {
-            var dropdown = document.getElementById('navDropdown');
-            if (dropdown && !dropdown.contains(e.target)) {
-                document.getElementById('dropdownMenu').classList.remove('open');
-            }
+        var dropdown = document.getElementById('navDropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+        document.getElementById('dropdownMenu').classList.remove('open');
+        }
         });
     </script>
 
@@ -109,14 +107,14 @@
     <script>
         NProgress.configure({ showSpinner: false, speed: 300 });
         document.querySelectorAll('a[href]').forEach(function(link) {
-            link.addEventListener('click', function(e) {
-                var href = this.getAttribute('href');
-                if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
-                NProgress.start();
-            });
+        link.addEventListener('click', function(e) {
+        var href = this.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript') || this.target === '_blank') return;
+        NProgress.start();
+        });
         });
         window.addEventListener('pageshow', function() {
-            NProgress.done();
+        NProgress.done();
         });
     </script>
 

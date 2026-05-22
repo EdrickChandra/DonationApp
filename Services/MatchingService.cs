@@ -34,15 +34,12 @@ public class MatchingService
         _context = context;
     }
 
-    // ── Find ItemRequests that match a donated Item ───────────────────────────
-
     public async Task<List<ItemRequestMatchResult>> FindMatchesForItem(Item item)
     {
         var candidates = await _context.ItemRequests
             .Include(r => r.Images)
             .Include(r => r.User)
-            .Where(r => r.Status == ItemRequestStatus.Open
-                && r.ExpiresAt > DateTime.UtcNow)
+            .Where(r => r.Status == ItemRequestStatus.Open && r.ExpiresAt > DateTime.UtcNow)
             .ToListAsync();
 
         var results = new List<ItemRequestMatchResult>();
@@ -64,15 +61,12 @@ public class MatchingService
         return results.OrderByDescending(r => r.Score).Take(10).ToList();
     }
 
-    // ── Find Items that match an ItemRequest ──────────────────────────────────
-
     public async Task<List<ItemMatchResult>> FindMatchesForItemRequest(ItemRequest itemRequest)
     {
         var query = _context.Items
             .Include(i => i.Images)
             .Include(i => i.User)
-            .Where(i => i.Status == ItemStatus.Available
-                && i.ExpiresAt > DateTime.UtcNow);
+            .Where(i => i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
 
         if (itemRequest.KondisiMinimum == KondisiMinimum.Baru)
             query = query.Where(i => i.Kondisi == ItemCondition.Baru);
@@ -97,22 +91,16 @@ public class MatchingService
         return results.OrderByDescending(r => r.Score).Take(10).ToList();
     }
 
-    // ── Scoring: Item → ItemRequest ───────────────────────────────────────────
-
     private (int score, List<string> reasons) ScoreItemAgainstRequest(Item item, ItemRequest req)
     {
         int score = 0;
         var reasons = new List<string>();
 
-        if (item.Kategori == req.Kategori)
-        {
-            score += 40;
-            reasons.Add("Kategori cocok");
-        }
-        else
-        {
+        if (item.Kategori != req.Kategori)
             return (0, reasons);
-        }
+
+        score += 40;
+        reasons.Add("Kategori cocok");
 
         var keywordScore = ComputeKeywordScore(
             item.NamaBarang + " " + item.Deskripsi,
@@ -135,22 +123,16 @@ public class MatchingService
         return (score, reasons);
     }
 
-    // ── Scoring: ItemRequest → Item ───────────────────────────────────────────
-
     private (int score, List<string> reasons) ScoreRequestAgainstItem(ItemRequest req, Item item)
     {
         int score = 0;
         var reasons = new List<string>();
 
-        if (req.Kategori == item.Kategori)
-        {
-            score += 40;
-            reasons.Add("Kategori cocok");
-        }
-        else
-        {
+        if (req.Kategori != item.Kategori)
             return (0, reasons);
-        }
+
+        score += 40;
+        reasons.Add("Kategori cocok");
 
         var keywordScore = ComputeKeywordScore(
             req.Title + " " + req.Deskripsi,
@@ -172,8 +154,6 @@ public class MatchingService
 
         return (score, reasons);
     }
-
-    // ── Keyword scoring ───────────────────────────────────────────────────────
 
     private int ComputeKeywordScore(string sourceText, string targetText)
     {
@@ -201,8 +181,6 @@ public class MatchingService
             .ToHashSet();
     }
 
-    // ── Location scoring ──────────────────────────────────────────────────────
-
     private (int points, string? reason) ScoreLocation(string lokasi1, string provinsi1, string lokasi2, string provinsi2)
     {
         if (!string.IsNullOrWhiteSpace(lokasi1) && !string.IsNullOrWhiteSpace(lokasi2))
@@ -220,8 +198,6 @@ public class MatchingService
         return (0, null);
     }
 
-    // ── Detail scoring ────────────────────────────────────────────────────────
-
     private (int points, string? reason) ScoreDetails(string? details1Json, string? details2Json, ItemCategory category)
     {
         if (string.IsNullOrWhiteSpace(details1Json) || string.IsNullOrWhiteSpace(details2Json))
@@ -234,17 +210,17 @@ public class MatchingService
 
             if (d1 == null || d2 == null) return (0, null);
 
-            var matchedFields = new List<string>();
-
             var keysToCompare = category switch
             {
                 ItemCategory.Pakaian => new[] { "Ukuran", "JenisKelamin" },
-                ItemCategory.Elektronik => new[] { "Merk", "Model" },
-                ItemCategory.PerabotRumah => new[] { "Material" },
-                ItemCategory.MainanHobi => new[] { "UsiaRekomendasi" },
+                ItemCategory.Elektronik => new[] { "Jenis", "Merk" },
+                ItemCategory.Buku => new[] { "Jenjang", "Subjek" },
+                ItemCategory.MainanHobi => new[] { "UsiaRekomendasi", "Jenis" },
                 ItemCategory.AlatMusik => new[] { "JenisInstrumen", "Merk" },
                 _ => Array.Empty<string>()
             };
+
+            var matchedFields = new List<string>();
 
             foreach (var key in keysToCompare)
             {

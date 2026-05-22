@@ -40,16 +40,18 @@ public class DonasiController : ProfileBaseController
 
         var selected = selectedId.HasValue
             ? donations.FirstOrDefault(d => d.Id == selectedId.Value)
-            : donations.FirstOrDefault(d => d.Status != ItemStatus.Available || d.ExpiresAt > DateTime.UtcNow);
+            : null;
 
         ViewBag.Donations = donations;
         ViewBag.Selected = selected;
-        ViewBag.Matches = TempData["Matches"] as string;
-        ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
-        ViewBag.MatchContext = TempData["MatchContext"] as string ?? "";
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            ViewBag.Matches = TempData["Matches"] as string;
+            ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
+            ViewBag.MatchContext = TempData["MatchContext"] as string ?? "";
             return PartialView("~/Views/Profile/Donasi/Donasi.cshtml");
+        }
 
         ViewBag.InitialSection = "donasi";
         return View("~/Views/Profile/Shell.cshtml");
@@ -91,7 +93,8 @@ public class DonasiController : ProfileBaseController
         item.CreatedAt = DateTime.UtcNow;
         item.ExpiresAt = DateTime.UtcNow.AddDays(7);
         item.Status = ItemStatus.Available;
-        item.Provinsi = user?.Provinsi ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(item.Provinsi))
+            item.Provinsi = user?.Provinsi ?? string.Empty;
         item.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
         _db.Items.Add(item);
