@@ -4,13 +4,13 @@
 
 .pnav {
     position: sticky;
-    top: 52px;
+    top: 0;
     z-index: 50;
     display: flex;
     align-items: center;
     height: 48px;
     border-bottom: 1px solid #1a2f52;
-    background: var(--navy);
+    background: #0f1f3d;
     gap: 0;
     box-shadow: 0 1px 0 rgba(255,255,255,0.06);
 }
@@ -100,32 +100,6 @@
     font-weight: 600;
 }
 
-.pnav-actions {
-    margin-left: auto;
-    padding: 0 16px;
-    border-left: 1px solid #1a2f52;
-    height: 100%;
-    display: flex;
-    align-items: center;
-}
-
-.pnav-logout {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #94a3b8;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    padding: 4px;
-    border-radius: 6px;
-    transition: color 0.15s;
-}
-
-    .pnav-logout:hover {
-        color: #ef4444;
-    }
-
 .ppage {
     min-height: calc(100vh - 48px - 52px);
     background: var(--page-bg);
@@ -155,26 +129,26 @@
 .ptab-bar {
     display: flex;
     gap: 0;
-    border-bottom: 1.5px solid #cbd5e1;
+    border-bottom: 2px solid #9aa0ac;
     margin-bottom: 20px;
 }
 
 .ptab {
     padding: 10px 18px;
     font-size: 13px;
-    color: var(--text-light);
+    color: #334155;
     border-bottom: 2px solid transparent;
     cursor: pointer;
     text-decoration: none;
     white-space: nowrap;
     transition: color 0.15s;
-    margin-bottom: -1.5px;
+    margin-bottom: -2px;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 500;
 }
 
     .ptab:hover {
-        color: var(--text-dark);
+        color: var(--blue);
     }
 
     .ptab.active {
@@ -190,7 +164,7 @@
 }
 
 .pstat-card {
-    background: var(--card-bg);
+    background: var(--white);
     border: 1px solid #cbd5e1;
     border-radius: 10px;
     padding: 16px;
@@ -198,7 +172,7 @@
 
 .pstat-label {
     font-size: 12px;
-    color: var(--text-light);
+    color: var(--text-mid);
     margin-bottom: 8px;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 500;
@@ -214,12 +188,12 @@
 
 .pstat-sub {
     font-size: 12px;
-    color: var(--text-light);
+    color: var(--text-mid);
     margin-top: 6px;
 }
 
 .preview-card {
-    background: var(--card-bg);
+    background: var(--white);
     border: 1px solid #cbd5e1;
     border-radius: 10px;
     overflow: hidden;
@@ -301,6 +275,7 @@
     flex-shrink: 0;
     border-right: 1px solid #cbd5e1;
     overflow-y: auto;
+    background: #dde1e8;
 }
 
 .plist-item {
@@ -308,14 +283,14 @@
     align-items: center;
     gap: 10px;
     padding: 12px 14px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #c4c9d4;
     cursor: pointer;
     text-decoration: none;
     transition: background 0.1s;
 }
 
     .plist-item:hover {
-        background: #dde1e8;
+        background: #a8aebb;
     }
 
     .plist-item.active {
@@ -329,7 +304,7 @@
     border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
-    background: #e2e8f0;
+    background: #c4c9d4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -360,7 +335,7 @@
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background: #eff1f5;
+    background: var(--page-bg);
 }
 
 .pdetail-empty {
@@ -381,11 +356,11 @@
 }
 
 .psec {
-    border: 1px solid #cbd5e1;
+    border: 1px solid #9aa0ac;
     border-radius: 8px;
     padding: 14px 16px;
     margin-bottom: 12px;
-    background: var(--card-bg);
+    background: #b0b6c2;
 }
 
 .psec-label {
@@ -415,8 +390,8 @@
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    border: 1.5px solid #cbd5e1;
-    background: #e2e8f0;
+    border: 1.5px solid #9aa0ac;
+    background: #c4c9d4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -452,7 +427,7 @@
 .pstep-line {
     flex: 1;
     height: 1.5px;
-    background: #cbd5e1;
+    background: #9aa0ac;
     margin-top: 13px;
 }
 
@@ -490,9 +465,9 @@
 }
 
 .pbadge-muted {
-    background: #f1f5f9;
+    background: #e2e8f0;
     color: var(--text-light);
-    border: 1px solid #cbd5e1;
+    border: 1px solid #9aa0ac;
 }
 
 .pbtn {
@@ -504,7 +479,7 @@
     border-radius: 8px;
     font-size: 13px;
     cursor: pointer;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #9aa0ac;
     background: var(--white);
     color: var(--text-dark);
     text-decoration: none;
@@ -625,7 +600,7 @@
         height: 72px;
         border-radius: 8px;
         object-fit: cover;
-        border: 1px solid #cbd5e1;
+        border: 1px solid #9aa0ac;
     }
 
 .pimage-del {
@@ -646,7 +621,7 @@
 }
 
 .pupload-zone {
-    border: 1.5px dashed #cbd5e1;
+    border: 1.5px dashed #9aa0ac;
     border-radius: 8px;
     padding: 20px;
     text-align: center;
@@ -664,8 +639,8 @@
 
 .pchat-shell {
     display: flex;
-    background: var(--card-bg);
-    border: 1px solid #cbd5e1;
+    background: #b0b6c2;
+    border: 1px solid #9aa0ac;
     border-radius: 10px;
     overflow: hidden;
     min-height: 500px;
@@ -675,6 +650,7 @@
     width: 260px;
     flex-shrink: 0;
     border-right: 1px solid #cbd5e1;
+    background: #dde1e8;
     display: flex;
     flex-direction: column;
 }
@@ -684,7 +660,7 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text-dark);
-    border-bottom: 1px solid #cbd5e1;
+    border-bottom: 1px solid #9aa0ac;
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
@@ -693,13 +669,13 @@
     align-items: center;
     gap: 10px;
     padding: 12px 14px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #c4c9d4;
     cursor: pointer;
     transition: background 0.1s;
 }
 
     .pchat-item:hover {
-        background: #dde1e8;
+        background: #a8aebb;
     }
 
     .pchat-item.active {
@@ -712,14 +688,14 @@
     border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
-    background: #e2e8f0;
+    background: #c4c9d4;
 }
 
 .pchat-thumb-placeholder {
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    background: #e2e8f0;
+    background: #c4c9d4;
     flex-shrink: 0;
 }
 
@@ -762,8 +738,8 @@
     align-items: center;
     gap: 10px;
     padding: 12px 16px;
-    border-bottom: 1px solid #cbd5e1;
-    background: #eff1f5;
+    border-bottom: 1px solid #9aa0ac;
+    background: var(--page-bg);
 }
 
 .pchat-header-thumb {
@@ -846,7 +822,7 @@
 }
 
 .pchat-input-bar {
-    border-top: 1px solid #cbd5e1;
+    border-top: 1px solid #9aa0ac;
     display: flex;
     flex-direction: column;
     background: var(--white);
@@ -911,7 +887,7 @@
 
 .pchat-textarea {
     flex: 1;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #9aa0ac;
     border-radius: 8px;
     padding: 8px 12px;
     font-size: 13px;
@@ -951,8 +927,8 @@
     align-items: flex-start;
     gap: 12px;
     padding: 14px 16px;
-    border: 1px solid #cbd5e1;
-    background: var(--card-bg);
+    border: 1px solid #9aa0ac;
+    background: #b0b6c2;
     border-radius: 8px;
     margin-bottom: 6px;
 }
@@ -1006,7 +982,7 @@
 .pstar-btn {
     font-size: 28px;
     cursor: pointer;
-    color: #cbd5e1;
+    color: #9aa0ac;
     transition: color 0.1s;
     background: none;
     border: none;
@@ -1023,7 +999,7 @@
     align-items: center;
     gap: 10px;
     padding: 10px 0;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid #c4c9d4;
 }
 
     .preq-row:last-child {
@@ -1034,7 +1010,7 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: #e2e8f0;
+    background: #c4c9d4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1064,8 +1040,8 @@
 .pcond-btn {
     padding: 6px 16px;
     border-radius: 6px;
-    border: 1.5px solid #cbd5e1;
-    background: #f1f5f9;
+    border: 1.5px solid #9aa0ac;
+    background: #c4c9d4;
     color: var(--text-mid);
     font-size: 13px;
     cursor: pointer;

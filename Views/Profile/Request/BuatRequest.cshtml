@@ -1,8 +1,18 @@
 @using DonationApp.Models
 @using DonationApp.Services
+@using System.Text.Json
 @{
     var userAlamat = ViewBag.UserAlamat as string ?? "";
     var userProvinsi = ViewBag.UserProvinsi as string ?? "";
+    var editRequest = ViewBag.EditRequest as ItemRequest;
+    var isEdit = editRequest != null;
+    var pageTitle = isEdit ? "Edit Request" : "Buat Request";
+
+    Dictionary<string, string>? existingDetails = null;
+    if (isEdit && !string.IsNullOrWhiteSpace(editRequest!.DetailTambahan))
+    {
+        try { existingDetails = JsonSerializer.Deserialize<Dictionary<string, string>>(editRequest.DetailTambahan!); } catch { }
+    }
 }
 
 <div class="ppage">
@@ -11,14 +21,18 @@
         <div class="ptab-bar" style="margin:0;border:none;">
             <a asp-controller="Request" asp-action="MyRequests" class="ptab">Request Saya</a>
             <a asp-controller="Request" asp-action="Permintaan" class="ptab">Permintaan Donasi</a>
-            <a asp-controller="Request" asp-action="CreateView" class="ptab active">Buat Request</a>
+            <a asp-controller="Request" asp-action="CreateView" class="ptab @(!isEdit ? "active" : "")">Buat Request</a>
+            @if (isEdit)
+            {
+                <span class="ptab active">Edit Request</span>
+            }
         </div>
     </div>
 
     <div class="ppage-inner" style="max-width:600px;">
 
         <div class="ppage-header">
-            <h1 class="ppage-title">Buat Request</h1>
+            <h1 class="ppage-title">@pageTitle</h1>
             <a asp-controller="Request" asp-action="MyRequests" class="pbtn" style="font-size:12px;">
                 <i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali
             </a>
@@ -28,15 +42,28 @@
         {
             <div class="pform-error-banner">@TempData["RequestError"]</div>
         }
+        @if (TempData["RequestSuccess"] != null)
+        {
+            <div style="background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:16px;font-size:13px;">
+                @TempData["RequestSuccess"]
+            </div>
+        }
 
         <div class="preview-card" style="padding:20px;">
-            <form id="req-form" asp-controller="Request" asp-action="Create" method="post" enctype="multipart/form-data" novalidate>
+            <form id="req-form"
+                  asp-controller="Request"
+                  asp-action="@(isEdit ? "EditPost" : "Create")"
+                  method="post" enctype="multipart/form-data" novalidate>
                 @Html.AntiForgeryToken()
+                @if (isEdit)
+                {
+                    <input type="hidden" name="id" value="@editRequest!.Id" />
+                }
                 <input type="hidden" id="ReqDetailTambahanJson" name="DetailTambahanJson" />
 
                 <div class="pform-group">
                     <label class="pform-label">Judul Request</label>
-                    <input class="pform-input" name="Title" placeholder="Cari sepatu ukuran 42..." required />
+                    <input class="pform-input" name="Title" value="@editRequest?.Title" placeholder="Cari sepatu ukuran 42..." required />
                     <span class="pform-error" data-for="Title">Judul request wajib diisi.</span>
                 </div>
 
@@ -46,7 +73,7 @@
                         <option value="">Pilih Kategori</option>
                         @foreach (var cat in CategoryHelper.AllCategories().Where(c => c != ItemCategory.Semua))
                         {
-                            <option value="@((int)cat)">@CategoryHelper.DisplayName(cat)</option>
+                            <option value="@((int)cat)" selected="@(editRequest != null && editRequest.Kategori == cat)">@CategoryHelper.DisplayName(cat)</option>
                         }
                     </select>
                     <span class="pform-error" data-for="Kategori">Kategori wajib dipilih.</span>
@@ -56,16 +83,16 @@
 
                 <div class="pform-group">
                     <label class="pform-label">Kondisi Minimum</label>
-                    <select class="pform-input" name="KondisiMinimum">
-                        <option value="@((int)KondisiMinimum.Keduanya)">Baru atau Bekas</option>
-                        <option value="@((int)KondisiMinimum.Baru)">Baru saja</option>
-                        <option value="@((int)KondisiMinimum.Bekas)">Bekas tidak masalah</option>
-                    </select>
+                    <input type="hidden" id="kondisiMinInput" name="KondisiMinimum" value="@((int)(editRequest?.KondisiMinimum ?? KondisiMinimum.Keduanya))" />
+                    <div class="pcond-group">
+                        <button type="button" class="pcond-btn @(editRequest?.KondisiMinimum == KondisiMinimum.Baru ? "selected" : "")" data-value="@((int)KondisiMinimum.Baru)">Baru</button>
+                        <button type="button" class="pcond-btn @(editRequest == null || editRequest.KondisiMinimum != KondisiMinimum.Baru ? "selected" : "")" data-value="@((int)KondisiMinimum.Keduanya)">Bekas</button>
+                    </div>
                 </div>
 
                 <div class="pform-group">
                     <label class="pform-label">Jumlah yang Dibutuhkan</label>
-                    <input class="pform-input" name="Jumlah" type="number" min="1" max="99" value="1" style="width:120px;" />
+                    <input class="pform-input" name="Jumlah" type="number" min="1" max="99" value="@(editRequest?.Jumlah ?? 1)" style="width:120px;" />
                 </div>
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -75,7 +102,7 @@
                             <option value="">Pilih Provinsi</option>
                             @foreach (var prov in new[] { "Aceh", "Bali", "Banten", "Bengkulu", "DI Yogyakarta", "DKI Jakarta", "Gorontalo", "Jambi", "Jawa Barat", "Jawa Tengah", "Jawa Timur", "Kalimantan Barat", "Kalimantan Selatan", "Kalimantan Tengah", "Kalimantan Timur", "Kalimantan Utara", "Kepulauan Bangka Belitung", "Kepulauan Riau", "Lampung", "Maluku", "Maluku Utara", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Papua", "Papua Barat", "Riau", "Sulawesi Barat", "Sulawesi Selatan", "Sulawesi Tengah", "Sulawesi Tenggara", "Sulawesi Utara", "Sumatera Barat", "Sumatera Selatan", "Sumatera Utara" })
                             {
-                                <option selected="@(userProvinsi == prov)">@prov</option>
+                                <option selected="@((editRequest?.Provinsi ?? userProvinsi) == prov)">@prov</option>
                             }
                         </select>
                     </div>
@@ -90,13 +117,34 @@
 
                 <div class="pform-group">
                     <label class="pform-label">Deskripsi</label>
-                    <textarea class="pform-input" name="Deskripsi" rows="4" placeholder="Jelaskan barang yang Anda cari secara detail..." required style="resize:vertical;"></textarea>
+                    <textarea class="pform-input" name="Deskripsi" rows="4" placeholder="Jelaskan barang yang Anda cari secara detail..." required style="resize:vertical;">@editRequest?.Deskripsi</textarea>
                     <span class="pform-error" data-for="Deskripsi">Deskripsi wajib diisi.</span>
                 </div>
 
+                @if (isEdit && editRequest!.Images.Any())
+                {
+                    <div class="pform-group">
+                        <label class="pform-label">Foto Saat Ini</label>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+                            @foreach (var img in editRequest.Images)
+                            {
+                                <div style="position:relative;width:88px;height:88px;">
+                                    <img src="@img.FilePath" style="width:88px;height:88px;border-radius:8px;object-fit:cover;" />
+                                    <form asp-controller="Request" asp-action="DeleteRequestImage" method="post" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="imageId" value="@img.Id" />
+                                        <input type="hidden" name="requestId" value="@editRequest.Id" />
+                                        <button type="submit" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:none;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;">✕</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
                 <div class="pform-group">
                     <label class="pform-label">
-                        Foto Referensi
+                        @(isEdit ? "Tambah Foto Baru" : "Foto Referensi")
                         <span class="pform-hint">(opsional, maks. 5, 5MB, JPG/PNG)</span>
                     </label>
                     <input type="file" id="req-file-input" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
@@ -104,7 +152,7 @@
                 </div>
 
                 <button type="submit" class="pbtn pbtn-primary pbtn-block" onclick="return validateReq()">
-                    Post Request
+                    @(isEdit ? "Simpan Perubahan" : "Post Request")
                 </button>
             </form>
         </div>
@@ -112,6 +160,11 @@
 </div>
 
 <script>
+    var isEdit = @(isEdit ? "true" : "false");
+    var existingProvinsi = '@(editRequest?.Provinsi ?? userProvinsi)';
+    var existingLokasi = '@(editRequest?.Lokasi ?? "")';
+    var existingDetails = @Html.Raw(existingDetails != null ? JsonSerializer.Serialize(existingDetails) : "{}");
+
     var categoryFields = {
         "@((int)ItemCategory.Pakaian)": [
             { key:"Ukuran", label:"Ukuran", type:"select", options:["XS","S","M","L","XL","XXL"] },
@@ -159,6 +212,7 @@
                 f.options.forEach(function(o) {
                     var opt = document.createElement('option');
                     opt.value = o; opt.textContent = o;
+                    if (existingDetails && existingDetails[f.key] === o) opt.selected = true;
                     input.appendChild(opt);
                 });
             } else {
@@ -168,21 +222,24 @@
                 input.placeholder = f.placeholder || '';
                 input.id = 'req-field-' + f.key;
                 input.dataset.key = f.key;
+                if (existingDetails && existingDetails[f.key]) input.value = existingDetails[f.key];
             }
             div.appendChild(input);
             container.appendChild(div);
         });
     }
 
+    var katEl = document.getElementById('req-kategori');
+    if (katEl && katEl.value) showReqFields(katEl.value);
+
     function updateReqKota(provinsi) {
-        populateKota(provinsi, document.getElementById('req-kota'));
+        populateKota(provinsi, document.getElementById('req-kota'), existingLokasi);
     }
 
-    var userProvinsi = '@userProvinsi';
-    if (userProvinsi) {
+    if (existingProvinsi) {
         var provSelect = document.getElementById('req-provinsi');
-        if (provSelect) provSelect.value = userProvinsi;
-        updateReqKota(userProvinsi);
+        if (provSelect) provSelect.value = existingProvinsi;
+        updateReqKota(existingProvinsi);
     }
 
     var reqImageStore = [];
@@ -275,4 +332,12 @@
         }
         return valid;
     }
+
+        document.querySelectorAll('.pcond-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.pcond-btn').forEach(function(b) { b.classList.remove('selected'); });
+            this.classList.add('selected');
+            document.getElementById('kondisiMinInput').value = this.dataset.value;
+        });
+    });
 </script>

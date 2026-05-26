@@ -1,5 +1,6 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["HideSearch"] = true;
     var initialSection = ViewBag.InitialSection as string ?? "overview";
 }
 
@@ -19,7 +20,7 @@
 @section Scripts {
     <style>
         #profile-shell {
-            margin: -24px -10%;
+            margin: 0;
         }
 
         @@media (max-width: 768px) {

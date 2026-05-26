@@ -7,8 +7,6 @@
     var matchContext = ViewBag.MatchContext as string ?? "";
 }
 
-
-
 <div class="ppage">
     <div class="ppage-inner">
 
@@ -23,6 +21,17 @@
             </a>
         </div>
 
+        @if (TempData["RequestSuccess"] != null)
+        {
+            <div style="background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:16px;font-size:13px;">
+                @TempData["RequestSuccess"]
+            </div>
+        }
+        @if (TempData["RequestError"] != null)
+        {
+            <div class="pform-error-banner">@TempData["RequestError"]</div>
+        }
+
         @if (myRequests == null || !myRequests.Any())
         {
             <div class="preview-card" style="padding:48px;text-align:center;">
@@ -36,6 +45,7 @@
             {
                 var daysLeft = (r.ExpiresAt - DateTime.UtcNow).Days;
                 var firstImg = r.Images.FirstOrDefault();
+                var isOpen = r.Status == ItemRequestStatus.Open;
                 <div class="preview-card" style="margin-bottom:12px;">
                     <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:@(r.Offers.Any() ? "0.5px solid var(--color-border-tertiary)" : "none");">
                         @if (firstImg != null)
@@ -49,13 +59,28 @@
                         <div style="flex:1;">
                             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
                                 <span style="font-size:14px;font-weight:500;color:var(--color-text-primary);">@r.Title</span>
-                                <span class="pbadge @(r.Status == ItemRequestStatus.Open ? "pbadge-available" : "pbadge-muted")">@r.Status</span>
+                                <span class="pbadge @(isOpen ? "pbadge-available" : "pbadge-muted")">@r.Status</span>
                             </div>
                             <div style="font-size:12px;color:var(--color-text-secondary);">@CategoryHelper.DisplayName(r.Kategori) · @daysLeft hari lagi · @r.Offers.Count penawaran</div>
                         </div>
-                        <a asp-controller="Request" asp-action="Detail" asp-route-id="@r.Id" class="pbtn" style="font-size:12px;padding:4px 10px;flex-shrink:0;">
-                            <i class="ti ti-external-link" aria-hidden="true" style="font-size:13px;"></i>
-                        </a>
+                        <div style="display:flex;gap:4px;flex-shrink:0;">
+                            <a asp-controller="Request" asp-action="Detail" asp-route-id="@r.Id" class="pbtn" style="font-size:12px;padding:4px 10px;" title="Lihat">
+                                <i class="ti ti-external-link" aria-hidden="true" style="font-size:13px;"></i>
+                            </a>
+                            @if (isOpen)
+                            {
+                                <a href="/Request/EditView/@r.Id" class="pbtn" style="font-size:12px;padding:4px 10px;" title="Edit">
+                                    <i class="ti ti-edit" aria-hidden="true" style="font-size:13px;"></i>
+                                </a>
+                                <form asp-controller="Request" asp-action="DeleteRequest" method="post" onsubmit="return confirm('Hapus request ini?')" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@r.Id" />
+                                    <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;" title="Hapus">
+                                        <i class="ti ti-trash" aria-hidden="true" style="font-size:13px;"></i>
+                                    </button>
+                                </form>
+                            }
+                        </div>
                     </div>
 
                     @if (r.Offers.Any())
@@ -85,7 +110,7 @@
                                         {
                                             <span class="pbadge pbadge-rejected">Ditolak</span>
                                         }
-                                        else if (r.Status == ItemRequestStatus.Open)
+                                        else if (isOpen)
                                         {
                                             <form asp-controller="Request" asp-action="AcceptOffer" method="post">
                                                 @Html.AntiForgeryToken()

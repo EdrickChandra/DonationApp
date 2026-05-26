@@ -14,7 +14,7 @@ html{
     --blue: #2563eb;
     --blue-hover: #1d4ed8;
     --blue-light: #3b82f6;
-    --page-bg: #b8bdc7;
+    --page-bg: #e2e8f0;
     --card-bg: #c8cdd6;
     --text-dark: #0f172a;
     --text-mid: #334155;
@@ -35,6 +35,10 @@ main {
     flex: 1;
     padding: 24px 10%;
 }
+
+    main:has(.pnav) {
+        padding: 0;
+    }
 
 footer {
     background: var(--navy);

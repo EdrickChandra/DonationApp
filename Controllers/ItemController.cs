@@ -149,6 +149,14 @@ public class ItemController : BaseController
         ViewBag.IsOwner = userId == item.UserId;
         ViewBag.HasRequested = userId != null && item.ClaimRequests.Any(r => r.UserId == userId);
 
+        var avgRating = await _context.UserReputations
+            .Where(r => r.ReviewedUserId == item.UserId)
+            .AverageAsync(r => (double?)r.Rating) ?? 0;
+        var totalReviews = await _context.UserReputations
+            .CountAsync(r => r.ReviewedUserId == item.UserId);
+        ViewBag.AverageRating = Math.Round(avgRating, 1);
+        ViewBag.TotalReviews = totalReviews;
+
         return View(item);
     }
 

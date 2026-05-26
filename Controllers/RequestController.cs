@@ -96,6 +96,28 @@ public class RequestController : ProfileBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
+    [Authorize]
+    public async Task<IActionResult> EditView(int id)
+    {
+        var userId = _userManager.GetUserId(User)!;
+        var itemRequest = await _context.ItemRequests
+            .Include(r => r.Images)
+            .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+
+        if (itemRequest == null) return RedirectToAction("MyRequests");
+
+        var user = await _userManager.GetUserAsync(User);
+        ViewBag.UserAlamat = user?.Alamat ?? "";
+        ViewBag.UserProvinsi = user?.Provinsi ?? "";
+        ViewBag.EditRequest = itemRequest;
+
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Request/BuatRequest.cshtml");
+
+        ViewBag.InitialSection = "request";
+        return View("~/Views/Profile/Shell.cshtml");
+    }
+
     [AllowAnonymous]
     public async Task<IActionResult> Index(ItemCategory? kategori)
     {
@@ -235,6 +257,123 @@ public class RequestController : ProfileBaseController
         }
 
         return RedirectToAction("MyRequests", "Request");
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditPost(int id, ItemRequest itemRequest, List<IFormFile>? Images, string? DetailTambahanJson)
+    {
+        var userId = _userManager.GetUserId(User)!;
+        var existing = await _context.ItemRequests
+            .Include(r => r.Images)
+            .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+
+        if (existing == null) return RedirectToAction("MyRequests");
+
+        ModelState.Remove("UserId");
+        ModelState.Remove("User");
+        ModelState.Remove("Images");
+        ModelState.Remove("Offers");
+
+        if (!ModelState.IsValid)
+        {
+            TempData["RequestError"] = "Pastikan semua field wajib sudah diisi dengan benar.";
+            return RedirectToAction("EditView", new { id });
+        }
+
+        existing.Title = itemRequest.Title;
+        existing.Kategori = itemRequest.Kategori;
+        existing.Deskripsi = itemRequest.Deskripsi;
+        existing.Lokasi = itemRequest.Lokasi;
+        existing.Provinsi = itemRequest.Provinsi;
+        existing.KondisiMinimum = itemRequest.KondisiMinimum;
+        existing.Jumlah = itemRequest.Jumlah;
+        existing.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
+
+        if (Images != null && Images.Count > 0)
+        {
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "requests", userId, existing.Id.ToString());
+            Directory.CreateDirectory(uploadFolder);
+
+            int imageCount = existing.Images.Count;
+            foreach (var image in Images)
+            {
+                if (imageCount >= 5) break;
+                var extension = Path.GetExtension(image.FileName).ToLower();
+                if (!allowedExtensions.Contains(extension)) continue;
+                if (image.Length > 5 * 1024 * 1024) continue;
+                var fileName = Guid.NewGuid().ToString() + extension;
+                var filePath = Path.Combine(uploadFolder, fileName);
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await image.CopyToAsync(stream);
+                _context.RequestImages.Add(new RequestImage
+                {
+                    ItemRequestId = existing.Id,
+                    FilePath = $"/uploads/requests/{userId}/{existing.Id}/{fileName}"
+                });
+                imageCount++;
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        TempData["RequestSuccess"] = "Request berhasil diperbarui.";
+        return RedirectToAction("MyRequests");
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteRequest(int id)
+    {
+        var userId = _userManager.GetUserId(User)!;
+        var itemRequest = await _context.ItemRequests
+            .Include(r => r.Images)
+            .Include(r => r.Offers)
+            .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
+
+        if (itemRequest == null) return RedirectToAction("MyRequests");
+
+        if (itemRequest.Offers.Any(o => o.Status == RequestOfferStatus.Accepted))
+        {
+            TempData["RequestError"] = "Request tidak dapat dihapus karena sudah ada penawaran yang diterima.";
+            return RedirectToAction("MyRequests");
+        }
+
+        foreach (var image in itemRequest.Images)
+        {
+            var fullPath = Path.Combine(_environment.WebRootPath, image.FilePath.TrimStart('/'));
+            if (System.IO.File.Exists(fullPath))
+                System.IO.File.Delete(fullPath);
+        }
+
+        _context.ItemRequests.Remove(itemRequest);
+        await _context.SaveChangesAsync();
+        TempData["RequestSuccess"] = "Request berhasil dihapus.";
+        return RedirectToAction("MyRequests");
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteRequestImage(int imageId, int requestId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+        var request = await _context.ItemRequests.FirstOrDefaultAsync(r => r.Id == requestId && r.UserId == userId);
+        if (request == null) return RedirectToAction("EditView", new { id = requestId });
+
+        var image = await _context.RequestImages.FirstOrDefaultAsync(img => img.Id == imageId && img.ItemRequestId == requestId);
+        if (image != null)
+        {
+            var fullPath = Path.Combine(_environment.WebRootPath, image.FilePath.TrimStart('/'));
+            if (System.IO.File.Exists(fullPath))
+                System.IO.File.Delete(fullPath);
+            _context.RequestImages.Remove(image);
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToAction("EditView", new { id = requestId });
     }
 
     [Authorize]

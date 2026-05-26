@@ -19,7 +19,12 @@
 
         @if (ViewData["HideSearch"] == null)
         {
-            <input class="search-bar" type="text" placeholder="Search...">
+            <form action="/Search" method="get" style="flex:1;display:flex;" id="searchForm">
+                <input class="search-bar" type="text" name="q" placeholder="Search..."
+                       value="@(ViewContext.HttpContext.Request.Query["q"].ToString())"
+                       autocomplete="off" />
+                <input type="hidden" name="tab" id="searchTabHidden" value="donasi" />
+            </form>
         }
 
         <div class="nav-links-desktop" style="margin-left:12px;">
@@ -101,6 +106,14 @@
         document.getElementById('dropdownMenu').classList.remove('open');
         }
         });
+
+        (function() {
+        var path = window.location.pathname.toLowerCase();
+        var tab = 'donasi';
+        if (path.startsWith('/request')) tab = 'request';
+        var hidden = document.getElementById('searchTabHidden');
+        if (hidden) hidden.value = tab;
+        })();
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>

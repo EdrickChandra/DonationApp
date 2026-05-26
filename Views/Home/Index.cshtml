@@ -50,33 +50,49 @@
             var images = item.Images.ToList();
             var posterInitial = item.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
             var posterName = item.User != null ? item.User.NamaDepan : "Unknown";
-            <a class="item-card" asp-controller="Item" asp-action="Detail" asp-route-id="@item.Id">
-                <div class="card-img">
-                    <img src="@images.First().FilePath" class="card-img-fill" />
-                    <span class="card-timer-badge">
-                        <i class="ti ti-clock" aria-hidden="true"></i>
-                        @daysLeft hari
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="card-name">@item.NamaBarang</div>
-                    <div class="card-meta">
-                        <span class="card-cat">@CategoryHelper.DisplayName(item.Kategori)</span>
-                        <span class="card-dot">·</span>
-                        <span class="card-loc">
-                            <i class="ti ti-map-pin" aria-hidden="true"></i>
-                            @item.Lokasi
+            var kondisiBadgeClass = item.Kondisi == ItemCondition.Baru ? "card-kondisi-baru" : "card-kondisi-bekas";
+            var kondisiLabel = item.Kondisi == ItemCondition.Baru ? "Baru" : "Bekas";
+            var cardId = $"card-menu-{item.Id}";
+            <div class="item-card" style="position:relative;">
+                <a asp-controller="Item" asp-action="Detail" asp-route-id="@item.Id" style="text-decoration:none;display:block;">
+                    <div class="card-img">
+                        <img src="@images.First().FilePath" class="card-img-fill" />
+                        <span class="card-timer-badge">
+                            <i class="ti ti-clock" aria-hidden="true"></i>
+                            @daysLeft hari
                         </span>
+                        <span class="@kondisiBadgeClass">@kondisiLabel</span>
                     </div>
-                </div>
-                <div class="card-footer">
-                    <div class="card-poster">
-                        <div class="card-poster-av">@posterInitial</div>
-                        <span class="card-poster-name">@posterName</span>
+                    <div class="card-body">
+                        <div class="card-name">@item.NamaBarang</div>
+                        <div class="card-meta">
+                            <span class="card-cat">@CategoryHelper.DisplayName(item.Kategori)</span>
+                            <span class="card-dot">·</span>
+                            <span class="card-loc">
+                                <i class="ti ti-map-pin" aria-hidden="true"></i>
+                                @item.Lokasi
+                            </span>
+                        </div>
                     </div>
-                    <span class="card-cta">Lihat →</span>
+                    <div class="card-footer">
+                        <div class="card-poster">
+                            <div class="card-poster-av">@posterInitial</div>
+                            <span class="card-poster-name">@posterName</span>
+                        </div>
+                    </div>
+                </a>
+                <button class="card-menu-btn" onclick="toggleCardMenu('@cardId', event)" aria-label="Opsi">
+                    <i class="ti ti-dots-vertical" aria-hidden="true"></i>
+                </button>
+                <div class="card-menu-dropdown" id="@cardId">
+                    <button class="card-menu-item" onclick="reportItem(@item.Id)">
+                        <i class="ti ti-flag" aria-hidden="true"></i> Lapor
+                    </button>
+                    <button class="card-menu-item" onclick="copyLink('/Item/Detail/@item.Id')">
+                        <i class="ti ti-copy" aria-hidden="true"></i> Salin Link
+                    </button>
                 </div>
-            </a>
+            </div>
         }
         @if (!Model.Any())
         {
@@ -84,3 +100,32 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function toggleCardMenu(id, e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) {
+                if (el.id !== id) el.classList.remove('open');
+            });
+            document.getElementById(id).classList.toggle('open');
+        }
+
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) {
+                el.classList.remove('open');
+            });
+        });
+
+        function copyLink(path) {
+            navigator.clipboard.writeText(window.location.origin + path);
+            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
+        }
+
+        function reportItem(id) {
+            alert('Laporan untuk item #' + id + ' telah dikirim.');
+            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
+        }
+    </script>
+}

@@ -22,6 +22,17 @@
             </div>
         </div>
 
+        @if (TempData["DonasiSuccess"] != null)
+        {
+            <div style="margin:12px 16px 0;background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);font-size:13px;">
+                @TempData["DonasiSuccess"]
+            </div>
+        }
+        @if (TempData["DonasiError"] != null)
+        {
+            <div style="margin:12px 16px 0;" class="pform-error-banner">@TempData["DonasiError"]</div>
+        }
+
         @if (visibleDonations == null || !visibleDonations.Any())
         {
             <div style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
@@ -90,20 +101,37 @@
                             r.Status == ClaimRequestStatus.Shipped ||
                             r.Status == ClaimRequestStatus.Delivered);
 
+                        var isClaimed = selected.Status != ItemStatus.Available || accepted != null;
+
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (selected.Images.Any())
                             {
                                 <img src="@selected.Images.First().FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
                             }
-                            <div>
+                            <div style="flex:1;">
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.NamaBarang</div>
-                                <div style="display:flex;gap:6px;">
+                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                     <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
                                     <span class="pbadge pbadge-muted">@selected.Kondisi</span>
                                     <span class="pbadge pbadge-muted">@selected.Jumlah pcs</span>
                                     <span class="pbadge pbadge-muted">@selected.Lokasi</span>
                                 </div>
                             </div>
+                            @if (!isClaimed)
+                            {
+                                <div style="display:flex;gap:6px;flex-shrink:0;">
+                                    <a href="/Donasi/Edit/@selected.Id" class="pbtn" style="font-size:12px;padding:5px 12px;">
+                                        <i class="ti ti-edit" aria-hidden="true"></i> Edit
+                                    </a>
+                                    <form asp-controller="Donasi" asp-action="Delete" method="post" onsubmit="return confirm('Hapus donasi ini?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@selected.Id" />
+                                        <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:5px 12px;">
+                                            <i class="ti ti-trash" aria-hidden="true"></i> Hapus
+                                        </button>
+                                    </form>
+                                </div>
+                            }
                         </div>
 
                         @if (accepted != null)

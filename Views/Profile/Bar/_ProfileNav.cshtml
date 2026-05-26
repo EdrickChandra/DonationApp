@@ -10,7 +10,7 @@
     <div class="pnav-user">
         <a href="/Profile/Edit" class="pnav-avatar-link">
             <div class="pnav-avatar">@avatarLetter</div>
-            <span class="pnav-username">@user?.NamaDepan</span>
+            <span class="pnav-username">Profile</span>
         </a>
     </div>
 
@@ -43,14 +43,5 @@
                 <span class="pnav-badge">@unreadNotif</span>
             }
         </a>
-    </div>
-
-    <div class="pnav-actions">
-        <form asp-controller="Account" asp-action="Logout" method="post">
-            @Html.AntiForgeryToken()
-            <button type="submit" class="pnav-logout" title="Keluar">
-                <i class="ti ti-logout" aria-hidden="true"></i>
-            </button>
-        </form>
     </div>
 </nav>
