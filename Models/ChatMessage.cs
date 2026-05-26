@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
@@ -19,12 +19,12 @@ public class ChatMessage
     [ForeignKey("SenderId")]
     public ApplicationUser? Sender { get; set; }
 
-    [Required]
+    // Not [Required] — can be empty when message is image-only
     public string Content { get; set; } = string.Empty;
+
+    public string? ImagePath { get; set; }
 
     public DateTime SentAt { get; set; } = DateTime.UtcNow;
 
     public bool IsRead { get; set; } = false;
-
-    public string? ImagePath { get; set; }
 }

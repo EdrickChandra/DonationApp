@@ -1,6 +1,6 @@
 @using DonationApp.Models
 @{
-    var reviews = ViewBag.RecentReviews as List<UserReputation>;
+    var reviews = ViewBag.RecentReviews as List<Feedback>;
     var avgRating = (double)(ViewBag.AvgRating ?? 0.0);
     var totalReviews = (int)(ViewBag.TotalReviews ?? 0);
 }
@@ -48,6 +48,7 @@
                     var rAvatar = r.Reviewer?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                     var rName = r.Reviewer != null ? r.Reviewer.NamaDepan + " " + r.Reviewer.NamaBelakang : "Unknown";
                     var daysAgo = (DateTime.UtcNow - r.CreatedAt).Days;
+                    var itemName = r.ClaimRequest?.Item?.NamaBarang ?? r.RequestOffer?.ItemRequest?.Title ?? "";
                     <div class="preview-item">
                         <div class="preview-avatar">@rAvatar</div>
                         <div style="flex:1;">
@@ -65,9 +66,9 @@
                             {
                                 <div class="preview-text">@r.Komentar</div>
                             }
-                            @if (r.ClaimRequest?.Item != null)
+                            @if (!string.IsNullOrEmpty(itemName))
                             {
-                                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px;">untuk "@r.ClaimRequest.Item.NamaBarang"</div>
+                                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px;">untuk "@itemName"</div>
                             }
                         </div>
                     </div>

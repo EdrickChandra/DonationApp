@@ -2,16 +2,21 @@
 @using DonationApp.Models
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var selected = ViewBag.SelectedKategori != null ? (ItemCategory)ViewBag.SelectedKategori : ItemCategory.Semua;
+    var selected = ViewBag.SelectedKategori as ItemCategory?;
 }
 
 <div class="page-header">
     <div class="page-header-inner">
         <div class="pills">
+            <a class="pill @(selected == null ? "active" : "")"
+               asp-controller="Request" asp-action="Index">
+                <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                Semua
+            </a>
             @foreach (var cat in CategoryHelper.AllCategories())
             {
-                var icon = cat switch {
-                    ItemCategory.Semua => "ti-layout-grid",
+                var icon = cat switch
+                {
                     ItemCategory.Pakaian => "ti-shirt",
                     ItemCategory.Elektronik => "ti-device-laptop",
                     ItemCategory.Buku => "ti-book",
@@ -23,7 +28,7 @@
                     _ => "ti-tag"
                 };
                 <a class="pill @(selected == cat ? "active" : "")"
-                   asp-controller="Home" asp-action="Index" asp-route-kategori="@cat">
+                   asp-controller="Request" asp-action="Index" asp-route-kategori="@cat">
                     <i class="ti @icon" aria-hidden="true"></i>
                     @CategoryHelper.DisplayName(cat)
                 </a>
@@ -54,7 +59,7 @@
             var kondisiLabel = item.Kondisi == ItemCondition.Baru ? "Baru" : "Bekas";
             var cardId = $"card-menu-{item.Id}";
             <div class="item-card" style="position:relative;">
-                <a asp-controller="Item" asp-action="Detail" asp-route-id="@item.Id" style="text-decoration:none;display:block;">
+                <a asp-controller="Donasi" asp-action="Detail" asp-route-id="@item.Id" style="text-decoration:none;display:block;">
                     <div class="card-img">
                         <img src="@images.First().FilePath" class="card-img-fill" />
                         <span class="card-timer-badge">
@@ -88,7 +93,7 @@
                     <button class="card-menu-item" onclick="reportItem(@item.Id)">
                         <i class="ti ti-flag" aria-hidden="true"></i> Lapor
                     </button>
-                    <button class="card-menu-item" onclick="copyLink('/Item/Detail/@item.Id')">
+                    <button class="card-menu-item" onclick="copyLink('/Donasi/Detail/@item.Id')">
                         <i class="ti ti-copy" aria-hidden="true"></i> Salin Link
                     </button>
                 </div>
@@ -104,28 +109,12 @@
 @section Scripts {
     <script>
         function toggleCardMenu(id, e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) {
-                if (el.id !== id) el.classList.remove('open');
-            });
+            e.preventDefault(); e.stopPropagation();
+            document.querySelectorAll('.card-menu-dropdown').forEach(el => { if (el.id !== id) el.classList.remove('open'); });
             document.getElementById(id).classList.toggle('open');
         }
-
-        document.addEventListener('click', function() {
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) {
-                el.classList.remove('open');
-            });
-        });
-
-        function copyLink(path) {
-            navigator.clipboard.writeText(window.location.origin + path);
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
-        }
-
-        function reportItem(id) {
-            alert('Laporan untuk item #' + id + ' telah dikirim.');
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
-        }
+        document.addEventListener('click', () => document.querySelectorAll('.card-menu-dropdown').forEach(el => el.classList.remove('open')));
+        function copyLink(path) { navigator.clipboard.writeText(window.location.origin + path); }
+        function reportItem(id) { alert('Laporan untuk item #' + id + ' telah dikirim.'); }
     </script>
 }

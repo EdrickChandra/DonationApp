@@ -10,18 +10,18 @@
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
             <div class="ptab-bar" style="margin:0;border:none;">
-                <a href="/Notifikasi/Index?tab=unread" class="ptab @(tab == "unread" ? "active" : "")">
+                <a href="/Profile/Notifikasi?tab=unread" class="ptab @(tab == "unread" ? "active" : "")">
                     Belum Dibaca
                     @if (unread != null && unread.Any())
                     {
                         <span class="pnav-badge">@unread.Count</span>
                     }
                 </a>
-                <a href="/Notifikasi/Index?tab=read" class="ptab @(tab == "read" ? "active" : "")">Sudah Dibaca</a>
+                <a href="/Profile/Notifikasi?tab=read" class="ptab @(tab == "read" ? "active" : "")">Sudah Dibaca</a>
             </div>
             @if (tab == "unread" && unread != null && unread.Any())
             {
-                <form asp-controller="Notifikasi" asp-action="MarkAllRead" method="post">
+                <form asp-controller="Profile" asp-action="MarkAllRead" method="post">
                     @Html.AntiForgeryToken()
                     <button type="submit" class="pbtn" style="font-size:12px;padding:5px 12px;">Tandai semua dibaca</button>
                 </form>
@@ -49,7 +49,7 @@
                             {
                                 <a href="@n.Link" class="pnotif-link">Lihat</a>
                             }
-                            <form asp-controller="Notifikasi" asp-action="MarkRead" method="post">
+                            <form asp-controller="Profile" asp-action="MarkRead" method="post">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@n.Id" />
                                 <button type="submit" class="pnotif-mark" title="Tandai dibaca">

@@ -9,9 +9,8 @@ using System.Text.Json;
 
 namespace DonationApp.Controllers;
 
-public class RequestController : ProfileBaseController
+public class RequestController : AppBaseController
 {
-    private readonly AppDbContext _context;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _environment;
     private readonly MatchingService _matchingService;
@@ -19,7 +18,6 @@ public class RequestController : ProfileBaseController
     public RequestController(AppDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment, MatchingService matchingService)
         : base(context, userManager)
     {
-        _context = context;
         _userManager = userManager;
         _environment = environment;
         _matchingService = matchingService;
@@ -30,7 +28,7 @@ public class RequestController : ProfileBaseController
     {
         var userId = _userManager.GetUserId(User)!;
 
-        var myRequests = await _context.ItemRequests
+        var myRequests = await _db.ItemRequests
             .Include(r => r.Images)
             .Include(r => r.Offers)
                 .ThenInclude(o => o.User)
@@ -57,12 +55,12 @@ public class RequestController : ProfileBaseController
     {
         var userId = _userManager.GetUserId(User)!;
 
-        var claimRequests = await _context.ClaimRequests
+        var claimRequests = await _db.ClaimRequests
             .Include(r => r.Item)
                 .ThenInclude(i => i!.Images)
             .Include(r => r.Item)
                 .ThenInclude(i => i!.User)
-            .Include(r => r.Reputations)
+            .Include(r => r.Feedbacks)
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
@@ -100,7 +98,7 @@ public class RequestController : ProfileBaseController
     public async Task<IActionResult> EditView(int id)
     {
         var userId = _userManager.GetUserId(User)!;
-        var itemRequest = await _context.ItemRequests
+        var itemRequest = await _db.ItemRequests
             .Include(r => r.Images)
             .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
 
@@ -121,18 +119,18 @@ public class RequestController : ProfileBaseController
     [AllowAnonymous]
     public async Task<IActionResult> Index(ItemCategory? kategori)
     {
-        var query = _context.ItemRequests
+        var query = _db.ItemRequests
             .Include(r => r.Images)
             .Include(r => r.User)
             .Include(r => r.Offers)
             .Where(r => r.Status == ItemRequestStatus.Open && r.ExpiresAt > DateTime.UtcNow);
 
-        if (kategori.HasValue && kategori.Value != ItemCategory.Semua)
+        if (kategori.HasValue)
             query = query.Where(r => r.Kategori == kategori.Value);
 
         var itemRequests = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
 
-        ViewBag.SelectedKategori = kategori ?? ItemCategory.Semua;
+        ViewBag.SelectedKategori = kategori;
 
         return View("Request", itemRequests);
     }
@@ -142,7 +140,7 @@ public class RequestController : ProfileBaseController
     {
         var userId = _userManager.GetUserId(User);
 
-        var itemRequest = await _context.ItemRequests
+        var itemRequest = await _db.ItemRequests
             .Include(r => r.Images)
             .Include(r => r.User)
             .Include(r => r.Offers)
@@ -151,8 +149,7 @@ public class RequestController : ProfileBaseController
                 .ThenInclude(o => o.Images)
             .FirstOrDefaultAsync(r => r.Id == id);
 
-        if (itemRequest == null)
-            return NotFound();
+        if (itemRequest == null) return NotFound();
 
         ViewBag.IsOwner = userId == itemRequest.UserId;
         ViewBag.HasOffered = userId != null && itemRequest.Offers.Any(o => o.UserId == userId);
@@ -174,7 +171,7 @@ public class RequestController : ProfileBaseController
         if (!ModelState.IsValid)
         {
             TempData["RequestError"] = "Pastikan semua field wajib sudah diisi dengan benar.";
-            return RedirectToAction("MyRequests", "Request");
+            return RedirectToAction("MyRequests");
         }
 
         var userId = _userManager.GetUserId(User)!;
@@ -192,71 +189,16 @@ public class RequestController : ProfileBaseController
             : itemRequest.Lokasi;
         itemRequest.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
-        _context.ItemRequests.Add(itemRequest);
-        await _context.SaveChangesAsync();
+        _db.ItemRequests.Add(itemRequest);
+        await _db.SaveChangesAsync();
 
         if (Images != null && Images.Count > 0)
-        {
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "requests", userId, itemRequest.Id.ToString());
-            Directory.CreateDirectory(uploadFolder);
+            await SaveRequestImagesAsync(Images, userId, itemRequest.Id, maxCount: 5);
 
-            int imageCount = 0;
-            foreach (var image in Images)
-            {
-                if (imageCount >= 5) break;
-                var extension = Path.GetExtension(image.FileName).ToLower();
-                if (!allowedExtensions.Contains(extension)) continue;
-                if (image.Length > 5 * 1024 * 1024) continue;
-                var fileName = Guid.NewGuid().ToString() + extension;
-                var filePath = Path.Combine(uploadFolder, fileName);
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await image.CopyToAsync(stream);
-                _context.RequestImages.Add(new RequestImage
-                {
-                    ItemRequestId = itemRequest.Id,
-                    FilePath = $"/uploads/requests/{userId}/{itemRequest.Id}/{fileName}"
-                });
-                imageCount++;
-            }
+        await _db.SaveChangesAsync();
+        await RunMatchingAndStoreTempData(itemRequest.Id);
 
-            await _context.SaveChangesAsync();
-        }
-
-        var savedRequest = await _context.ItemRequests
-            .Include(r => r.Images)
-            .Include(r => r.User)
-            .FirstOrDefaultAsync(r => r.Id == itemRequest.Id);
-
-        if (savedRequest != null)
-        {
-            var matches = await _matchingService.FindMatchesForItemRequest(savedRequest);
-            if (matches.Any())
-            {
-                var matchData = matches.Select(m => new
-                {
-                    id = m.Item.Id,
-                    title = m.Item.NamaBarang,
-                    kategori = m.Item.Kategori.ToString(),
-                    lokasi = m.Item.Lokasi,
-                    provinsi = m.Item.Provinsi,
-                    deskripsi = m.Item.Deskripsi,
-                    score = m.Score,
-                    reasons = m.MatchReasons,
-                    posterName = m.Item.User != null ? m.Item.User.NamaDepan + " " + m.Item.User.NamaBelakang : "Unknown",
-                    posterAvatar = m.Item.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
-                    createdAgo = (DateTime.UtcNow - m.Item.CreatedAt).Days,
-                    firstImage = m.Item.Images.FirstOrDefault()?.FilePath,
-                    type = "item"
-                }).ToList();
-
-                TempData["Matches"] = JsonSerializer.Serialize(matchData);
-                TempData["MatchCount"] = matches.Count.ToString();
-                TempData["MatchContext"] = "request";
-            }
-        }
-
-        return RedirectToAction("MyRequests", "Request");
+        return RedirectToAction("MyRequests");
     }
 
     [Authorize]
@@ -265,7 +207,7 @@ public class RequestController : ProfileBaseController
     public async Task<IActionResult> EditPost(int id, ItemRequest itemRequest, List<IFormFile>? Images, string? DetailTambahanJson)
     {
         var userId = _userManager.GetUserId(User)!;
-        var existing = await _context.ItemRequests
+        var existing = await _db.ItemRequests
             .Include(r => r.Images)
             .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
 
@@ -292,32 +234,9 @@ public class RequestController : ProfileBaseController
         existing.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
         if (Images != null && Images.Count > 0)
-        {
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "requests", userId, existing.Id.ToString());
-            Directory.CreateDirectory(uploadFolder);
+            await SaveRequestImagesAsync(Images, userId, existing.Id, maxCount: 5, currentCount: existing.Images.Count);
 
-            int imageCount = existing.Images.Count;
-            foreach (var image in Images)
-            {
-                if (imageCount >= 5) break;
-                var extension = Path.GetExtension(image.FileName).ToLower();
-                if (!allowedExtensions.Contains(extension)) continue;
-                if (image.Length > 5 * 1024 * 1024) continue;
-                var fileName = Guid.NewGuid().ToString() + extension;
-                var filePath = Path.Combine(uploadFolder, fileName);
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await image.CopyToAsync(stream);
-                _context.RequestImages.Add(new RequestImage
-                {
-                    ItemRequestId = existing.Id,
-                    FilePath = $"/uploads/requests/{userId}/{existing.Id}/{fileName}"
-                });
-                imageCount++;
-            }
-        }
-
-        await _context.SaveChangesAsync();
+        await _db.SaveChangesAsync();
         TempData["RequestSuccess"] = "Request berhasil diperbarui.";
         return RedirectToAction("MyRequests");
     }
@@ -328,7 +247,7 @@ public class RequestController : ProfileBaseController
     public async Task<IActionResult> DeleteRequest(int id)
     {
         var userId = _userManager.GetUserId(User)!;
-        var itemRequest = await _context.ItemRequests
+        var itemRequest = await _db.ItemRequests
             .Include(r => r.Images)
             .Include(r => r.Offers)
             .FirstOrDefaultAsync(r => r.Id == id && r.UserId == userId);
@@ -342,14 +261,10 @@ public class RequestController : ProfileBaseController
         }
 
         foreach (var image in itemRequest.Images)
-        {
-            var fullPath = Path.Combine(_environment.WebRootPath, image.FilePath.TrimStart('/'));
-            if (System.IO.File.Exists(fullPath))
-                System.IO.File.Delete(fullPath);
-        }
+            DeleteFileIfExists(image.FilePath);
 
-        _context.ItemRequests.Remove(itemRequest);
-        await _context.SaveChangesAsync();
+        _db.ItemRequests.Remove(itemRequest);
+        await _db.SaveChangesAsync();
         TempData["RequestSuccess"] = "Request berhasil dihapus.";
         return RedirectToAction("MyRequests");
     }
@@ -360,17 +275,17 @@ public class RequestController : ProfileBaseController
     public async Task<IActionResult> DeleteRequestImage(int imageId, int requestId)
     {
         var userId = _userManager.GetUserId(User)!;
-        var request = await _context.ItemRequests.FirstOrDefaultAsync(r => r.Id == requestId && r.UserId == userId);
+        var request = await _db.ItemRequests.FirstOrDefaultAsync(r => r.Id == requestId && r.UserId == userId);
         if (request == null) return RedirectToAction("EditView", new { id = requestId });
 
-        var image = await _context.RequestImages.FirstOrDefaultAsync(img => img.Id == imageId && img.ItemRequestId == requestId);
+        var image = await _db.ItemImages.FirstOrDefaultAsync(img =>
+            img.Id == imageId && img.ItemRequestId == requestId && img.OwnerType == ImageOwnerType.Request);
+
         if (image != null)
         {
-            var fullPath = Path.Combine(_environment.WebRootPath, image.FilePath.TrimStart('/'));
-            if (System.IO.File.Exists(fullPath))
-                System.IO.File.Delete(fullPath);
-            _context.RequestImages.Remove(image);
-            await _context.SaveChangesAsync();
+            DeleteFileIfExists(image.FilePath);
+            _db.ItemImages.Remove(image);
+            await _db.SaveChangesAsync();
         }
 
         return RedirectToAction("EditView", new { id = requestId });
@@ -383,17 +298,14 @@ public class RequestController : ProfileBaseController
     {
         var userId = _userManager.GetUserId(User)!;
 
-        var itemRequest = await _context.ItemRequests.FindAsync(itemRequestId);
+        var itemRequest = await _db.ItemRequests.FindAsync(itemRequestId);
         if (itemRequest == null || itemRequest.UserId == userId || itemRequest.Status != ItemRequestStatus.Open)
             return RedirectToAction("Detail", new { id = itemRequestId });
 
-        var alreadyOffered = await _context.RequestOffers
+        var alreadyOffered = await _db.RequestOffers
             .AnyAsync(o => o.ItemRequestId == itemRequestId && o.UserId == userId);
 
-        if (alreadyOffered)
-            return RedirectToAction("Detail", new { id = itemRequestId });
-
-        if (string.IsNullOrWhiteSpace(deskripsi))
+        if (alreadyOffered || string.IsNullOrWhiteSpace(deskripsi))
             return RedirectToAction("Detail", new { id = itemRequestId });
 
         var offer = new RequestOffer
@@ -405,50 +317,28 @@ public class RequestController : ProfileBaseController
             CreatedAt = DateTime.UtcNow
         };
 
-        _context.RequestOffers.Add(offer);
-        await _context.SaveChangesAsync();
+        _db.RequestOffers.Add(offer);
+        await _db.SaveChangesAsync();
 
         if (Images != null && Images.Count > 0)
-        {
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-            var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "offers", offer.Id.ToString());
-            Directory.CreateDirectory(uploadFolder);
+            await SaveOfferImagesAsync(Images, offer.Id, maxCount: 3);
 
-            int imageCount = 0;
-            foreach (var image in Images)
-            {
-                if (imageCount >= 3) break;
-                var extension = Path.GetExtension(image.FileName).ToLower();
-                if (!allowedExtensions.Contains(extension)) continue;
-                if (image.Length > 5 * 1024 * 1024) continue;
-                var fileName = Guid.NewGuid().ToString() + extension;
-                var filePath = Path.Combine(uploadFolder, fileName);
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await image.CopyToAsync(stream);
-                _context.RequestOfferImages.Add(new RequestOfferImage
-                {
-                    RequestOfferId = offer.Id,
-                    FilePath = $"/uploads/offers/{offer.Id}/{fileName}"
-                });
-                imageCount++;
-            }
-
-            await _context.SaveChangesAsync();
-        }
+        await _db.SaveChangesAsync();
 
         var offerer = await _userManager.FindByIdAsync(userId);
         var offererName = offerer != null ? offerer.NamaDepan + " " + offerer.NamaBelakang : "Seseorang";
 
-        _context.Notifications.Add(new Notification
+        _db.Notifications.Add(new Notification
         {
             UserId = itemRequest.UserId,
             Message = $"{offererName} menawarkan barang untuk request \"{itemRequest.Title}\" Anda.",
+            Type = NotificationType.NewOffer,
+            RefId = itemRequestId.ToString(),
             Link = "/Request/MyRequests",
             CreatedAt = DateTime.UtcNow
         });
 
-        await _context.SaveChangesAsync();
-
+        await _db.SaveChangesAsync();
         return RedirectToAction("Detail", new { id = itemRequestId });
     }
 
@@ -459,26 +349,28 @@ public class RequestController : ProfileBaseController
     {
         var userId = _userManager.GetUserId(User)!;
 
-        var offer = await _context.RequestOffers
+        var offer = await _db.RequestOffers
             .Include(o => o.ItemRequest)
             .FirstOrDefaultAsync(o => o.Id == offerId);
 
         if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
-            return RedirectToAction("MyRequests", "Request");
+            return RedirectToAction("MyRequests");
 
         offer.Status = RequestOfferStatus.Accepted;
         offer.ItemRequest.Status = ItemRequestStatus.Fulfilled;
 
-        _context.Notifications.Add(new Notification
+        _db.Notifications.Add(new Notification
         {
             UserId = offer.UserId,
             Message = $"Penawaran Anda untuk request \"{offer.ItemRequest.Title}\" telah diterima!",
+            Type = NotificationType.OfferAccepted,
+            RefId = offer.ItemRequestId.ToString(),
             Link = "/Request/Detail/" + offer.ItemRequestId,
             CreatedAt = DateTime.UtcNow
         });
 
-        await _context.SaveChangesAsync();
-        return RedirectToAction("MyRequests", "Request");
+        await _db.SaveChangesAsync();
+        return RedirectToAction("MyRequests");
     }
 
     [Authorize]
@@ -488,24 +380,123 @@ public class RequestController : ProfileBaseController
     {
         var userId = _userManager.GetUserId(User)!;
 
-        var offer = await _context.RequestOffers
+        var offer = await _db.RequestOffers
             .Include(o => o.ItemRequest)
             .FirstOrDefaultAsync(o => o.Id == offerId);
 
         if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
-            return RedirectToAction("MyRequests", "Request");
+            return RedirectToAction("MyRequests");
 
         offer.Status = RequestOfferStatus.Rejected;
 
-        _context.Notifications.Add(new Notification
+        _db.Notifications.Add(new Notification
         {
             UserId = offer.UserId,
             Message = $"Penawaran Anda untuk request \"{offer.ItemRequest.Title}\" ditolak.",
+            Type = NotificationType.OfferRejected,
+            RefId = offer.ItemRequestId.ToString(),
             Link = "/Request/Detail/" + offer.ItemRequestId,
             CreatedAt = DateTime.UtcNow
         });
 
-        await _context.SaveChangesAsync();
-        return RedirectToAction("MyRequests", "Request");
+        await _db.SaveChangesAsync();
+        return RedirectToAction("MyRequests");
+    }
+
+    // -------------------------------------------------------------------------
+    // Private helpers
+    // -------------------------------------------------------------------------
+
+    private async Task SaveRequestImagesAsync(List<IFormFile> images, string userId, int requestId, int maxCount, int currentCount = 0)
+    {
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "requests", userId, requestId.ToString());
+        Directory.CreateDirectory(uploadFolder);
+
+        int count = currentCount;
+        foreach (var image in images)
+        {
+            if (count >= maxCount) break;
+            var extension = Path.GetExtension(image.FileName).ToLower();
+            if (!allowedExtensions.Contains(extension) || image.Length > 5 * 1024 * 1024) continue;
+            var fileName = Guid.NewGuid().ToString() + extension;
+            var filePath = Path.Combine(uploadFolder, fileName);
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await image.CopyToAsync(stream);
+            _db.ItemImages.Add(new ItemImage
+            {
+                OwnerType = ImageOwnerType.Request,
+                ItemRequestId = requestId,
+                FilePath = $"/uploads/requests/{userId}/{requestId}/{fileName}"
+            });
+            count++;
+        }
+    }
+
+    private async Task SaveOfferImagesAsync(List<IFormFile> images, int offerId, int maxCount)
+    {
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "offers", offerId.ToString());
+        Directory.CreateDirectory(uploadFolder);
+
+        int count = 0;
+        foreach (var image in images)
+        {
+            if (count >= maxCount) break;
+            var extension = Path.GetExtension(image.FileName).ToLower();
+            if (!allowedExtensions.Contains(extension) || image.Length > 5 * 1024 * 1024) continue;
+            var fileName = Guid.NewGuid().ToString() + extension;
+            var filePath = Path.Combine(uploadFolder, fileName);
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await image.CopyToAsync(stream);
+            _db.ItemImages.Add(new ItemImage
+            {
+                OwnerType = ImageOwnerType.RequestOffer,
+                RequestOfferId = offerId,
+                FilePath = $"/uploads/offers/{offerId}/{fileName}"
+            });
+            count++;
+        }
+    }
+
+    private void DeleteFileIfExists(string relativePath)
+    {
+        var fullPath = Path.Combine(_environment.WebRootPath, relativePath.TrimStart('/'));
+        if (System.IO.File.Exists(fullPath))
+            System.IO.File.Delete(fullPath);
+    }
+
+    private async Task RunMatchingAndStoreTempData(int requestId)
+    {
+        var savedRequest = await _db.ItemRequests
+            .Include(r => r.Images)
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == requestId);
+
+        if (savedRequest == null) return;
+
+        var matches = await _matchingService.FindMatchesForItemRequest(savedRequest);
+        if (!matches.Any()) return;
+
+        var matchData = matches.Select(m => new
+        {
+            id = m.Item.Id,
+            title = m.Item.NamaBarang,
+            kategori = m.Item.Kategori.ToString(),
+            lokasi = m.Item.Lokasi,
+            provinsi = m.Item.Provinsi,
+            deskripsi = m.Item.Deskripsi,
+            score = m.Score,
+            reasons = m.MatchReasons,
+            posterName = m.Item.User != null ? m.Item.User.NamaDepan + " " + m.Item.User.NamaBelakang : "Unknown",
+            posterAvatar = m.Item.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
+            createdAgo = (DateTime.UtcNow - m.Item.CreatedAt).Days,
+            firstImage = m.Item.Images.FirstOrDefault()?.FilePath,
+            type = "item"
+        }).ToList();
+
+        TempData["Matches"] = JsonSerializer.Serialize(matchData);
+        TempData["MatchCount"] = matches.Count.ToString();
+        TempData["MatchContext"] = "request";
     }
 }

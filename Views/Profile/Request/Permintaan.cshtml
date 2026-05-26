@@ -30,12 +30,12 @@
                     {
                         var (statusLabel, statusClass) = r.Status switch
                         {
-                            ClaimRequestStatus.Pending => ("Menunggu", "pbadge-muted"),
-                            ClaimRequestStatus.Accepted => ("Diterima", "pbadge-claimed"),
-                            ClaimRequestStatus.Rejected => ("Ditolak", "pbadge-rejected"),
-                            ClaimRequestStatus.Shipped => ("Dikirim", "pbadge-pending"),
-                            ClaimRequestStatus.Delivered => ("Selesai", "pbadge-available"),
-                            _ => ("Unknown", "pbadge-muted")
+                            ClaimRequestStatus.Pending   => ("Menunggu", "pbadge-muted"),
+                            ClaimRequestStatus.Accepted  => ("Diterima",  "pbadge-claimed"),
+                            ClaimRequestStatus.Rejected  => ("Ditolak",   "pbadge-rejected"),
+                            ClaimRequestStatus.Shipped   => ("Dikirim",   "pbadge-pending"),
+                            ClaimRequestStatus.Delivered => ("Selesai",   "pbadge-available"),
+                            _                            => ("Unknown",   "pbadge-muted")
                         };
                         <a class="plist-item @(selected?.Id == r.Id ? "active" : "")"
                            href="/Request/Permintaan?selectedId=@r.Id">
@@ -63,7 +63,7 @@
                     }
                     else
                     {
-                        var alreadyReviewed = selected.Reputations.Any(r => r.ReviewerId == currentUserId);
+                        var alreadyReviewed = selected.Feedbacks.Any(f => f.ReviewerId == currentUserId);
 
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (selected.Item?.Images.Any() == true)
@@ -73,7 +73,7 @@
                             <div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.Item?.NamaBarang</div>
                                 <div style="display:flex;gap:6px;">
-                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Item?.Kategori ?? ItemCategory.Semua)</span>
+                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Item?.Kategori ?? ItemCategory.Pakaian)</span>
                                 </div>
                             </div>
                         </div>
@@ -86,7 +86,7 @@
                                     <div style="font-size:13px;font-weight:500;color:#0f172a;">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
                                     <div style="font-size:11px;color:#64748b;">@selected.Item?.User?.Alamat</div>
                                 </div>
-                                <form asp-controller="Item" asp-action="Chat" method="post" style="margin-left:auto;">
+                                <form asp-controller="Donasi" asp-action="Chat" method="post" style="margin-left:auto;">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="itemId" value="@selected.Item?.Id" />
                                     <input type="hidden" name="otherUserId" value="@selected.Item?.UserId" />
@@ -123,7 +123,7 @@
 
                             @if (selected.Status == ClaimRequestStatus.Shipped)
                             {
-                                <form asp-controller="Item" asp-action="MarkDelivered" method="post">
+                                <form asp-controller="Donasi" asp-action="MarkDelivered" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="claimRequestId" value="@selected.Id" />
                                     <button type="submit" class="pbtn pbtn-success pbtn-block">
@@ -164,7 +164,7 @@
                         }
                         else if (alreadyReviewed)
                         {
-                            var myReview = selected.Reputations.First(r => r.ReviewerId == currentUserId);
+                            var myReview = selected.Feedbacks.First(f => f.ReviewerId == currentUserId);
                             <div class="psec">
                                 <div class="psec-label">Feedback Anda</div>
                                 <div style="display:flex;gap:2px;margin-bottom:8px;">

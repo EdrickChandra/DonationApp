@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
@@ -33,5 +33,7 @@ public class RequestOffer
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public ICollection<RequestOfferImage> Images { get; set; } = new List<RequestOfferImage>();
+    public ICollection<ItemImage> Images { get; set; } = new List<ItemImage>();
+    public ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
+    public ICollection<PointTransaction> PointTransactions { get; set; } = new List<PointTransaction>();
 }

@@ -5,17 +5,21 @@
     var activeTab = ViewBag.ActiveTab as string ?? "donasi";
     var donations = ViewBag.Donations as List<Item> ?? new List<Item>();
     var requests = ViewBag.Requests as List<ItemRequest> ?? new List<ItemRequest>();
-    var selectedKat = ViewBag.SelectedKategori != null ? (ItemCategory)ViewBag.SelectedKategori : ItemCategory.Semua;
+    var selected = ViewBag.SelectedKategori as ItemCategory?;
 }
 
 <div class="page-header">
     <div class="page-header-inner">
         <div class="pills">
+            <a class="pill @(selected == null ? "active" : "")"
+               asp-controller="Request" asp-action="Index">
+                <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                Semua
+            </a>
             @foreach (var cat in CategoryHelper.AllCategories())
             {
                 var icon = cat switch
                 {
-                    ItemCategory.Semua => "ti-layout-grid",
                     ItemCategory.Pakaian => "ti-shirt",
                     ItemCategory.Elektronik => "ti-device-laptop",
                     ItemCategory.Buku => "ti-book",
@@ -26,8 +30,8 @@
                     ItemCategory.PeralatanDapur => "ti-tools-kitchen-2",
                     _ => "ti-tag"
                 };
-                <a class="pill @(selectedKat == cat ? "active" : "")"
-                   href="/Search?q=@Uri.EscapeDataString(query)&tab=@activeTab&kategori=@((int)cat)">
+                <a class="pill @(selected == cat ? "active" : "")"
+                   asp-controller="Request" asp-action="Index" asp-route-kategori="@cat">
                     <i class="ti @icon" aria-hidden="true"></i>
                     @CategoryHelper.DisplayName(cat)
                 </a>
@@ -52,11 +56,11 @@
 
     <div class="feed-tabs">
         <a class="feed-tab @(activeTab == "donasi" ? "active" : "")"
-           href="/Search?q=@Uri.EscapeDataString(query)&tab=donasi&kategori=@((int)selectedKat)">
+           href="/Search?q=@Uri.EscapeDataString(query)&tab=donasi&kategori=@((int)selected)">
             Donasi (@donations.Count)
         </a>
         <a class="feed-tab @(activeTab == "request" ? "active" : "")"
-           href="/Search?q=@Uri.EscapeDataString(query)&tab=request&kategori=@((int)selectedKat)">
+           href="/Search?q=@Uri.EscapeDataString(query)&tab=request&kategori=@((int)selected)">
             Request (@requests.Count)
         </a>
     </div>

@@ -1,6 +1,5 @@
 .page-header {
     background: transparent;
-    padding: 0;
 }
 
 .page-header-inner {
@@ -965,10 +964,9 @@
         font-size: 18px;
     }
 
-    .page-header {
-        padding: 0;
+    .page-header-inner{
+        padding-top:2%;
     }
-
     .pills {
         flex-wrap: nowrap;
         overflow-x: auto;

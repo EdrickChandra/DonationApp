@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -7,12 +7,12 @@ using DonationApp.Models;
 
 namespace DonationApp.Controllers;
 
-public class ProfileBaseController : Controller
+public class AppBaseController : Controller
 {
     protected readonly AppDbContext _db;
     protected readonly UserManager<ApplicationUser> _userManager;
 
-    public ProfileBaseController(AppDbContext db, UserManager<ApplicationUser> userManager)
+    public AppBaseController(AppDbContext db, UserManager<ApplicationUser> userManager)
     {
         _db = db;
         _userManager = userManager;
@@ -25,24 +25,34 @@ public class ProfileBaseController : Controller
             var userId = _userManager.GetUserId(User);
             if (userId != null)
             {
-                var user = await _userManager.FindByIdAsync(userId);
-                ViewBag.NavUser = user;
+                var userTask = _userManager.FindByIdAsync(userId);
 
-                ViewBag.UnreadCount = await _db.Notifications
+                var notifTask = _db.Notifications
                     .CountAsync(n => n.UserId == userId && !n.IsRead);
 
-                ViewBag.UnreadMessageCount = await _db.ChatMessages
+                var msgTask = _db.ChatMessages
                     .Where(m => m.SenderId != userId && !m.IsRead &&
                         _db.Conversations.Any(c => c.Id == m.ConversationId &&
                             (c.RequesterId == userId || c.DonorId == userId)))
                     .CountAsync();
 
-                var avgRating = await _db.UserReputations
-                    .Where(r => r.ReviewedUserId == userId)
-                    .AverageAsync(r => (double?)r.Rating) ?? 0;
+                var ratingTask = _db.Feedbacks
+                    .Where(f => f.ReviewedUserId == userId)
+                    .AverageAsync(f => (double?)f.Rating);
 
-                ViewBag.AverageRating = Math.Round(avgRating, 1);
+                await Task.WhenAll(userTask, notifTask, msgTask, ratingTask);
+
+                ViewBag.NavUser = userTask.Result;
+                ViewBag.UnreadCount = notifTask.Result;
+                ViewBag.UnreadMessageCount = msgTask.Result;
+                ViewBag.AverageRating = Math.Round(ratingTask.Result ?? 0, 1);
             }
+        }
+        else
+        {
+            ViewBag.UnreadCount = 0;
+            ViewBag.UnreadMessageCount = 0;
+            ViewBag.AverageRating = 0.0;
         }
 
         await next();

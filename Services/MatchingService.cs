@@ -68,7 +68,7 @@ public class MatchingService
             .Include(i => i.User)
             .Where(i => i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
 
-        if (itemRequest.KondisiMinimum == KondisiMinimum.Baru)
+        if (itemRequest.KondisiMinimum == ItemCondition.Baru)
             query = query.Where(i => i.Kondisi == ItemCondition.Baru);
 
         var candidates = await query.ToListAsync();

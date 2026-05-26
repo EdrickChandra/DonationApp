@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using DonationApp.Data;
 using DonationApp.Models;
 
 namespace DonationApp.Controllers;
 
-public class AccountController : BaseController
+public class AccountController : AppBaseController
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
@@ -32,10 +32,11 @@ public class AccountController : BaseController
             NamaBelakang = model.NamaBelakang,
             Email = model.Email,
             UserName = model.NamaDepan,
-            NomorTelepon = model.NomorTelepon,
+            PhoneNumber = model.PhoneNumber,
             Alamat = model.Alamat,
             Provinsi = model.Provinsi,
-            KodePos = model.KodePos
+            KodePos = model.KodePos,
+            CreatedAt = DateTime.UtcNow
         };
 
         var result = await _userManager.CreateAsync(user, model.Password);

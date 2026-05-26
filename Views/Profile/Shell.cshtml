@@ -40,9 +40,7 @@
         }
 
         @@keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         #profile-body {
@@ -50,15 +48,8 @@
         }
 
         @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(4px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(4px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
     </style>
 
@@ -69,7 +60,6 @@
             '/Profile',
             '/Donasi',
             '/Pesan',
-            '/Notifikasi',
             '/Request/MyRequests',
             '/Request/Permintaan',
             '/Request/CreateView'
@@ -175,12 +165,12 @@
         });
 
         var sectionUrls = {
-            'overview': '/Profile/Overview',
-            'donasi': '/Donasi/Index',
-            'request': '/Request/MyRequests',
-            'pesan': '/Pesan/Index',
-            'notifikasi': '/Notifikasi/Index',
-            'profil': '/Profile/Edit'
+            'overview':    '/Profile/Overview',
+            'donasi':      '/Donasi/Index',
+            'request':     '/Request/MyRequests',
+            'pesan':       '/Pesan/Index',
+            'notifikasi':  '/Profile/Notifikasi',
+            'profil':      '/Profile/Edit'
         };
 
         var initialUrl = sectionUrls['@initialSection'] || '/Profile/Overview';

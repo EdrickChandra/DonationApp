@@ -68,7 +68,7 @@
                     <label class="pform-label">Kategori</label>
                     <select class="pform-input" name="Kategori" id="donasi-kategori" onchange="showDonasFields(this.value)" required>
                         <option value="">Pilih Kategori</option>
-                        @foreach (var cat in CategoryHelper.AllCategories().Where(c => c != ItemCategory.Semua))
+                        @foreach (var cat in CategoryHelper.AllCategories())
                         {
                             <option value="@((int)cat)" selected="@(editItem != null && editItem.Kategori == cat)">@CategoryHelper.DisplayName(cat)</option>
                         }

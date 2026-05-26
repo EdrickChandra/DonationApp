@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace DonationApp.Models;
 
@@ -15,7 +15,7 @@ public class RegisterViewModel
     public string Email { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Nomor telepon wajib diisi.")]
-    public string NomorTelepon { get; set; } = string.Empty;
+    public string PhoneNumber { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Alamat wajib diisi.")]
     public string Alamat { get; set; } = string.Empty;
@@ -23,9 +23,8 @@ public class RegisterViewModel
     [Required(ErrorMessage = "Provinsi wajib diisi.")]
     public string Provinsi { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Kode pos wajib diisi.")]
     [RegularExpression(@"^\d{5}$", ErrorMessage = "Kode pos harus 5 digit angka.")]
-    public string KodePos { get; set; } = string.Empty;
+    public string? KodePos { get; set; }
 
     [Required(ErrorMessage = "Password wajib diisi.")]
     [MinLength(6, ErrorMessage = "Password minimal 6 karakter.")]

@@ -172,9 +172,9 @@
                                         <div class="pstep-dot @(accepted.Status >= ClaimRequestStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
-                                    <div class="pstep-line @(accepted.Status == ClaimRequestStatus.Delivered && accepted.Reputations.Any() ? "done" : "")"></div>
-                                    <div class="pstep @(accepted.Reputations.Any() ? "done" : "")">
-                                        <div class="pstep-dot @(accepted.Reputations.Any() ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
+                                    <div class="pstep-line @(accepted.Status == ClaimRequestStatus.Delivered && accepted.Feedbacks.Any() ? "done" : "")"></div>
+                                    <div class="pstep @(accepted.Feedbacks.Any() ? "done" : "")">
+                                        <div class="pstep-dot @(accepted.Feedbacks.Any() ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Feedback</div>
                                     </div>
                                 </div>

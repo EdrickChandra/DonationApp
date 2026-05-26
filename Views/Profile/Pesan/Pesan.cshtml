@@ -180,7 +180,8 @@
             function loadMessages(convId) {
                 var messagesEl = document.getElementById('chatMessages');
                 messagesEl.innerHTML = '';
-                fetch('/Chat/GetMessages?conversationId=' + convId)
+                // Updated: /Pesan/GetMessages instead of /Chat/GetMessages
+                fetch('/Pesan/GetMessages?conversationId=' + convId)
                     .then(function(r) { return r.json(); })
                     .then(function(msgs) {
                         msgs.forEach(function(m) { appendMessage(m); });
@@ -252,7 +253,8 @@
                 formData.append('image', input.files[0]);
                 var token = document.querySelector('input[name="__RequestVerificationToken"]');
                 var headers = token ? { 'RequestVerificationToken': token.value } : {};
-                var response = await fetch('/Chat/UploadImage', { method: 'POST', headers: headers, body: formData });
+                // Updated: /Pesan/UploadImage instead of /Chat/UploadImage
+                var response = await fetch('/Pesan/UploadImage', { method: 'POST', headers: headers, body: formData });
                 var data = await response.json();
                 return data.success ? data.path : null;
             }

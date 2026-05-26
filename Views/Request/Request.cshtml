@@ -2,16 +2,21 @@
 @using DonationApp.Models
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var selected = ViewBag.SelectedKategori != null ? (ItemCategory)ViewBag.SelectedKategori : ItemCategory.Semua;
+    var selected = ViewBag.SelectedKategori as ItemCategory?;
 }
 
 <div class="page-header">
     <div class="page-header-inner">
         <div class="pills">
+            <a class="pill @(selected == null ? "active" : "")"
+               asp-controller="Request" asp-action="Index">
+                <i class="ti ti-layout-grid" aria-hidden="true"></i>
+                Semua
+            </a>
             @foreach (var cat in CategoryHelper.AllCategories())
             {
-                var icon = cat switch {
-                    ItemCategory.Semua => "ti-layout-grid",
+                var icon = cat switch
+                {
                     ItemCategory.Pakaian => "ti-shirt",
                     ItemCategory.Elektronik => "ti-device-laptop",
                     ItemCategory.Buku => "ti-book",
@@ -64,7 +69,6 @@
                                 <i class="ti ti-list-search" aria-hidden="true"></i>
                             </div>
                         }
-                        <span class="card-request-badge">Request</span>
                         <span class="card-timer-badge">
                             <i class="ti ti-clock" aria-hidden="true"></i>
                             @daysLeft hari

@@ -1,4 +1,4 @@
-﻿@model DonationApp.Models.RegisterViewModel
+@model DonationApp.Models.RegisterViewModel
 @{
     ViewData["HideSearch"] = true;
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -34,9 +34,9 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label" asp-for="NomorTelepon">Nomor Telepon</label>
-                <input class="form-input" asp-for="NomorTelepon" placeholder="+62 812 3456 7890" />
-                <span class="validation-message" asp-validation-for="NomorTelepon"></span>
+                <label class="form-label" asp-for="PhoneNumber">Nomor Telepon</label>
+                <input class="form-input" asp-for="PhoneNumber" placeholder="+62 812 3456 7890" />
+                <span class="validation-message" asp-validation-for="PhoneNumber"></span>
             </div>
 
             <div class="form-group">
@@ -50,45 +50,23 @@
                     <label class="form-label" asp-for="Provinsi">Provinsi</label>
                     <select class="form-input" asp-for="Provinsi">
                         <option value="">Pilih Provinsi</option>
-                        <option>Aceh</option>
-                        <option>Bali</option>
-                        <option>Banten</option>
-                        <option>Bengkulu</option>
-                        <option>DI Yogyakarta</option>
-                        <option>DKI Jakarta</option>
-                        <option>Gorontalo</option>
-                        <option>Jambi</option>
-                        <option>Jawa Barat</option>
-                        <option>Jawa Tengah</option>
-                        <option>Jawa Timur</option>
-                        <option>Kalimantan Barat</option>
-                        <option>Kalimantan Selatan</option>
-                        <option>Kalimantan Tengah</option>
-                        <option>Kalimantan Timur</option>
-                        <option>Kalimantan Utara</option>
-                        <option>Kepulauan Bangka Belitung</option>
-                        <option>Kepulauan Riau</option>
-                        <option>Lampung</option>
-                        <option>Maluku</option>
-                        <option>Maluku Utara</option>
-                        <option>Nusa Tenggara Barat</option>
-                        <option>Nusa Tenggara Timur</option>
-                        <option>Papua</option>
-                        <option>Papua Barat</option>
-                        <option>Riau</option>
-                        <option>Sulawesi Barat</option>
-                        <option>Sulawesi Selatan</option>
-                        <option>Sulawesi Tengah</option>
-                        <option>Sulawesi Tenggara</option>
-                        <option>Sulawesi Utara</option>
-                        <option>Sumatera Barat</option>
-                        <option>Sumatera Selatan</option>
+                        <option>Aceh</option><option>Bali</option><option>Banten</option>
+                        <option>Bengkulu</option><option>DI Yogyakarta</option><option>DKI Jakarta</option>
+                        <option>Gorontalo</option><option>Jambi</option><option>Jawa Barat</option>
+                        <option>Jawa Tengah</option><option>Jawa Timur</option><option>Kalimantan Barat</option>
+                        <option>Kalimantan Selatan</option><option>Kalimantan Tengah</option><option>Kalimantan Timur</option>
+                        <option>Kalimantan Utara</option><option>Kepulauan Bangka Belitung</option><option>Kepulauan Riau</option>
+                        <option>Lampung</option><option>Maluku</option><option>Maluku Utara</option>
+                        <option>Nusa Tenggara Barat</option><option>Nusa Tenggara Timur</option><option>Papua</option>
+                        <option>Papua Barat</option><option>Riau</option><option>Sulawesi Barat</option>
+                        <option>Sulawesi Selatan</option><option>Sulawesi Tengah</option><option>Sulawesi Tenggara</option>
+                        <option>Sulawesi Utara</option><option>Sumatera Barat</option><option>Sumatera Selatan</option>
                         <option>Sumatera Utara</option>
                     </select>
                     <span class="validation-message" asp-validation-for="Provinsi"></span>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" asp-for="KodePos">Kode Pos</label>
+                    <label class="form-label" asp-for="KodePos">Kode Pos <span style="font-weight:400;color:#94a3b8;">(opsional)</span></label>
                     <input class="form-input" asp-for="KodePos" placeholder="12345" maxlength="5" />
                     <span class="validation-message" asp-validation-for="KodePos"></span>
                 </div>

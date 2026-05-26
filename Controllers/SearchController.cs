@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DonationApp.Data;
 using DonationApp.Models;
@@ -6,14 +6,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DonationApp.Controllers;
 
-public class SearchController : BaseController
+public class SearchController : AppBaseController
 {
-    private readonly AppDbContext _context;
-
     public SearchController(AppDbContext context, UserManager<ApplicationUser> userManager)
         : base(context, userManager)
     {
-        _context = context;
     }
 
     public async Task<IActionResult> Index(string? q, string? tab, ItemCategory? kategori)
@@ -21,12 +18,12 @@ public class SearchController : BaseController
         var query = q?.Trim() ?? string.Empty;
         var activeTab = tab ?? "donasi";
 
-        var donationsQuery = _context.Items
+        var donationsQuery = _db.Items
             .Include(i => i.Images)
             .Include(i => i.User)
             .Where(i => i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
 
-        var requestsQuery = _context.ItemRequests
+        var requestsQuery = _db.ItemRequests
             .Include(r => r.Images)
             .Include(r => r.User)
             .Include(r => r.Offers)
@@ -45,20 +42,22 @@ public class SearchController : BaseController
                 r.Lokasi.Contains(query));
         }
 
-        if (kategori.HasValue && kategori.Value != ItemCategory.Semua)
+        if (kategori.HasValue)
         {
             donationsQuery = donationsQuery.Where(i => i.Kategori == kategori.Value);
             requestsQuery = requestsQuery.Where(r => r.Kategori == kategori.Value);
         }
 
-        var donations = await donationsQuery.OrderByDescending(i => i.CreatedAt).ToListAsync();
-        var requests = await requestsQuery.OrderByDescending(r => r.CreatedAt).ToListAsync();
+        var donationsTask = donationsQuery.OrderByDescending(i => i.CreatedAt).ToListAsync();
+        var requestsTask = requestsQuery.OrderByDescending(r => r.CreatedAt).ToListAsync();
+
+        await Task.WhenAll(donationsTask, requestsTask);
 
         ViewBag.Query = query;
         ViewBag.ActiveTab = activeTab;
-        ViewBag.SelectedKategori = kategori ?? ItemCategory.Semua;
-        ViewBag.Donations = donations;
-        ViewBag.Requests = requests;
+        ViewBag.SelectedKategori = kategori;
+        ViewBag.Donations = donationsTask.Result;
+        ViewBag.Requests = requestsTask.Result;
 
         return View("Search");
     }
