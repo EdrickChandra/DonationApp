@@ -29,6 +29,20 @@ public class RequestOffer
     [Required]
     public string Deskripsi { get; set; } = string.Empty;
 
+    [MaxLength(200)]
+    public string NamaBarang { get; set; } = string.Empty;
+
+    public ItemCondition Kondisi { get; set; } = ItemCondition.Bekas;
+
+    [MaxLength(200)]
+    public string Lokasi { get; set; } = string.Empty;
+
+    [MaxLength(100)]
+    public string Provinsi { get; set; } = string.Empty;
+
+    [Range(1, 999)]
+    public int Jumlah { get; set; } = 1;
+
     public RequestOfferStatus Status { get; set; } = RequestOfferStatus.Pending;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

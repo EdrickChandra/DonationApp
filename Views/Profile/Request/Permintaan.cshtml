@@ -49,7 +49,7 @@
                             }
                             <div style="flex:1;min-width:0;">
                                 <div class="plist-name">@r.Item?.NamaBarang</div>
-                                <div class="plist-sub">@((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</div>
+                                <div class="plist-sub">@r.Jumlah pcs · @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</div>
                             </div>
                             <span class="pbadge @statusClass">@statusLabel</span>
                         </a>
@@ -72,8 +72,9 @@
                             }
                             <div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.Item?.NamaBarang</div>
-                                <div style="display:flex;gap:6px;">
+                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                     <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Item?.Kategori ?? ItemCategory.Pakaian)</span>
+                                    <span class="pbadge pbadge-muted">@selected.Jumlah pcs diminta</span>
                                 </div>
                             </div>
                         </div>

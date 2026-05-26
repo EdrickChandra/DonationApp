@@ -88,7 +88,7 @@
                         <div class="detail-row-value" style="margin-top:4px;">@Model.Kondisi</div>
                     </div>
                     <div class="dinfo-cell">
-                        <div class="detail-row-label">Jumlah</div>
+                        <div class="detail-row-label">Tersedia</div>
                         <div class="detail-row-value" style="margin-top:4px;">@Model.Jumlah pcs</div>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                 else if (hasRequested)
                 {
                     <button class="detail-btn detail-btn-disabled" style="margin-bottom:8px;" disabled>Sudah Diminta</button>
-                    <form asp-controller="Item" asp-action="Chat" method="post">
+                    <form asp-controller="Donasi" asp-action="Chat" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="itemId" value="@Model.Id" />
                         <input type="hidden" name="otherUserId" value="@Model.UserId" />
@@ -134,9 +134,28 @@
                 }
                 else if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <form asp-controller="Item" asp-action="Request" method="post">
+                    <form asp-controller="Donasi" asp-action="Request" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="itemId" value="@Model.Id" />
+
+                        @if (Model.Jumlah > 1)
+                        {
+                            <div style="margin-bottom:14px;">
+                                <div class="detail-row-label" style="margin-bottom:8px;">Jumlah yang diminta</div>
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    <button type="button" class="stepper-btn" onclick="stepDown()">−</button>
+                                    <span id="stepperDisplay" style="font-size:18px;font-weight:700;min-width:28px;text-align:center;">1</span>
+                                    <button type="button" class="stepper-btn" onclick="stepUp(@Model.Jumlah)">+</button>
+                                    <span style="font-size:12px;color:#94a3b8;">maks. @Model.Jumlah pcs</span>
+                                </div>
+                                <input type="hidden" name="jumlah" id="stepperInput" value="1" />
+                            </div>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="jumlah" value="1" />
+                        }
+
                         <button type="submit" class="detail-btn">
                             <i class="ti ti-hand-stop" aria-hidden="true"></i> Minta Barang
                         </button>
@@ -175,6 +194,27 @@
 </div>
 
 @section Scripts {
+    <style>
+        .stepper-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            background: #f1f5f9;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, border-color 0.15s;
+            color: #0f172a;
+        }
+        .stepper-btn:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+    </style>
     <script>
         var images = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(images.Select(i => i.FilePath).ToList()));
         var currentIndex = 0;
@@ -211,6 +251,24 @@
 
         function reportDetail() {
             alert('Laporan telah dikirim.');
+        }
+
+        var stepperVal = 1;
+
+        function stepDown() {
+            if (stepperVal > 1) {
+                stepperVal--;
+                document.getElementById('stepperDisplay').textContent = stepperVal;
+                document.getElementById('stepperInput').value = stepperVal;
+            }
+        }
+
+        function stepUp(max) {
+            if (stepperVal < max) {
+                stepperVal++;
+                document.getElementById('stepperDisplay').textContent = stepperVal;
+                document.getElementById('stepperInput').value = stepperVal;
+            }
         }
     </script>
 }

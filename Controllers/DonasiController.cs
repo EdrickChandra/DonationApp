@@ -53,6 +53,10 @@ public class DonasiController : AppBaseController
             return PartialView("~/Views/Profile/Donasi/Donasi.cshtml");
         }
 
+        TempData.Keep("Matches");
+        TempData.Keep("MatchCount");
+        TempData.Keep("MatchContext");
+
         ViewBag.InitialSection = "donasi";
         return View("~/Views/Profile/Shell.cshtml");
     }
@@ -236,7 +240,7 @@ public class DonasiController : AppBaseController
     [HttpPost]
     [ValidateAntiForgeryToken]
     [ActionName("Request")]
-    public async Task<IActionResult> AjukanPermintaan(int itemId)
+    public async Task<IActionResult> AjukanPermintaan(int itemId, int jumlah = 1)
     {
         var userId = _userManager.GetUserId(User)!;
 
@@ -247,10 +251,13 @@ public class DonasiController : AppBaseController
         var existing = await _db.ClaimRequests.AnyAsync(r => r.ItemId == itemId && r.UserId == userId);
         if (!existing)
         {
+            var clampedJumlah = Math.Max(1, Math.Min(jumlah, item.Jumlah));
+
             _db.ClaimRequests.Add(new ClaimRequest
             {
                 ItemId = itemId,
                 UserId = userId,
+                Jumlah = clampedJumlah,
                 CreatedAt = DateTime.UtcNow
             });
 
@@ -260,7 +267,7 @@ public class DonasiController : AppBaseController
             _db.Notifications.Add(new Notification
             {
                 UserId = item.UserId,
-                Message = $"{requesterName} meminta barang \"{item.NamaBarang}\" milik Anda.",
+                Message = $"{requesterName} meminta {clampedJumlah} pcs barang \"{item.NamaBarang}\" milik Anda.",
                 Type = NotificationType.ClaimRequest,
                 RefId = itemId.ToString(),
                 Link = "/Donasi/Index?selectedId=" + itemId,
@@ -270,7 +277,105 @@ public class DonasiController : AppBaseController
             await _db.SaveChangesAsync();
         }
 
-        return RedirectToAction("Detail", new { id = itemId });
+        return RedirectToAction("Permintaan", "Request");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> QuickOffer(int itemRequestId, int fromItemId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var itemRequest = await _db.ItemRequests.FindAsync(itemRequestId);
+        if (itemRequest == null || itemRequest.UserId == userId || itemRequest.Status != ItemRequestStatus.Open)
+            return Json(new { success = false, error = "Request tidak valid." });
+
+        var fromItem = await _db.Items.FirstOrDefaultAsync(i => i.Id == fromItemId && i.UserId == userId);
+        if (fromItem == null)
+            return Json(new { success = false, error = "Item tidak ditemukan." });
+
+        var alreadyOffered = await _db.RequestOffers
+            .AnyAsync(o => o.ItemRequestId == itemRequestId && o.UserId == userId);
+
+        if (alreadyOffered)
+            return Json(new { success = false, error = "Anda sudah menawarkan untuk request ini." });
+
+        var clampedJumlah = Math.Max(1, Math.Min(fromItem.Jumlah, itemRequest.Jumlah));
+
+        var offer = new RequestOffer
+        {
+            ItemRequestId = itemRequestId,
+            UserId = userId,
+            NamaBarang = fromItem.NamaBarang,
+            Kondisi = fromItem.Kondisi,
+            Lokasi = fromItem.Lokasi,
+            Provinsi = fromItem.Provinsi,
+            Jumlah = clampedJumlah,
+            Deskripsi = fromItem.Deskripsi,
+            Status = RequestOfferStatus.Pending,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _db.RequestOffers.Add(offer);
+        await _db.SaveChangesAsync();
+
+        var offerer = await _userManager.FindByIdAsync(userId);
+        var offererName = offerer != null ? offerer.NamaDepan + " " + offerer.NamaBelakang : "Seseorang";
+
+        _db.Notifications.Add(new Notification
+        {
+            UserId = itemRequest.UserId,
+            Message = $"{offererName} menawarkan \"{fromItem.NamaBarang}\" ({clampedJumlah} pcs) untuk request \"{itemRequest.Title}\" Anda.",
+            Type = NotificationType.NewOffer,
+            RefId = itemRequestId.ToString(),
+            Link = "/Request/MyRequests",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+
+        return Json(new { success = true });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> QuickClaim(int itemId, int jumlah = 1)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var item = await _db.Items.FindAsync(itemId);
+        if (item == null || item.UserId == userId || item.Status != ItemStatus.Available)
+            return Json(new { success = false, error = "Item tidak valid." });
+
+        var existing = await _db.ClaimRequests.AnyAsync(r => r.ItemId == itemId && r.UserId == userId);
+        if (existing)
+            return Json(new { success = false, error = "Anda sudah meminta item ini." });
+
+        var clampedJumlah = Math.Max(1, Math.Min(jumlah, item.Jumlah));
+
+        _db.ClaimRequests.Add(new ClaimRequest
+        {
+            ItemId = itemId,
+            UserId = userId,
+            Jumlah = clampedJumlah,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        var requester = await _userManager.FindByIdAsync(userId);
+        var requesterName = requester != null ? requester.NamaDepan + " " + requester.NamaBelakang : "Seseorang";
+
+        _db.Notifications.Add(new Notification
+        {
+            UserId = item.UserId,
+            Message = $"{requesterName} meminta {clampedJumlah} pcs barang \"{item.NamaBarang}\" milik Anda.",
+            Type = NotificationType.ClaimRequest,
+            RefId = itemId.ToString(),
+            Link = "/Donasi/Index?selectedId=" + itemId,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+        return Json(new { success = true });
     }
 
     [HttpPost]
@@ -334,12 +439,18 @@ public class DonasiController : AppBaseController
 
         request.Status = ClaimRequestStatus.Accepted;
         request.UpdatedAt = DateTime.UtcNow;
-        request.Item.Status = ItemStatus.Claimed;
+
+        request.Item.Jumlah -= request.Jumlah;
+        if (request.Item.Jumlah <= 0)
+        {
+            request.Item.Jumlah = 0;
+            request.Item.Status = ItemStatus.Claimed;
+        }
 
         _db.Notifications.Add(new Notification
         {
             UserId = request.UserId,
-            Message = $"Permintaan Anda untuk barang \"{request.Item.NamaBarang}\" diterima!",
+            Message = $"Permintaan Anda untuk {request.Jumlah} pcs \"{request.Item.NamaBarang}\" diterima!",
             Type = NotificationType.ClaimAccepted,
             RefId = request.ItemId.ToString(),
             Link = "/Request/Permintaan",
@@ -400,7 +511,7 @@ public class DonasiController : AppBaseController
         _db.Notifications.Add(new Notification
         {
             UserId = request.UserId,
-            Message = $"Barang \"{request.Item.NamaBarang}\" telah dikirim. Silakan konfirmasi penerimaan.",
+            Message = $"Barang \"{request.Item.NamaBarang}\" ({request.Jumlah} pcs) telah dikirim. Silakan konfirmasi penerimaan.",
             Type = NotificationType.ItemShipped,
             RefId = claimRequestId.ToString(),
             Link = "/Request/Permintaan",
@@ -432,7 +543,7 @@ public class DonasiController : AppBaseController
         _db.Notifications.Add(new Notification
         {
             UserId = request.Item.UserId,
-            Message = $"Barang \"{request.Item.NamaBarang}\" telah dikonfirmasi diterima.",
+            Message = $"Barang \"{request.Item.NamaBarang}\" ({request.Jumlah} pcs) telah dikonfirmasi diterima.",
             Type = NotificationType.ItemDelivered,
             RefId = claimRequestId.ToString(),
             Link = "/Donasi/Index",
@@ -443,8 +554,46 @@ public class DonasiController : AppBaseController
         return RedirectToAction("Permintaan", "Request");
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers
+    [HttpGet]
+    public async Task<IActionResult> FindMatches(int itemId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var item = await _db.Items
+            .Include(i => i.Images)
+            .Include(i => i.User)
+            .FirstOrDefaultAsync(i => i.Id == itemId && i.UserId == userId);
+
+        if (item == null)
+            return Json(new { success = false, error = "Item tidak ditemukan." });
+
+        var matches = await _matching.FindMatchesForItem(item);
+
+        if (!matches.Any())
+            return Json(new { success = true, count = 0, matches = new object[] { } });
+
+        var matchData = matches.Select(m => new
+        {
+            id = m.ItemRequest.Id,
+            title = m.ItemRequest.Title,
+            kategori = m.ItemRequest.Kategori.ToString(),
+            lokasi = m.ItemRequest.Lokasi,
+            provinsi = m.ItemRequest.Provinsi,
+            deskripsi = m.ItemRequest.Deskripsi,
+            score = m.Score,
+            reasons = m.MatchReasons,
+            posterName = m.ItemRequest.User != null
+                ? m.ItemRequest.User.NamaDepan + " " + m.ItemRequest.User.NamaBelakang
+                : "Unknown",
+            posterAvatar = m.ItemRequest.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
+            createdAgo = (DateTime.UtcNow - m.ItemRequest.CreatedAt).Days,
+            firstImage = m.ItemRequest.Images.FirstOrDefault()?.FilePath,
+            type = "request"
+        }).ToList();
+
+        return Json(new { success = true, count = matchData.Count, matches = matchData, sourceId = itemId, context = "donasi" });
+    }
+
     // -------------------------------------------------------------------------
 
     private async Task SaveImagesAsync(List<IFormFile> images, string userId, int itemId, int maxCount, int currentCount = 0)

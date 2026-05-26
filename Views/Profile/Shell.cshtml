@@ -71,6 +71,13 @@
             });
         }
 
+        function hoistModalToBody() {
+            var modal = document.getElementById('matchModal');
+            if (modal && modal.parentElement !== document.body) {
+                document.body.appendChild(modal);
+            }
+        }
+
         function loadSection(url, pushState) {
             if (url === currentUrl) return;
             currentUrl = url;
@@ -78,6 +85,9 @@
             document.getElementById('profile-loading').style.display = 'block';
             var body = document.getElementById('profile-body');
             body.style.opacity = '0';
+
+            var existingModal = document.getElementById('matchModal');
+            if (existingModal) existingModal.remove();
 
             fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function(r) {
@@ -96,6 +106,7 @@
                 updateActiveNav(url);
                 reinitScripts(body);
                 injectBackButton();
+                hoistModalToBody();
             })
             .catch(function() {
                 window.location.href = url;

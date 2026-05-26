@@ -30,6 +30,9 @@ public class ClaimRequest
 
     public ClaimRequestStatus Status { get; set; } = ClaimRequestStatus.Pending;
 
+    [Range(1, 999)]
+    public int Jumlah { get; set; } = 1;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 

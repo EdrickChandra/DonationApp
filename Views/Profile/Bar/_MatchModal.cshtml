@@ -2,100 +2,228 @@
     var matchesJson = ViewData["MatchesJson"] as string;
     var matchCount = (int)(ViewData["MatchCount"] ?? 0);
     var matchContext = ViewData["MatchContext"] as string ?? "";
+    var sourceId = ViewData["SourceId"] as string ?? "";
 }
 
-@if (!string.IsNullOrEmpty(matchesJson))
-{
-    <div id="matchModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;">
-        <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-xl);width:100%;max-width:400px;overflow:hidden;">
-            <div style="padding:16px 20px 12px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:flex-start;justify-content:space-between;">
-                <div>
-                    <p style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0 0 3px;">Kecocokan ditemukan!</p>
-                    <p style="font-size:12px;color:var(--color-text-secondary);margin:0;">
-                        @matchCount @(matchContext == "donasi" ? "request" : "donasi") cocok dengan postingan Anda
-                    </p>
-                </div>
-                <button onclick="closeMatchModal()" style="background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:18px;line-height:1;padding:0;">
-                    <i class="ti ti-x" aria-hidden="true"></i>
-                </button>
+<div id="matchModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#fff;border-radius:14px;width:100%;max-width:420px;overflow:hidden;position:relative;z-index:10000;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+        <div style="background:linear-gradient(135deg,#1e40af,#2563eb);padding:16px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;">
+            <div>
+                <p id="matchModalTitle" style="font-size:16px;font-weight:700;color:#fff;margin:0 0 3px;font-family:'Plus Jakarta Sans',sans-serif;">
+                    <i class="ti ti-sparkles" aria-hidden="true" style="margin-right:6px;"></i>Kecocokan ditemukan!
+                </p>
+                <p id="matchModalSubtitle" style="font-size:12px;color:#bfdbfe;margin:0;"></p>
             </div>
-            <div style="padding:16px 20px;">
-                <div id="matchCard" style="background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;">
-                    <div style="position:relative;height:180px;background:var(--color-background-secondary);">
-                        <div id="matchCardImageInner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
-                            <i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:var(--color-text-secondary);"></i>
-                        </div>
-                        <div id="matchCardBadges" style="position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:2;"></div>
+            <button onclick="closeMatchModal()" style="background:rgba(255,255,255,0.2);border:none;cursor:pointer;color:#fff;font-size:16px;line-height:1;padding:4px 8px;border-radius:6px;">
+                <i class="ti ti-x" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <div style="padding:16px 20px;">
+            <div id="matchCard" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+                <div style="position:relative;height:180px;background:#f1f5f9;">
+                    <div id="matchCardImageInner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
+                        <i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:#94a3b8;"></i>
                     </div>
-                    <div style="padding:14px 16px 4px;">
-                        <p id="matchCardTitle" style="font-size:15px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px;"></p>
-                        <p id="matchCardLocation" style="font-size:12px;color:var(--color-text-secondary);margin:0 0 8px;"></p>
-                        <p id="matchCardDesc" style="font-size:13px;color:var(--color-text-secondary);margin:0 0 10px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;"></p>
-                        <div id="matchCardReasons" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                            <div id="matchCardAvatar" style="width:22px;height:22px;border-radius:50%;background:var(--color-background-info);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;color:var(--color-text-info);flex-shrink:0;"></div>
-                            <span id="matchCardPoster" style="font-size:12px;color:var(--color-text-secondary);"></span>
-                        </div>
-                    </div>
-                    <div style="padding:0 16px 14px;display:flex;gap:8px;">
-                        <button onclick="prevMatch()" id="matchPrevBtn" class="pbtn" style="flex:1;font-size:12px;padding:7px 0;">← Prev</button>
-                        <a id="matchViewBtn" href="#" class="pbtn pbtn-primary" style="flex:2;font-size:12px;padding:7px 0;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center;">Lihat →</a>
-                        <button onclick="nextMatch()" id="matchNextBtn" class="pbtn" style="flex:1;font-size:12px;padding:7px 0;">Next →</button>
+                    <div id="matchCardBadges" style="position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:2;"></div>
+                </div>
+                <div style="padding:14px 16px 4px;">
+                    <p id="matchCardTitle" style="font-size:15px;font-weight:600;color:#0f172a;margin:0 0 4px;font-family:'Plus Jakarta Sans',sans-serif;"></p>
+                    <p id="matchCardLocation" style="font-size:12px;color:#64748b;margin:0 0 8px;display:flex;align-items:center;gap:4px;"></p>
+                    <p id="matchCardDesc" style="font-size:13px;color:#64748b;margin:0 0 10px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"></p>
+                    <div id="matchCardReasons" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                        <div id="matchCardAvatar" style="width:22px;height:22px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#1e40af;flex-shrink:0;"></div>
+                        <span id="matchCardPoster" style="font-size:12px;color:#64748b;"></span>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;" id="matchDots"></div>
-                <p id="matchCounter" style="text-align:center;font-size:12px;color:var(--color-text-secondary);margin:6px 0 0;"></p>
+                <div style="padding:0 16px 14px;display:flex;gap:8px;">
+                    <button onclick="prevMatch()" id="matchPrevBtn" class="pbtn" style="flex:1;font-size:12px;padding:7px 0;">← Prev</button>
+                    <button onclick="quickAction()" id="matchActionBtn" class="pbtn pbtn-primary" style="flex:2;font-size:12px;padding:7px 0;border:none;cursor:pointer;"></button>
+                    <button onclick="nextMatch()" id="matchNextBtn" class="pbtn" style="flex:1;font-size:12px;padding:7px 0;">Next →</button>
+                </div>
+                <div id="matchActionFeedback" style="display:none;padding:0 16px 10px;font-size:12px;text-align:center;"></div>
             </div>
-            <div style="padding:0 20px 16px;">
-                <button onclick="closeMatchModal()" class="pbtn pbtn-block" style="font-size:13px;padding:8px 0;">Tutup</button>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+                <div style="display:flex;gap:6px;" id="matchDots"></div>
+                <a id="matchDetailLink" href="#" style="font-size:12px;color:#2563eb;text-decoration:none;">Lihat detail →</a>
             </div>
+            <p id="matchCounter" style="text-align:center;font-size:12px;color:#64748b;margin:6px 0 0;"></p>
+        </div>
+
+        <div style="padding:0 20px 16px;">
+            <button onclick="closeMatchModal()" class="pbtn pbtn-block" style="font-size:13px;padding:8px 0;">Tutup</button>
         </div>
     </div>
+</div>
 
-    <script>
-        var matchData = @Html.Raw(matchesJson);
-        var matchIndex = 0;
-        var matchContext = '@matchContext';
+<div id="matchNoResultModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+    <div style="background:#fff;border-radius:14px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div style="background:linear-gradient(135deg,#1e40af,#2563eb);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
+            <p style="font-size:15px;font-weight:700;color:#fff;margin:0;font-family:'Plus Jakarta Sans',sans-serif;"><i class="ti ti-sparkles" aria-hidden="true" style="margin-right:6px;"></i>Smart Matching</p>
+            <button onclick="closeNoResultModal()" style="background:rgba(255,255,255,0.2);border:none;cursor:pointer;color:#fff;font-size:16px;padding:4px 8px;border-radius:6px;"><i class="ti ti-x" aria-hidden="true"></i></button>
+        </div>
+        <div style="padding:24px 20px;text-align:center;">
+            <i class="ti ti-mood-sad" aria-hidden="true" style="font-size:40px;color:#94a3b8;margin-bottom:12px;display:block;"></i>
+            <p style="font-size:14px;font-weight:600;color:#0f172a;margin:0 0 6px;">Tidak ada kecocokan</p>
+            <p style="font-size:13px;color:#64748b;margin:0;">Belum ada yang cocok saat ini. Coba lagi nanti.</p>
+        </div>
+        <div style="padding:0 20px 16px;">
+            <button onclick="closeNoResultModal()" class="pbtn pbtn-block" style="font-size:13px;padding:8px 0;">Tutup</button>
+        </div>
+    </div>
+</div>
 
-        function renderMatchCard() {
-            if (!matchData.length) return;
-            var m = matchData[matchIndex];
-            var imgEl = document.getElementById('matchCardImageInner');
-            if (m.firstImage) {
-                imgEl.innerHTML = '<img src="' + m.firstImage + '" style="width:100%;height:100%;object-fit:cover;" />';
+<script>
+(function() {
+    var matchData = [];
+    var matchIndex = 0;
+    var matchContext = '';
+    var matchSourceId = '';
+
+    window.openMatchModal = function(data, context, sourceId) {
+        matchData = data;
+        matchContext = context;
+        matchSourceId = String(sourceId);
+        matchIndex = 0;
+
+        if (!data || data.length === 0) {
+            var nm = document.getElementById('matchNoResultModal');
+            if (nm) { nm.style.display = 'flex'; }
+            return;
+        }
+
+        var modal = document.getElementById('matchModal');
+        if (!modal) return;
+
+        document.getElementById('matchModalSubtitle').textContent =
+            data.length + ' ' + (context === 'donasi' ? 'request' : 'donasi') + ' cocok ditemukan';
+
+        renderMatchCard();
+        modal.style.display = 'flex';
+    };
+
+    window.closeMatchModal = function() {
+        var m = document.getElementById('matchModal');
+        if (m) m.style.display = 'none';
+    };
+
+    window.closeNoResultModal = function() {
+        var m = document.getElementById('matchNoResultModal');
+        if (m) m.style.display = 'none';
+    };
+
+    function renderMatchCard() {
+        if (!matchData.length) return;
+        var m = matchData[matchIndex];
+
+        var imgEl = document.getElementById('matchCardImageInner');
+        if (m.firstImage) {
+            imgEl.innerHTML = '<img src="' + m.firstImage + '" style="width:100%;height:100%;object-fit:cover;" />';
+        } else {
+            imgEl.innerHTML = '<i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:#94a3b8;"></i>';
+        }
+
+        var scoreColor = m.score >= 80 ? '#1e40af' : m.score >= 60 ? '#166534' : '#64748b';
+        document.getElementById('matchCardBadges').innerHTML =
+            '<span style="background:#dbeafe;color:#1e40af;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;font-family:Plus Jakarta Sans,sans-serif;">' + m.kategori + '</span>' +
+            '<span style="background:#fff;color:' + scoreColor + ';font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;border:1px solid #e2e8f0;">' + m.score + ' pts</span>';
+
+        document.getElementById('matchCardTitle').textContent = m.title;
+        document.getElementById('matchCardLocation').innerHTML =
+            '<i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i>' +
+            (m.lokasi || '') + (m.provinsi ? ' · ' + m.provinsi : '');
+        document.getElementById('matchCardDesc').textContent = m.deskripsi;
+        document.getElementById('matchCardReasons').innerHTML = (m.reasons || []).map(function(r) {
+            return '<span style="font-size:11px;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;padding:2px 8px;border-radius:99px;">' + r + '</span>';
+        }).join('');
+        document.getElementById('matchCardAvatar').textContent = m.posterAvatar;
+        document.getElementById('matchCardPoster').textContent = m.posterName + ' · ' + m.createdAgo + ' hari lalu';
+
+        var baseUrl = matchContext === 'donasi' ? '/Request/Detail/' : '/Donasi/Detail/';
+        document.getElementById('matchDetailLink').href = baseUrl + m.id;
+
+        var actionBtn = document.getElementById('matchActionBtn');
+        var feedback = document.getElementById('matchActionFeedback');
+        feedback.style.display = 'none';
+        actionBtn.disabled = false;
+
+        if (matchContext === 'donasi') {
+            actionBtn.textContent = '🎁 Tawarkan Sekarang';
+            actionBtn.style.background = '#2563eb';
+        } else {
+            actionBtn.textContent = '✋ Minta Sekarang';
+            actionBtn.style.background = '#16a34a';
+        }
+
+        document.getElementById('matchDots').innerHTML = matchData.map(function(_, i) {
+            return '<div style="width:8px;height:8px;border-radius:50%;background:' + (i === matchIndex ? '#2563eb' : '#cbd5e1') + ';cursor:pointer;transition:background 0.15s;" onclick="goToMatch(' + i + ')"></div>';
+        }).join('');
+        document.getElementById('matchCounter').textContent = (matchIndex + 1) + ' dari ' + matchData.length + ' kecocokan';
+        document.getElementById('matchPrevBtn').style.opacity = matchIndex === 0 ? '0.4' : '1';
+        document.getElementById('matchNextBtn').style.opacity = matchIndex === matchData.length - 1 ? '0.4' : '1';
+    }
+
+    window.quickAction = function() {
+        var m = matchData[matchIndex];
+        var actionBtn = document.getElementById('matchActionBtn');
+        var feedback = document.getElementById('matchActionFeedback');
+        actionBtn.disabled = true;
+        actionBtn.textContent = 'Mengirim...';
+        feedback.style.display = 'none';
+
+        var token = document.querySelector('input[name="__RequestVerificationToken"]');
+        var tokenVal = token ? token.value : '';
+        var url, body;
+
+        if (matchContext === 'donasi') {
+            url = '/Donasi/QuickOffer';
+            body = new URLSearchParams({ itemRequestId: m.id, fromItemId: matchSourceId, __RequestVerificationToken: tokenVal });
+        } else {
+            url = '/Donasi/QuickClaim';
+            body = new URLSearchParams({ itemId: m.id, jumlah: 1, __RequestVerificationToken: tokenVal });
+        }
+
+        fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            feedback.style.display = 'block';
+            if (data.success) {
+                actionBtn.textContent = '✓ Terkirim';
+                actionBtn.style.background = '#16a34a';
+                feedback.style.color = '#16a34a';
+                feedback.textContent = matchContext === 'donasi' ? 'Penawaran berhasil dikirim!' : 'Permintaan berhasil dikirim!';
             } else {
-                imgEl.innerHTML = '<i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:var(--color-text-secondary);"></i>';
+                actionBtn.disabled = false;
+                actionBtn.textContent = matchContext === 'donasi' ? '🎁 Tawarkan Sekarang' : '✋ Minta Sekarang';
+                feedback.style.color = '#ef4444';
+                feedback.textContent = data.error || 'Gagal mengirim.';
             }
-            var scoreColor = m.score >= 80 ? 'var(--color-text-info)' : m.score >= 60 ? 'var(--color-text-success)' : 'var(--color-text-secondary)';
-            document.getElementById('matchCardBadges').innerHTML =
-                '<span style="background:var(--color-background-info);color:var(--color-text-info);font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;">' + m.kategori + '</span>' +
-                '<span style="background:var(--color-background-secondary);color:' + scoreColor + ';font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;border:0.5px solid var(--color-border-tertiary);">' + m.score + ' pts</span>';
-            document.getElementById('matchCardTitle').textContent = m.title;
-            document.getElementById('matchCardLocation').textContent = (m.lokasi || '') + (m.provinsi ? ' · ' + m.provinsi : '');
-            document.getElementById('matchCardDesc').textContent = m.deskripsi;
-            document.getElementById('matchCardReasons').innerHTML = (m.reasons || []).map(function(r) {
-                return '<span style="font-size:11px;color:var(--color-text-secondary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);padding:2px 8px;border-radius:99px;">' + r + '</span>';
-            }).join('');
-            document.getElementById('matchCardAvatar').textContent = m.posterAvatar;
-            document.getElementById('matchCardPoster').textContent = m.posterName + ' · ' + m.createdAgo + ' hari lalu';
-            var baseUrl = matchContext === 'donasi' ? '/Request/Detail/' : '/Item/Detail/';
-            document.getElementById('matchViewBtn').href = baseUrl + m.id;
-            document.getElementById('matchDots').innerHTML = matchData.map(function(_, i) {
-                return '<div style="width:8px;height:8px;border-radius:50%;background:' + (i === matchIndex ? 'var(--color-text-info)' : 'var(--color-border-tertiary)') + ';cursor:pointer;" onclick="goToMatch(' + i + ')"></div>';
-            }).join('');
-            document.getElementById('matchCounter').textContent = (matchIndex + 1) + ' dari ' + matchData.length + ' kecocokan';
-            document.getElementById('matchPrevBtn').style.opacity = matchIndex === 0 ? '0.4' : '1';
-            document.getElementById('matchNextBtn').style.opacity = matchIndex === matchData.length - 1 ? '0.4' : '1';
-        }
+        })
+        .catch(function() {
+            actionBtn.disabled = false;
+            actionBtn.textContent = matchContext === 'donasi' ? '🎁 Tawarkan Sekarang' : '✋ Minta Sekarang';
+            feedback.style.display = 'block';
+            feedback.style.color = '#ef4444';
+            feedback.textContent = 'Terjadi kesalahan. Coba lagi.';
+        });
+    };
 
-        function goToMatch(i) { matchIndex = i; renderMatchCard(); }
-        function prevMatch() { if (matchIndex > 0) { matchIndex--; renderMatchCard(); } }
-        function nextMatch() { if (matchIndex < matchData.length - 1) { matchIndex++; renderMatchCard(); } }
-        function closeMatchModal() { var m = document.getElementById('matchModal'); if (m) m.style.display = 'none'; }
+    window.goToMatch = function(i) { matchIndex = i; renderMatchCard(); };
+    window.prevMatch = function() { if (matchIndex > 0) { matchIndex--; renderMatchCard(); } };
+    window.nextMatch = function() { if (matchIndex < matchData.length - 1) { matchIndex++; renderMatchCard(); } };
 
-        if (matchData.length > 0) {
-            renderMatchCard();
-            document.getElementById('matchModal').addEventListener('click', function(e) { if (e.target === this) closeMatchModal(); });
-        }
-    </script>
-}
+    document.getElementById('matchModal').addEventListener('click', function(e) {
+        if (e.target === this) closeMatchModal();
+    });
+    document.getElementById('matchNoResultModal').addEventListener('click', function(e) {
+        if (e.target === this) closeNoResultModal();
+    });
+
+    var autoData = @Html.Raw(!string.IsNullOrEmpty(matchesJson) ? matchesJson : "null");
+    if (autoData && autoData.length > 0) {
+        window.openMatchModal(autoData, '@matchContext', '@sourceId');
+    }
+})();
+</script>

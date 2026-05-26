@@ -5,6 +5,7 @@
     var matchesJson = ViewBag.Matches as string;
     var matchCount = ViewBag.MatchCount as int? ?? 0;
     var matchContext = ViewBag.MatchContext as string ?? "";
+    var sourceId = (myRequests?.FirstOrDefault()?.Id ?? 0).ToString();
 }
 
 <div class="ppage">
@@ -63,7 +64,14 @@
                             </div>
                             <div style="font-size:12px;color:var(--color-text-secondary);">@CategoryHelper.DisplayName(r.Kategori) · @daysLeft hari lagi · @r.Offers.Count penawaran</div>
                         </div>
-                        <div style="display:flex;gap:4px;flex-shrink:0;">
+                        <div style="display:flex;gap:4px;flex-shrink:0;align-items:center;">
+                            @if (isOpen)
+                            {
+                                <button onclick="runMatch(@r.Id, this)" title="Cari Kecocokan"
+                                    style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#2563eb);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0;">
+                                    <i class="ti ti-sparkles" aria-hidden="true"></i>
+                                </button>
+                            }
                             <a asp-controller="Request" asp-action="Detail" asp-route-id="@r.Id" class="pbtn" style="font-size:12px;padding:4px 10px;" title="Lihat">
                                 <i class="ti ti-external-link" aria-hidden="true" style="font-size:13px;"></i>
                             </a>
@@ -95,6 +103,17 @@
                                     <div class="preview-avatar" style="flex-shrink:0;width:26px;height:26px;font-size:11px;">@offerAvatar</div>
                                     <div style="flex:1;">
                                         <div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">@offerName</div>
+                                        @if (!string.IsNullOrEmpty(offer.NamaBarang))
+                                        {
+                                            <div style="font-size:12px;color:#334155;font-weight:600;margin-bottom:2px;">
+                                                @offer.NamaBarang
+                                                <span style="font-weight:400;color:#64748b;">· @offer.Kondisi · @offer.Jumlah pcs</span>
+                                                @if (!string.IsNullOrEmpty(offer.Lokasi))
+                                                {
+                                                    <span style="font-weight:400;color:#64748b;"> · @offer.Lokasi</span>
+                                                }
+                                            </div>
+                                        }
                                         <div style="font-size:12px;color:var(--color-text-secondary);">@offer.Deskripsi</div>
                                         @if (offer.Images.Any())
                                         {
@@ -137,5 +156,31 @@
 @await Html.PartialAsync("~/Views/Profile/Bar/_MatchModal.cshtml", new ViewDataDictionary(Html.MetadataProvider, Html.ViewData.ModelState) {
     { "MatchesJson", matchesJson },
     { "MatchCount", matchCount },
-    { "MatchContext", matchContext }
+    { "MatchContext", matchContext },
+    { "SourceId", sourceId }
 })
+
+<script>
+    function runMatch(requestId, btn) {
+        var orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="ti ti-loader-2" aria-hidden="true" style="animation:spin 0.6s linear infinite;display:inline-block;"></i>';
+
+        fetch('/Request/FindMatches?requestId=' + requestId)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+            if (data.success) {
+                window.openMatchModal(data.matches, data.context, data.sourceId);
+            } else {
+                alert(data.error || 'Gagal mencari kecocokan.');
+            }
+        })
+        .catch(function() {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+            alert('Terjadi kesalahan. Coba lagi.');
+        });
+    }
+</script>

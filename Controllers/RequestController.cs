@@ -39,12 +39,18 @@ public class RequestController : AppBaseController
             .ToListAsync();
 
         ViewBag.MyRequests = myRequests;
-        ViewBag.Matches = TempData["Matches"] as string;
-        ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
-        ViewBag.MatchContext = TempData["MatchContext"] as string ?? "";
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        {
+            ViewBag.Matches = TempData["Matches"] as string;
+            ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
+            ViewBag.MatchContext = TempData["MatchContext"] as string ?? "";
             return PartialView("~/Views/Profile/Request/RequestSaya.cshtml");
+        }
+
+        TempData.Keep("Matches");
+        TempData.Keep("MatchCount");
+        TempData.Keep("MatchContext");
 
         ViewBag.InitialSection = "request";
         return View("~/Views/Profile/Shell.cshtml");
@@ -129,9 +135,7 @@ public class RequestController : AppBaseController
             query = query.Where(r => r.Kategori == kategori.Value);
 
         var itemRequests = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
-
         ViewBag.SelectedKategori = kategori;
-
         return View("Request", itemRequests);
     }
 
@@ -196,7 +200,7 @@ public class RequestController : AppBaseController
             await SaveRequestImagesAsync(Images, userId, itemRequest.Id, maxCount: 5);
 
         await _db.SaveChangesAsync();
-        await RunMatchingAndStoreTempData(itemRequest.Id);
+        await RunMatchingAndStoreTempData(itemRequest.Id, userId);
 
         return RedirectToAction("MyRequests");
     }
@@ -294,7 +298,7 @@ public class RequestController : AppBaseController
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Offer(int itemRequestId, string deskripsi, List<IFormFile> Images)
+    public async Task<IActionResult> Offer(int itemRequestId, string deskripsi, int jumlah, string namaBarang, int kondisi, string lokasi, string provinsi, List<IFormFile> Images)
     {
         var userId = _userManager.GetUserId(User)!;
 
@@ -308,11 +312,18 @@ public class RequestController : AppBaseController
         if (alreadyOffered || string.IsNullOrWhiteSpace(deskripsi))
             return RedirectToAction("Detail", new { id = itemRequestId });
 
+        var clampedJumlah = Math.Max(1, Math.Min(jumlah, itemRequest.Jumlah));
+
         var offer = new RequestOffer
         {
             ItemRequestId = itemRequestId,
             UserId = userId,
+            NamaBarang = namaBarang?.Trim() ?? "",
+            Kondisi = (ItemCondition)kondisi,
+            Lokasi = lokasi?.Trim() ?? "",
+            Provinsi = provinsi?.Trim() ?? "",
             Deskripsi = deskripsi.Trim(),
+            Jumlah = clampedJumlah,
             Status = RequestOfferStatus.Pending,
             CreatedAt = DateTime.UtcNow
         };
@@ -331,7 +342,7 @@ public class RequestController : AppBaseController
         _db.Notifications.Add(new Notification
         {
             UserId = itemRequest.UserId,
-            Message = $"{offererName} menawarkan barang untuk request \"{itemRequest.Title}\" Anda.",
+            Message = $"{offererName} menawarkan \"{namaBarang}\" ({clampedJumlah} pcs) untuk request \"{itemRequest.Title}\" Anda.",
             Type = NotificationType.NewOffer,
             RefId = itemRequestId.ToString(),
             Link = "/Request/MyRequests",
@@ -362,7 +373,7 @@ public class RequestController : AppBaseController
         _db.Notifications.Add(new Notification
         {
             UserId = offer.UserId,
-            Message = $"Penawaran Anda untuk request \"{offer.ItemRequest.Title}\" telah diterima!",
+            Message = $"Penawaran Anda ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah diterima!",
             Type = NotificationType.OfferAccepted,
             RefId = offer.ItemRequestId.ToString(),
             Link = "/Request/Detail/" + offer.ItemRequestId,
@@ -403,8 +414,46 @@ public class RequestController : AppBaseController
         return RedirectToAction("MyRequests");
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> FindMatches(int requestId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var itemRequest = await _db.ItemRequests
+            .Include(r => r.Images)
+            .Include(r => r.User)
+            .FirstOrDefaultAsync(r => r.Id == requestId && r.UserId == userId);
+
+        if (itemRequest == null)
+            return Json(new { success = false, error = "Request tidak ditemukan." });
+
+        var matches = await _matchingService.FindMatchesForItemRequest(itemRequest);
+
+        if (!matches.Any())
+            return Json(new { success = true, count = 0, matches = new object[] { } });
+
+        var matchData = matches.Select(m => new
+        {
+            id = m.Item.Id,
+            title = m.Item.NamaBarang,
+            kategori = m.Item.Kategori.ToString(),
+            lokasi = m.Item.Lokasi,
+            provinsi = m.Item.Provinsi,
+            deskripsi = m.Item.Deskripsi,
+            score = m.Score,
+            reasons = m.MatchReasons,
+            posterName = m.Item.User != null ? m.Item.User.NamaDepan + " " + m.Item.User.NamaBelakang : "Unknown",
+            posterAvatar = m.Item.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
+            createdAgo = (DateTime.UtcNow - m.Item.CreatedAt).Days,
+            firstImage = m.Item.Images.FirstOrDefault()?.FilePath,
+            type = "item",
+            fromRequestId = requestId
+        }).ToList();
+
+        return Json(new { success = true, count = matchData.Count, matches = matchData, sourceId = requestId, context = "request" });
+    }
+
     // -------------------------------------------------------------------------
 
     private async Task SaveRequestImagesAsync(List<IFormFile> images, string userId, int requestId, int maxCount, int currentCount = 0)
@@ -466,7 +515,7 @@ public class RequestController : AppBaseController
             System.IO.File.Delete(fullPath);
     }
 
-    private async Task RunMatchingAndStoreTempData(int requestId)
+    private async Task RunMatchingAndStoreTempData(int requestId, string userId)
     {
         var savedRequest = await _db.ItemRequests
             .Include(r => r.Images)
@@ -477,6 +526,10 @@ public class RequestController : AppBaseController
 
         var matches = await _matchingService.FindMatchesForItemRequest(savedRequest);
         if (!matches.Any()) return;
+
+        var userItems = await _db.Items
+            .Where(i => i.UserId == userId && i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow)
+            .ToListAsync();
 
         var matchData = matches.Select(m => new
         {
@@ -492,7 +545,8 @@ public class RequestController : AppBaseController
             posterAvatar = m.Item.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
             createdAgo = (DateTime.UtcNow - m.Item.CreatedAt).Days,
             firstImage = m.Item.Images.FirstOrDefault()?.FilePath,
-            type = "item"
+            type = "item",
+            fromRequestId = requestId
         }).ToList();
 
         TempData["Matches"] = JsonSerializer.Serialize(matchData);
