@@ -7,7 +7,9 @@ public enum RequestOfferStatus
 {
     Pending,
     Accepted,
-    Rejected
+    Rejected,
+    Shipped,
+    Delivered
 }
 
 public class RequestOffer
@@ -46,6 +48,7 @@ public class RequestOffer
     public RequestOfferStatus Status { get; set; } = RequestOfferStatus.Pending;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
 
     public ICollection<ItemImage> Images { get; set; } = new List<ItemImage>();
     public ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();

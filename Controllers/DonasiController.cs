@@ -61,8 +61,12 @@ public class DonasiController : AppBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
+        var user = await _userManager.GetUserAsync(User);
+        ViewBag.UserProvinsi = user?.Provinsi ?? "";
+        ViewBag.UserKota = user?.Kota ?? "";
+
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return PartialView("~/Views/Profile/Donasi/BuatDonasi.cshtml");
 
@@ -76,6 +80,9 @@ public class DonasiController : AppBaseController
         var item = await _db.Items.Include(i => i.Images).FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
         if (item == null) return RedirectToAction("Index");
 
+        var user = await _userManager.GetUserAsync(User);
+        ViewBag.UserProvinsi = user?.Provinsi ?? "";
+        ViewBag.UserKota = user?.Kota ?? "";
         ViewBag.EditItem = item;
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -84,6 +91,7 @@ public class DonasiController : AppBaseController
         ViewBag.InitialSection = "donasi";
         return View("~/Views/Profile/Shell.cshtml");
     }
+
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -668,4 +676,35 @@ public class DonasiController : AppBaseController
         TempData["MatchCount"] = matches.Count.ToString();
         TempData["MatchContext"] = "donasi";
     }
+
+    [HttpGet]
+    public async Task<IActionResult> PenawaranDonasi(int? selectedId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var offers = await _db.RequestOffers
+            .Include(o => o.ItemRequest)
+                .ThenInclude(r => r!.Images)
+            .Include(o => o.ItemRequest)
+                .ThenInclude(r => r!.User)
+            .Include(o => o.Images)
+            .Include(o => o.Feedbacks)
+            .Where(o => o.UserId == userId)
+            .OrderByDescending(o => o.CreatedAt)
+            .ToListAsync();
+
+        var selected = selectedId.HasValue
+            ? offers.FirstOrDefault(o => o.Id == selectedId.Value)
+            : null;
+
+        ViewBag.MyOffers = offers;
+        ViewBag.Selected = selected;
+
+        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            return PartialView("~/Views/Profile/Donasi/PenawaranDonasi.cshtml");
+
+        ViewBag.InitialSection = "donasi";
+        return View("~/Views/Profile/Shell.cshtml");
+    }
+
 }

@@ -24,7 +24,7 @@ public class RequestController : AppBaseController
     }
 
     [Authorize]
-    public async Task<IActionResult> MyRequests()
+    public async Task<IActionResult> MyRequests(int? selectedId)
     {
         var userId = _userManager.GetUserId(User)!;
 
@@ -38,7 +38,12 @@ public class RequestController : AppBaseController
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
 
+        var selected = selectedId.HasValue
+            ? myRequests.FirstOrDefault(r => r.Id == selectedId.Value)
+            : null;
+
         ViewBag.MyRequests = myRequests;
+        ViewBag.Selected = selected;
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
         {
@@ -55,6 +60,8 @@ public class RequestController : AppBaseController
         ViewBag.InitialSection = "request";
         return View("~/Views/Profile/Shell.cshtml");
     }
+
+
 
     [Authorize]
     public async Task<IActionResult> Permintaan(int? selectedId)
@@ -92,6 +99,7 @@ public class RequestController : AppBaseController
         var user = await _userManager.GetUserAsync(User);
         ViewBag.UserAlamat = user?.Alamat ?? "";
         ViewBag.UserProvinsi = user?.Provinsi ?? "";
+        ViewBag.UserKota = user?.Kota ?? "";
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return PartialView("~/Views/Profile/Request/BuatRequest.cshtml");
@@ -113,6 +121,7 @@ public class RequestController : AppBaseController
         var user = await _userManager.GetUserAsync(User);
         ViewBag.UserAlamat = user?.Alamat ?? "";
         ViewBag.UserProvinsi = user?.Provinsi ?? "";
+        ViewBag.UserKota = user?.Kota ?? "";
         ViewBag.EditRequest = itemRequest;
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
@@ -121,6 +130,7 @@ public class RequestController : AppBaseController
         ViewBag.InitialSection = "request";
         return View("~/Views/Profile/Shell.cshtml");
     }
+
 
     [AllowAnonymous]
     public async Task<IActionResult> Index(ItemCategory? kategori)
@@ -298,7 +308,7 @@ public class RequestController : AppBaseController
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Offer(int itemRequestId, string deskripsi, int jumlah, string namaBarang, int kondisi, string lokasi, string provinsi, List<IFormFile> Images)
+    public async Task<IActionResult> Offer(int itemRequestId, string deskripsi, int jumlah, string namaBarang, int kondisi, List<IFormFile> Images)
     {
         var userId = _userManager.GetUserId(User)!;
 
@@ -312,6 +322,11 @@ public class RequestController : AppBaseController
         if (alreadyOffered || string.IsNullOrWhiteSpace(deskripsi))
             return RedirectToAction("Detail", new { id = itemRequestId });
 
+        // Auto-fill location from user profile
+        var user = await _userManager.FindByIdAsync(userId);
+        var lokasi = user?.Kota ?? string.Empty;
+        var provinsi = user?.Provinsi ?? string.Empty;
+
         var clampedJumlah = Math.Max(1, Math.Min(jumlah, itemRequest.Jumlah));
 
         var offer = new RequestOffer
@@ -320,8 +335,8 @@ public class RequestController : AppBaseController
             UserId = userId,
             NamaBarang = namaBarang?.Trim() ?? "",
             Kondisi = (ItemCondition)kondisi,
-            Lokasi = lokasi?.Trim() ?? "",
-            Provinsi = provinsi?.Trim() ?? "",
+            Lokasi = lokasi,
+            Provinsi = provinsi,
             Deskripsi = deskripsi.Trim(),
             Jumlah = clampedJumlah,
             Status = RequestOfferStatus.Pending,
@@ -336,8 +351,7 @@ public class RequestController : AppBaseController
 
         await _db.SaveChangesAsync();
 
-        var offerer = await _userManager.FindByIdAsync(userId);
-        var offererName = offerer != null ? offerer.NamaDepan + " " + offerer.NamaBelakang : "Seseorang";
+        var offererName = user != null ? user.NamaDepan + " " + user.NamaBelakang : "Seseorang";
 
         _db.Notifications.Add(new Notification
         {
@@ -352,6 +366,7 @@ public class RequestController : AppBaseController
         await _db.SaveChangesAsync();
         return RedirectToAction("Detail", new { id = itemRequestId });
     }
+
 
     [Authorize]
     [HttpPost]
@@ -553,4 +568,73 @@ public class RequestController : AppBaseController
         TempData["MatchCount"] = matches.Count.ToString();
         TempData["MatchContext"] = "request";
     }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkOfferShipped(int offerId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var offer = await _db.RequestOffers
+            .Include(o => o.ItemRequest)
+            .FirstOrDefaultAsync(o => o.Id == offerId);
+
+        // Only the request owner can mark as shipped
+        if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
+            return RedirectToAction("MyRequests");
+        if (offer.Status != RequestOfferStatus.Accepted)
+            return RedirectToAction("MyRequests");
+
+        offer.Status = RequestOfferStatus.Shipped;
+        offer.UpdatedAt = DateTime.UtcNow;
+
+        _db.Notifications.Add(new Notification
+        {
+            UserId = offer.UserId,
+            Message = $"Barang \"{offer.NamaBarang}\" ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah dikirim. Silakan konfirmasi penerimaan.",
+            Type = NotificationType.ItemShipped,
+            RefId = offerId.ToString(),
+            Link = "/Donasi/PenawaranDonasi",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+        return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MarkOfferDelivered(int offerId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var offer = await _db.RequestOffers
+            .Include(o => o.ItemRequest)
+            .FirstOrDefaultAsync(o => o.Id == offerId);
+
+        // Only the OFFERER (the one who shipped) confirms delivery
+        if (offer == null || offer.ItemRequest == null || offer.UserId != userId)
+            return RedirectToAction("Permintaan", "Donasi");
+        if (offer.Status != RequestOfferStatus.Shipped)
+            return RedirectToAction("Permintaan", "Donasi");
+
+        offer.Status = RequestOfferStatus.Delivered;
+        offer.UpdatedAt = DateTime.UtcNow;
+
+        _db.Notifications.Add(new Notification
+        {
+            UserId = offer.ItemRequest.UserId,
+            Message = $"Barang \"{offer.NamaBarang}\" ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah dikonfirmasi diterima.",
+            Type = NotificationType.ItemDelivered,
+            RefId = offer.ItemRequestId.ToString(),
+            Link = "/Request/MyRequests",
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+        return RedirectToAction("PenawaranDonasi", "Donasi", new { selectedId = offerId });
+    }
+
 }

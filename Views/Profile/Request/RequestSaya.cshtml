@@ -2,153 +2,301 @@
 @using DonationApp.Services
 @{
     var myRequests = ViewBag.MyRequests as List<ItemRequest>;
+    var selected = ViewBag.Selected as ItemRequest;
     var matchesJson = ViewBag.Matches as string;
     var matchCount = ViewBag.MatchCount as int? ?? 0;
     var matchContext = ViewBag.MatchContext as string ?? "";
-    var sourceId = (myRequests?.FirstOrDefault()?.Id ?? 0).ToString();
+    var sourceId = selected?.Id.ToString() ?? (myRequests?.FirstOrDefault()?.Id ?? 0).ToString();
 }
 
 <div class="ppage">
-    <div class="ppage-inner">
+    <div class="ppage-inner" style="max-width:100%;padding:0;">
 
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid #e2e8f0;">
             <div class="ptab-bar" style="margin:0;border:none;">
                 <a asp-controller="Request" asp-action="MyRequests" class="ptab active">Request Saya</a>
                 <a asp-controller="Request" asp-action="Permintaan" class="ptab">Permintaan Donasi</a>
                 <a asp-controller="Request" asp-action="CreateView" class="ptab">Buat Request</a>
             </div>
-            <a asp-controller="Request" asp-action="CreateView" class="pbtn pbtn-primary" style="font-size:12px;padding:6px 14px;">
-                <i class="ti ti-plus" aria-hidden="true" style="font-size:14px;"></i> Buat Request
+            <a asp-controller="Request" asp-action="CreateView" class="pbtn pbtn-primary" style="font-size:12px;padding:6px 14px;flex-shrink:0;">
+                <i class="ti ti-plus" aria-hidden="true"></i> Buat Request
             </a>
         </div>
 
         @if (TempData["RequestSuccess"] != null)
         {
-            <div style="background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:16px;font-size:13px;">
-                @TempData["RequestSuccess"]
-            </div>
+            <div style="margin:12px 16px 0;background:#f0fdf4;border:0.5px solid #bbf7d0;color:#166534;padding:10px 14px;border-radius:8px;font-size:13px;">@TempData["RequestSuccess"]</div>
         }
         @if (TempData["RequestError"] != null)
         {
-            <div class="pform-error-banner">@TempData["RequestError"]</div>
+            <div style="margin:12px 16px 0;" class="pform-error-banner">@TempData["RequestError"]</div>
         }
 
         @if (myRequests == null || !myRequests.Any())
         {
-            <div class="preview-card" style="padding:48px;text-align:center;">
-                <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px;">Belum ada request barang.</p>
+            <div style="padding:48px;text-align:center;">
+                <i class="ti ti-list-search" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
+                <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Belum ada request barang.</p>
                 <a asp-controller="Request" asp-action="CreateView" class="pbtn pbtn-primary">Buat Request Pertama</a>
             </div>
         }
         else
         {
-            @foreach (var r in myRequests)
-            {
-                var daysLeft = (r.ExpiresAt - DateTime.UtcNow).Days;
-                var firstImg = r.Images.FirstOrDefault();
-                var isOpen = r.Status == ItemRequestStatus.Open;
-                <div class="preview-card" style="margin-bottom:12px;">
-                    <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:@(r.Offers.Any() ? "0.5px solid var(--color-border-tertiary)" : "none");">
-                        @if (firstImg != null)
-                        {
-                            <img src="@firstImg.FilePath" style="width:52px;height:52px;border-radius:var(--border-radius-md);object-fit:cover;flex-shrink:0;" />
-                        }
-                        else
-                        {
-                            <div class="plist-thumb" style="width:52px;height:52px;"><i class="ti ti-list-search" aria-hidden="true" style="font-size:22px;"></i></div>
-                        }
-                        <div style="flex:1;">
-                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-                                <span style="font-size:14px;font-weight:500;color:var(--color-text-primary);">@r.Title</span>
-                                <span class="pbadge @(isOpen ? "pbadge-available" : "pbadge-muted")">@r.Status</span>
-                            </div>
-                            <div style="font-size:12px;color:var(--color-text-secondary);">@CategoryHelper.DisplayName(r.Kategori) · @daysLeft hari lagi · @r.Offers.Count penawaran</div>
-                        </div>
-                        <div style="display:flex;gap:4px;flex-shrink:0;align-items:center;">
-                            @if (isOpen)
-                            {
-                                <button onclick="runMatch(@r.Id, this)" title="Cari Kecocokan"
-                                    style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#2563eb);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0;">
-                                    <i class="ti ti-sparkles" aria-hidden="true"></i>
-                                </button>
-                            }
-                            <a asp-controller="Request" asp-action="Detail" asp-route-id="@r.Id" class="pbtn" style="font-size:12px;padding:4px 10px;" title="Lihat">
-                                <i class="ti ti-external-link" aria-hidden="true" style="font-size:13px;"></i>
-                            </a>
-                            @if (isOpen)
-                            {
-                                <a href="/Request/EditView/@r.Id" class="pbtn" style="font-size:12px;padding:4px 10px;" title="Edit">
-                                    <i class="ti ti-edit" aria-hidden="true" style="font-size:13px;"></i>
-                                </a>
-                                <form asp-controller="Request" asp-action="DeleteRequest" method="post" onsubmit="return confirm('Hapus request ini?')" style="display:inline;">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@r.Id" />
-                                    <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;" title="Hapus">
-                                        <i class="ti ti-trash" aria-hidden="true" style="font-size:13px;"></i>
-                                    </button>
-                                </form>
-                            }
-                        </div>
-                    </div>
+            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
 
-                    @if (r.Offers.Any())
+                @* LEFT LIST *@
+                <div class="plist" id="request-list">
+                    @foreach (var r in myRequests)
                     {
-                        <div style="padding:12px 16px;">
-                            <div style="font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">@r.Offers.Count Penawaran</div>
-                            @foreach (var offer in r.Offers.OrderByDescending(o => o.CreatedAt))
+                        var daysLeft = (r.ExpiresAt - DateTime.UtcNow).Days;
+                        var firstImg = r.Images.FirstOrDefault();
+                        var isOpen = r.Status == ItemRequestStatus.Open;
+
+                        var acceptedOffer = r.Offers.FirstOrDefault(o =>
+                            o.Status == RequestOfferStatus.Accepted ||
+                            o.Status == RequestOfferStatus.Shipped ||
+                            o.Status == RequestOfferStatus.Delivered);
+
+                        string statusLabel;
+                        string statusClass;
+                        if (acceptedOffer?.Status == RequestOfferStatus.Shipped)
+                        { statusLabel = "Dikirim"; statusClass = "pbadge-pending"; }
+                        else if (acceptedOffer?.Status == RequestOfferStatus.Delivered)
+                        { statusLabel = "Selesai"; statusClass = "pbadge-available"; }
+                        else if (acceptedOffer?.Status == RequestOfferStatus.Accepted)
+                        { statusLabel = "Diterima"; statusClass = "pbadge-claimed"; }
+                        else if (r.Status == ItemRequestStatus.Fulfilled)
+                        { statusLabel = "Terpenuhi"; statusClass = "pbadge-available"; }
+                        else if (isOpen)
+                        { statusLabel = "Open"; statusClass = "pbadge-claimed"; }
+                        else
+                        { statusLabel = r.Status.ToString(); statusClass = "pbadge-muted"; }
+
+                        <a class="plist-item @(selected?.Id == r.Id ? "active" : "")"
+                           href="/Request/MyRequests?selectedId=@r.Id">
+                            @if (firstImg != null)
                             {
-                                var offerAvatar = offer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
-                                var offerName = offer.User != null ? offer.User.NamaDepan + " " + offer.User.NamaBelakang : "Unknown";
-                                <div style="display:flex;align-items:flex-start;gap:10px;padding:10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:6px;">
-                                    <div class="preview-avatar" style="flex-shrink:0;width:26px;height:26px;font-size:11px;">@offerAvatar</div>
-                                    <div style="flex:1;">
-                                        <div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">@offerName</div>
-                                        @if (!string.IsNullOrEmpty(offer.NamaBarang))
-                                        {
-                                            <div style="font-size:12px;color:#334155;font-weight:600;margin-bottom:2px;">
-                                                @offer.NamaBarang
-                                                <span style="font-weight:400;color:#64748b;">· @offer.Kondisi · @offer.Jumlah pcs</span>
-                                                @if (!string.IsNullOrEmpty(offer.Lokasi))
-                                                {
-                                                    <span style="font-weight:400;color:#64748b;"> · @offer.Lokasi</span>
-                                                }
-                                            </div>
-                                        }
-                                        <div style="font-size:12px;color:var(--color-text-secondary);">@offer.Deskripsi</div>
-                                        @if (offer.Images.Any())
-                                        {
-                                            <img src="@offer.Images.First().FilePath" style="width:44px;height:44px;border-radius:var(--border-radius-md);object-fit:cover;margin-top:6px;" />
-                                        }
-                                    </div>
-                                    <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
-                                        @if (offer.Status == RequestOfferStatus.Accepted)
-                                        {
-                                            <span class="pbadge pbadge-available">Diterima</span>
-                                        }
-                                        else if (offer.Status == RequestOfferStatus.Rejected)
-                                        {
-                                            <span class="pbadge pbadge-rejected">Ditolak</span>
-                                        }
-                                        else if (isOpen)
-                                        {
-                                            <form asp-controller="Request" asp-action="AcceptOffer" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="offerId" value="@offer.Id" />
-                                                <button type="submit" class="pbtn pbtn-success" style="font-size:11px;padding:3px 8px;">Terima</button>
-                                            </form>
-                                            <form asp-controller="Request" asp-action="RejectOffer" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="offerId" value="@offer.Id" />
-                                                <button type="submit" class="pbtn pbtn-danger" style="font-size:11px;padding:3px 8px;">Tolak</button>
-                                            </form>
-                                        }
-                                    </div>
-                                </div>
+                                <img src="@firstImg.FilePath" class="plist-thumb" style="object-fit:cover;" />
                             }
-                        </div>
+                            else
+                            {
+                                <div class="plist-thumb"><i class="ti ti-list-search" aria-hidden="true"></i></div>
+                            }
+                            <div style="flex:1;min-width:0;">
+                                <div class="plist-name">@r.Title</div>
+                                <div class="plist-sub">
+                                    @CategoryHelper.DisplayName(r.Kategori)
+                                    @if (isOpen) { <span>· @daysLeft hari lagi</span> }
+                                    @if (r.Offers.Any()) { <span>· @r.Offers.Count penawaran</span> }
+                                </div>
+                            </div>
+                            <span class="pbadge @statusClass">@statusLabel</span>
+                        </a>
                     }
                 </div>
-            }
+
+                @* RIGHT DETAIL *@
+                <div class="pdetail" id="request-detail">
+                    @if (selected == null)
+                    {
+                        <div class="pdetail-empty">Pilih request untuk melihat detail.</div>
+                    }
+                    else
+                    {
+                        var isOpen = selected.Status == ItemRequestStatus.Open;
+                        var daysLeft = (selected.ExpiresAt - DateTime.UtcNow).Days;
+                        var firstImg = selected.Images.FirstOrDefault();
+                        var pendingOffers = selected.Offers.Where(o => o.Status == RequestOfferStatus.Pending).ToList();
+                        var activeOffer = selected.Offers.FirstOrDefault(o =>
+                            o.Status == RequestOfferStatus.Accepted ||
+                            o.Status == RequestOfferStatus.Shipped ||
+                            o.Status == RequestOfferStatus.Delivered);
+                        var rejectedOffers = selected.Offers.Where(o => o.Status == RequestOfferStatus.Rejected).ToList();
+
+                        @* Header *@
+                        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+                            @if (firstImg != null)
+                            {
+                                <img src="@firstImg.FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                            }
+                            <div style="flex:1;">
+                                <div class="pdetail-title" style="margin-bottom:8px;">@selected.Title</div>
+                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
+                                    @if (selected.KondisiMinimum.HasValue) { <span class="pbadge pbadge-muted">Min: @selected.KondisiMinimum</span> }
+                                    <span class="pbadge pbadge-muted">@selected.Jumlah pcs</span>
+                                    <span class="pbadge pbadge-muted">@selected.Lokasi</span>
+                                    @if (isOpen) { <span class="pbadge pbadge-muted">@daysLeft hari lagi</span> }
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
+                                @if (isOpen)
+                                {
+                                    <button onclick="runMatch(@selected.Id, this)" class="pbtn" style="font-size:12px;padding:5px 12px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-color:#2563eb;">
+                                        <i class="ti ti-search" aria-hidden="true"></i> Cari Cocok
+                                    </button>
+                                    <a href="/Request/EditView/@selected.Id" class="pbtn" style="font-size:12px;padding:5px 12px;">
+                                        <i class="ti ti-edit" aria-hidden="true"></i> Edit
+                                    </a>
+                                    <form asp-controller="Request" asp-action="DeleteRequest" method="post" onsubmit="return confirm('Hapus request ini?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@selected.Id" />
+                                        <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:5px 12px;">
+                                            <i class="ti ti-trash" aria-hidden="true"></i> Hapus
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-controller="Request" asp-action="Detail" asp-route-id="@selected.Id" class="pbtn" style="font-size:12px;padding:5px 12px;">
+                                    <i class="ti ti-external-link" aria-hidden="true"></i> Lihat Publik
+                                </a>
+                            </div>
+                        </div>
+
+                        @* Description *@
+                        <div class="psec">
+                            <div class="psec-label">Deskripsi</div>
+                            <p style="font-size:13px;color:#334155;line-height:1.6;margin:0;">@selected.Deskripsi</p>
+                        </div>
+
+                        @* Active offer with shipping stepper *@
+                        @if (activeOffer != null)
+                        {
+                            var offerAvatar = activeOffer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+                            var offerName = activeOffer.User != null ? activeOffer.User.NamaDepan + " " + activeOffer.User.NamaBelakang : "Unknown";
+                            var isDelivered = activeOffer.Status == RequestOfferStatus.Delivered;
+
+                            <div class="psec">
+                                <div class="psec-label">Penawaran Diterima</div>
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+                                    <div class="preview-avatar" style="width:30px;height:30px;font-size:12px;flex-shrink:0;">@offerAvatar</div>
+                                    <div style="flex:1;">
+                                        <div style="font-size:13px;font-weight:600;color:#0f172a;">@offerName</div>
+                                        <div style="font-size:11px;color:#64748b;">@activeOffer.NamaBarang · @activeOffer.Kondisi · @activeOffer.Jumlah pcs</div>
+                                    </div>
+                                </div>
+
+                                @* Stepper *@
+                                <div class="pstepper" style="margin-bottom:14px;">
+                                    <div class="pstep done">
+                                        <div class="pstep-dot done"><i class="ti ti-check" aria-hidden="true"></i></div>
+                                        <div class="pstep-label">Diterima</div>
+                                    </div>
+                                    <div class="pstep-line @(activeOffer.Status >= RequestOfferStatus.Shipped ? "done" : "")"></div>
+                                    <div class="pstep @(activeOffer.Status >= RequestOfferStatus.Shipped ? "done" : "")">
+                                        <div class="pstep-dot @(activeOffer.Status >= RequestOfferStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
+                                        <div class="pstep-label">Dikirim</div>
+                                    </div>
+                                    <div class="pstep-line @(activeOffer.Status == RequestOfferStatus.Delivered ? "done" : "")"></div>
+                                    <div class="pstep @(activeOffer.Status == RequestOfferStatus.Delivered ? "done" : "")">
+                                        <div class="pstep-dot @(activeOffer.Status == RequestOfferStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
+                                        <div class="pstep-label">Diterima</div>
+                                    </div>
+                                    <div class="pstep-line @(activeOffer.Feedbacks.Any() ? "done" : "")"></div>
+                                    <div class="pstep @(activeOffer.Feedbacks.Any() ? "done" : "")">
+                                        <div class="pstep-dot @(activeOffer.Feedbacks.Any() ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
+                                        <div class="pstep-label">Feedback</div>
+                                    </div>
+                                </div>
+
+                                @* Action buttons *@
+                                @if (activeOffer.Status == RequestOfferStatus.Accepted)
+                                {
+                                    <form asp-controller="Request" asp-action="MarkOfferShipped" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="offerId" value="@activeOffer.Id" />
+                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="font-size:12px;">
+                                            <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
+                                        </button>
+                                    </form>
+                                }
+                                else if (activeOffer.Status == RequestOfferStatus.Shipped)
+                                {
+                                    <p style="font-size:12px;color:#64748b;text-align:center;padding:4px 0;">Menunggu konfirmasi penerimaan dari pengirim...</p>
+                                }
+                                else if (isDelivered)
+                                {
+                                    <p style="font-size:12px;color:#16a34a;text-align:center;padding:4px 0;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                }
+                            </div>
+                        }
+
+                        @* Pending offers *@
+                        @if (pendingOffers.Any())
+                        {
+                            <div class="psec">
+                                <div class="psec-label">Penawaran Masuk (@pendingOffers.Count)</div>
+                                <div style="display:flex;flex-direction:column;gap:8px;">
+                                    @foreach (var offer in pendingOffers)
+                                    {
+                                        var avatar = offer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+                                        var name = offer.User != null ? offer.User.NamaDepan + " " + offer.User.NamaBelakang : "Unknown";
+                                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
+                                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                                                <div class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;">@avatar</div>
+                                                <div style="flex:1;">
+                                                    <div style="font-size:13px;font-weight:600;color:#0f172a;">@name</div>
+                                                    <div style="font-size:11px;color:#64748b;">@offer.NamaBarang · @offer.Kondisi · @offer.Jumlah pcs</div>
+                                                </div>
+                                                @if (offer.Images.Any())
+                                                {
+                                                    <img src="@offer.Images.First().FilePath" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;" />
+                                                }
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(offer.Lokasi))
+                                            {
+                                                <div style="font-size:12px;color:#64748b;margin-bottom:6px;">
+                                                    <i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i>
+                                                    @offer.Lokasi@(!string.IsNullOrEmpty(offer.Provinsi) ? ", " + offer.Provinsi : "")
+                                                </div>
+                                            }
+                                            <div style="font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5;">@offer.Deskripsi</div>
+                                            @if (isOpen && activeOffer == null)
+                                            {
+                                                <div style="display:flex;gap:6px;">
+                                                    <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="offerId" value="@offer.Id" />
+                                                        <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 12px;">Terima</button>
+                                                    </form>
+                                                    <form asp-controller="Request" asp-action="RejectOffer" method="post" style="display:inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="offerId" value="@offer.Id" />
+                                                        <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 12px;">Tolak</button>
+                                                    </form>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                        @* Rejected offers history *@
+                        @if (rejectedOffers.Any())
+                        {
+                            <div class="psec">
+                                <div class="psec-label">Penawaran Ditolak (@rejectedOffers.Count)</div>
+                                <div style="display:flex;flex-direction:column;gap:6px;">
+                                    @foreach (var offer in rejectedOffers)
+                                    {
+                                        var avatar = offer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+                                        var name = offer.User != null ? offer.User.NamaDepan + " " + offer.User.NamaBelakang : "Unknown";
+                                        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
+                                            <div class="preview-avatar" style="width:26px;height:26px;font-size:11px;flex-shrink:0;">@avatar</div>
+                                            <div style="flex:1;min-width:0;">
+                                                <div style="font-size:13px;font-weight:500;color:#0f172a;">@name</div>
+                                                <div style="font-size:11px;color:#64748b;">@offer.NamaBarang · @offer.Jumlah pcs</div>
+                                            </div>
+                                            <span class="pbadge pbadge-rejected">Ditolak</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+
+            </div>
         }
     </div>
 </div>
@@ -164,23 +312,14 @@
     function runMatch(requestId, btn) {
         var orig = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="ti ti-loader-2" aria-hidden="true" style="animation:spin 0.6s linear infinite;display:inline-block;"></i>';
-
+        btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 0.6s linear infinite;display:inline-block;" aria-hidden="true"></i>';
         fetch('/Request/FindMatches?requestId=' + requestId)
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            btn.disabled = false;
-            btn.innerHTML = orig;
-            if (data.success) {
-                window.openMatchModal(data.matches, data.context, data.sourceId);
-            } else {
-                alert(data.error || 'Gagal mencari kecocokan.');
-            }
+            btn.disabled = false; btn.innerHTML = orig;
+            if (data.success) window.openMatchModal(data.matches, data.context, data.sourceId);
+            else alert(data.error || 'Gagal mencari kecocokan.');
         })
-        .catch(function() {
-            btn.disabled = false;
-            btn.innerHTML = orig;
-            alert('Terjadi kesalahan. Coba lagi.');
-        });
+        .catch(function() { btn.disabled = false; btn.innerHTML = orig; alert('Terjadi kesalahan.'); });
     }
 </script>

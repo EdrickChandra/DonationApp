@@ -23,6 +23,9 @@ public class RegisterViewModel
     [Required(ErrorMessage = "Provinsi wajib diisi.")]
     public string Provinsi { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "Kota wajib diisi.")]
+    public string Kota { get; set; } = string.Empty;
+
     [RegularExpression(@"^\d{5}$", ErrorMessage = "Kode pos harus 5 digit angka.")]
     public string? KodePos { get; set; }
 

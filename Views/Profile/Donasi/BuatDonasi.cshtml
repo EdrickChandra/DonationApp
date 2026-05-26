@@ -5,6 +5,12 @@
     var editItem = ViewBag.EditItem as Item;
     var isEdit = editItem != null;
     var pageTitle = isEdit ? "Edit Donasi" : "Buat Donasi";
+    var userProvinsi = ViewBag.UserProvinsi as string ?? "";
+    var userKota = ViewBag.UserKota as string ?? "";
+
+    // For edit: use saved values; for create: fall back to user profile values
+    var defaultProvinsi = isEdit ? (editItem!.Provinsi) : userProvinsi;
+    var defaultKota = isEdit ? (editItem!.Lokasi) : userKota;
 
     Dictionary<string, string>? existingDetails = null;
     if (isEdit && !string.IsNullOrWhiteSpace(editItem!.DetailTambahan))
@@ -18,6 +24,7 @@
     <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary, #cbd5e1);">
         <div class="ptab-bar" style="margin:0;border:none;">
             <a asp-controller="Donasi" asp-action="Index" class="ptab">Donasi Saya</a>
+            <a asp-controller="Donasi" asp-action="PenawaranDonasi" class="ptab">Penawaran Donasi</a>
             <a asp-controller="Donasi" asp-action="Create" class="ptab @(!isEdit ? "active" : "")">Buat Donasi</a>
             @if (isEdit)
             {
@@ -87,24 +94,25 @@
                     </div>
                 </div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Provinsi</label>
-                    <select class="pform-input" name="Provinsi" id="donasi-provinsi" onchange="updateDonasiKota(this.value)" required>
-                        <option value="">Pilih Provinsi</option>
-                        @foreach (var prov in new[] { "Aceh", "Bali", "Banten", "Bengkulu", "DI Yogyakarta", "DKI Jakarta", "Gorontalo", "Jambi", "Jawa Barat", "Jawa Tengah", "Jawa Timur", "Kalimantan Barat", "Kalimantan Selatan", "Kalimantan Tengah", "Kalimantan Timur", "Kalimantan Utara", "Kepulauan Bangka Belitung", "Kepulauan Riau", "Lampung", "Maluku", "Maluku Utara", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Papua", "Papua Barat", "Riau", "Sulawesi Barat", "Sulawesi Selatan", "Sulawesi Tengah", "Sulawesi Tenggara", "Sulawesi Utara", "Sumatera Barat", "Sumatera Selatan", "Sumatera Utara" })
-                        {
-                            <option selected="@(editItem?.Provinsi == prov)">@prov</option>
-                        }
-                    </select>
-                    <span class="pform-error" data-for="Provinsi">Provinsi wajib dipilih.</span>
-                </div>
-
-                <div class="pform-group">
-                    <label class="pform-label">Kota</label>
-                    <select class="pform-input" name="Lokasi" id="donasi-kota" required>
-                        <option value="">Pilih provinsi terlebih dahulu</option>
-                    </select>
-                    <span class="pform-error" data-for="Lokasi">Kota wajib dipilih.</span>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                    <div class="pform-group">
+                        <label class="pform-label">Provinsi</label>
+                        <select class="pform-input" name="Provinsi" id="donasi-provinsi" onchange="updateDonasiKota(this.value)" required>
+                            <option value="">Pilih Provinsi</option>
+                            @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
+                            {
+                                <option selected="@(defaultProvinsi == prov)">@prov</option>
+                            }
+                        </select>
+                        <span class="pform-error" data-for="Provinsi">Provinsi wajib dipilih.</span>
+                    </div>
+                    <div class="pform-group">
+                        <label class="pform-label">Kota</label>
+                        <select class="pform-input" name="Lokasi" id="donasi-kota" required>
+                            <option value="">Pilih Provinsi dulu</option>
+                        </select>
+                        <span class="pform-error" data-for="Lokasi">Kota wajib dipilih.</span>
+                    </div>
                 </div>
 
                 <div class="pform-group">
@@ -162,19 +170,22 @@
 
 <script>
     var isEdit = @(isEdit ? "true" : "false");
-    var existingProvinsi = '@(editItem?.Provinsi ?? "")';
-    var existingLokasi = '@(editItem?.Lokasi ?? "")';
+    var defaultProvinsi = '@defaultProvinsi';
+    var defaultKota = '@defaultKota';
     var existingDetails = @Html.Raw(existingDetails != null ? JsonSerializer.Serialize(existingDetails) : "{}");
 
     function updateDonasiKota(provinsi) {
-        populateKota(provinsi, document.getElementById('donasi-kota'), existingLokasi);
+        populateKota(provinsi, document.getElementById('donasi-kota'), defaultKota);
     }
 
-    if (existingProvinsi) {
-        var provSel = document.getElementById('donasi-provinsi');
-        if (provSel) provSel.value = existingProvinsi;
-        updateDonasiKota(existingProvinsi);
-    }
+    // Auto-fill provinsi and kota on load
+    (function() {
+        if (defaultProvinsi) {
+            var provSel = document.getElementById('donasi-provinsi');
+            if (provSel) provSel.value = defaultProvinsi;
+            updateDonasiKota(defaultProvinsi);
+        }
+    })();
 
     var categoryFields = {
         "@((int)ItemCategory.Pakaian)": [

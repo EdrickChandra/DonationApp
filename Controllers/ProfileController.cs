@@ -75,7 +75,7 @@ public class ProfileController : AppBaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(string NamaDepan, string NamaBelakang, string PhoneNumber, string Alamat, string Provinsi, string KodePos)
+    public async Task<IActionResult> Edit(string NamaDepan, string NamaBelakang, string PhoneNumber, string Alamat, string Kota, string Provinsi, string KodePos)
     {
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return RedirectToAction("Login", "Account");
@@ -84,6 +84,7 @@ public class ProfileController : AppBaseController
         user.NamaBelakang = NamaBelakang;
         user.PhoneNumber = PhoneNumber;
         user.Alamat = Alamat;
+        user.Kota = Kota;
         user.Provinsi = Provinsi;
         user.KodePos = KodePos;
         user.UserName = NamaDepan;

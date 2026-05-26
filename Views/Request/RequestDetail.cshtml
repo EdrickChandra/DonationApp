@@ -175,6 +175,7 @@
                 </div>
             </div>
 
+            @* Offer form — no provinsi/kota fields, auto-filled from user *@
             @if (User.Identity!.IsAuthenticated && !isOwner && !hasOffered && Model.Status == ItemRequestStatus.Open)
             {
                 <div id="offerForm" style="display:none;">
@@ -195,25 +196,6 @@
                                     <input type="hidden" name="kondisi" id="offerKondisiInput" value="1" />
                                     <button type="button" class="condition-btn" id="offerKondisiBaru" data-value="0" onclick="setOfferKondisi(0)">Baru</button>
                                     <button type="button" class="condition-btn selected" id="offerKondisiBekas" data-value="1" onclick="setOfferKondisi(1)">Bekas</button>
-                                </div>
-                            </div>
-
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                                <div class="form-group">
-                                    <label class="form-label">Provinsi</label>
-                                    <select class="form-input" name="provinsi" id="offerProvinsi" onchange="updateOfferKota(this.value)">
-                                        <option value="">Pilih Provinsi</option>
-                                        @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
-                                        {
-                                            <option>@prov</option>
-                                        }
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">Kota</label>
-                                    <select class="form-input" name="lokasi" id="offerKota">
-                                        <option value="">Pilih Provinsi dulu</option>
-                                    </select>
                                 </div>
                             </div>
 
@@ -241,6 +223,7 @@
                                 </div>
                                 <div id="offer-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
                             </div>
+
                             <button type="submit" class="detail-btn" style="background:#0ea5e9;">Kirim Penawaran</button>
                         </form>
                     </div>
@@ -303,10 +286,6 @@
             document.getElementById('offerKondisiInput').value = val;
             document.getElementById('offerKondisiBaru').classList.toggle('selected', val === 0);
             document.getElementById('offerKondisiBekas').classList.toggle('selected', val === 1);
-        }
-
-        function updateOfferKota(provinsi) {
-            populateKota(provinsi, document.getElementById('offerKota'), '');
         }
 
         function offerStepDown() {

@@ -42,13 +42,14 @@
 
                 <div class="pform-group">
                     <label class="pform-label">Alamat</label>
-                    <input class="pform-input" name="Alamat" value="@Model.Alamat" placeholder="Kota / Kecamatan..." />
+                    <input class="pform-input" name="Alamat" value="@Model.Alamat" placeholder="Jl. Contoh No. 1" />
                 </div>
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                     <div class="pform-group">
                         <label class="pform-label">Provinsi</label>
-                        <select class="pform-input" name="Provinsi">
+                        <select class="pform-input" name="Provinsi" id="edit-provinsi" onchange="updateEditKota(this.value)">
+                            <option value="">Pilih Provinsi</option>
                             @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
                             {
                                 <option selected="@(Model.Provinsi == prov)">@prov</option>
@@ -56,9 +57,16 @@
                         </select>
                     </div>
                     <div class="pform-group">
-                        <label class="pform-label">Kode Pos <span style="font-weight:400;color:#94a3b8;">(opsional)</span></label>
-                        <input class="pform-input" name="KodePos" value="@Model.KodePos" maxlength="5" />
+                        <label class="pform-label">Kota</label>
+                        <select class="pform-input" name="Kota" id="edit-kota">
+                            <option value="">Pilih Provinsi dulu</option>
+                        </select>
                     </div>
+                </div>
+
+                <div class="pform-group">
+                    <label class="pform-label">Kode Pos <span style="font-weight:400;color:#94a3b8;">(opsional)</span></label>
+                    <input class="pform-input" name="KodePos" value="@Model.KodePos" maxlength="5" />
                 </div>
 
                 <button type="submit" class="pbtn pbtn-primary pbtn-block" style="margin-top:8px;">Simpan Perubahan</button>
@@ -67,3 +75,23 @@
 
     </div>
 </div>
+
+<script>
+    (function() {
+        var existingProvinsi = '@Model.Provinsi';
+        var existingKota = '@Model.Kota';
+
+        function updateEditKota(provinsi) {
+            populateKota(provinsi, document.getElementById('edit-kota'), existingKota);
+        }
+
+        window.updateEditKota = updateEditKota;
+
+        // Auto-populate kota on load if provinsi already set
+        if (existingProvinsi) {
+            var provSel = document.getElementById('edit-provinsi');
+            if (provSel) provSel.value = existingProvinsi;
+            updateEditKota(existingProvinsi);
+        }
+    })();
+</script>

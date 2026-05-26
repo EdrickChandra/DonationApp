@@ -56,18 +56,34 @@
     <script>
         var currentUrl = null;
 
+        // All paths that should load inside the shell via AJAX
         var profilePaths = [
             '/Profile',
             '/Donasi',
             '/Pesan',
             '/Request/MyRequests',
             '/Request/Permintaan',
-            '/Request/CreateView'
+            '/Request/CreateView',
+            '/Request/EditView',
+            '/Request/Detail',
+            '/Donasi/PenawaranDonasi'
         ];
+
+        // Map initialSection -> URL for initial load
+        var sectionUrls = {
+            'overview':    '/Profile/Overview',
+            'donasi':      '/Donasi/Index',
+            'request':     '/Request/MyRequests',
+            'pesan':       '/Pesan/Index',
+            'notifikasi':  '/Profile/Notifikasi',
+            'profil':      '/Profile/Edit'
+        };
 
         function isProfilePath(pathname) {
             return profilePaths.some(function(p) {
-                return pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '?');
+                return pathname === p ||
+                       pathname.startsWith(p + '/') ||
+                       pathname.startsWith(p + '?');
             });
         }
 
@@ -75,6 +91,10 @@
             var modal = document.getElementById('matchModal');
             if (modal && modal.parentElement !== document.body) {
                 document.body.appendChild(modal);
+            }
+            var noResultModal = document.getElementById('matchNoResultModal');
+            if (noResultModal && noResultModal.parentElement !== document.body) {
+                document.body.appendChild(noResultModal);
             }
         }
 
@@ -88,6 +108,8 @@
 
             var existingModal = document.getElementById('matchModal');
             if (existingModal) existingModal.remove();
+            var existingNoResult = document.getElementById('matchNoResultModal');
+            if (existingNoResult) existingNoResult.remove();
 
             fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
             .then(function(r) {
@@ -107,9 +129,71 @@
                 reinitScripts(body);
                 injectBackButton();
                 hoistModalToBody();
+                bindFormSubmits(body);
             })
             .catch(function() {
                 window.location.href = url;
+            });
+        }
+
+        // Intercept form submits inside the shell so that after POST redirect
+        // we reload the target page inside the shell instead of full-page reload.
+        // Only intercept forms whose action targets a profile path.
+        function bindFormSubmits(container) {
+            container.querySelectorAll('form[method="post"], form[method="POST"]').forEach(function(form) {
+                // Skip forms that already have a data-shell-bound attribute
+                if (form.dataset.shellBound) return;
+                form.dataset.shellBound = '1';
+
+                // Only intercept if the form action (after redirect) would land in a profile path.
+                // We intercept ALL profile forms so that after redirect the shell handles it.
+                var action = form.getAttribute('action') || form.action || '';
+
+                // Don't intercept file upload forms (enctype multipart) — let them be full-page
+                // so the server can properly process files. After redirect, Shell init handles it.
+                if (form.enctype === 'multipart/form-data' || form.getAttribute('enctype') === 'multipart/form-data') {
+                    return;
+                }
+
+                // Don't intercept logout
+                if (action.indexOf('Logout') !== -1 || action.indexOf('logout') !== -1) {
+                    return;
+                }
+
+                form.addEventListener('submit', function(e) {
+                    // Let native submit happen but after it completes, intercept the redirect
+                    // We do this by fetching via AJAX instead
+                    e.preventDefault();
+
+                    var formData = new FormData(form);
+                    var submitUrl = form.action || window.location.href;
+
+                    fetch(submitUrl, {
+                        method: 'POST',
+                        body: formData,
+                        redirect: 'follow',
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(function(r) {
+                        // After redirect, r.url is the final URL
+                        var finalUrl = r.url;
+                        var finalPath = new URL(finalUrl).pathname + new URL(finalUrl).search;
+
+                        if (isProfilePath(new URL(finalUrl).pathname)) {
+                            // Load the redirected page inside shell
+                            currentUrl = null; // force reload
+                            loadSection(finalPath, true);
+                        } else {
+                            // Non-profile redirect — do full page navigation
+                            window.location.href = finalUrl;
+                        }
+                    })
+                    .catch(function() {
+                        // Fallback to native submit
+                        form.removeEventListener('submit', arguments.callee);
+                        form.submit();
+                    });
+                });
             });
         }
 
@@ -152,6 +236,7 @@
             pdetail.insertBefore(backBtn, pdetail.firstChild);
         }
 
+        // Intercept <a> clicks for profile paths
         document.addEventListener('click', function(e) {
             var link = e.target.closest('a[href]');
             if (!link) return;
@@ -175,17 +260,20 @@
             }
         });
 
-        var sectionUrls = {
-            'overview':    '/Profile/Overview',
-            'donasi':      '/Donasi/Index',
-            'request':     '/Request/MyRequests',
-            'pesan':       '/Pesan/Index',
-            'notifikasi':  '/Profile/Notifikasi',
-            'profil':      '/Profile/Edit'
-        };
+        // Determine initial URL: use actual current pathname if it's a profile path,
+        // otherwise fall back to the sectionUrls mapping.
+        (function() {
+            var currentPath = window.location.pathname + window.location.search;
+            var initialUrl;
 
-        var initialUrl = sectionUrls['@initialSection'] || '/Profile/Overview';
-        window.history.replaceState({ url: initialUrl }, '', initialUrl);
-        loadSection(initialUrl, false);
+            if (isProfilePath(window.location.pathname)) {
+                initialUrl = currentPath;
+            } else {
+                initialUrl = sectionUrls['@initialSection'] || '/Profile/Overview';
+            }
+
+            window.history.replaceState({ url: initialUrl }, '', initialUrl);
+            loadSection(initialUrl, false);
+        })();
     </script>
 }

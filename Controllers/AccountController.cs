@@ -34,6 +34,7 @@ public class AccountController : AppBaseController
             UserName = model.NamaDepan,
             PhoneNumber = model.PhoneNumber,
             Alamat = model.Alamat,
+            Kota = model.Kota,
             Provinsi = model.Provinsi,
             KodePos = model.KodePos,
             CreatedAt = DateTime.UtcNow
