@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DonationApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260526075046_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260528082407_AddReportTargetRequest")]
+    partial class AddReportTargetRequest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,7 +82,14 @@ namespace DonationApp.Migrations
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("IsBanned")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("KodePos")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Kota")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
@@ -195,6 +202,9 @@ namespace DonationApp.Migrations
                     b.Property<int>("ItemId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Jumlah")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
@@ -272,6 +282,9 @@ namespace DonationApp.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ItemRequestId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Komentar")
                         .HasColumnType("TEXT");
 
@@ -293,11 +306,13 @@ namespace DonationApp.Migrations
 
                     b.HasIndex("ClaimRequestId");
 
+                    b.HasIndex("ItemRequestId");
+
                     b.HasIndex("RequestOfferId");
 
                     b.HasIndex("ReviewedUserId");
 
-                    b.HasIndex("ReviewerId", "ClaimRequestId", "RequestOfferId")
+                    b.HasIndex("ReviewerId", "ClaimRequestId", "ItemRequestId")
                         .IsUnique();
 
                     b.ToTable("Feedbacks");
@@ -550,6 +565,9 @@ namespace DonationApp.Migrations
                     b.Property<int?>("TargetDonationId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("TargetRequestId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("TargetUserId")
                         .HasColumnType("TEXT");
 
@@ -558,6 +576,8 @@ namespace DonationApp.Migrations
                     b.HasIndex("ReporterId");
 
                     b.HasIndex("TargetDonationId");
+
+                    b.HasIndex("TargetRequestId");
 
                     b.HasIndex("TargetUserId");
 
@@ -603,8 +623,32 @@ namespace DonationApp.Migrations
                     b.Property<int>("ItemRequestId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Jumlah")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kondisi")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Lokasi")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NamaBarang")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Provinsi")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -845,7 +889,11 @@ namespace DonationApp.Migrations
                         .WithMany("Feedbacks")
                         .HasForeignKey("ClaimRequestId");
 
-                    b.HasOne("DonationApp.Models.RequestOffer", "RequestOffer")
+                    b.HasOne("DonationApp.Models.ItemRequest", "ItemRequest")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("ItemRequestId");
+
+                    b.HasOne("DonationApp.Models.RequestOffer", null)
                         .WithMany("Feedbacks")
                         .HasForeignKey("RequestOfferId");
 
@@ -863,7 +911,7 @@ namespace DonationApp.Migrations
 
                     b.Navigation("ClaimRequest");
 
-                    b.Navigation("RequestOffer");
+                    b.Navigation("ItemRequest");
 
                     b.Navigation("ReviewedUser");
 
@@ -957,7 +1005,11 @@ namespace DonationApp.Migrations
 
                     b.HasOne("DonationApp.Models.Item", "TargetDonation")
                         .WithMany()
-                        .HasForeignKey("TargetDonationId")
+                        .HasForeignKey("TargetDonationId");
+
+                    b.HasOne("DonationApp.Models.ItemRequest", "TargetRequest")
+                        .WithMany()
+                        .HasForeignKey("TargetRequestId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("DonationApp.Models.ApplicationUser", "TargetUser")
@@ -968,6 +1020,8 @@ namespace DonationApp.Migrations
                     b.Navigation("Reporter");
 
                     b.Navigation("TargetDonation");
+
+                    b.Navigation("TargetRequest");
 
                     b.Navigation("TargetUser");
                 });
@@ -1074,6 +1128,8 @@ namespace DonationApp.Migrations
 
             modelBuilder.Entity("DonationApp.Models.ItemRequest", b =>
                 {
+                    b.Navigation("Feedbacks");
+
                     b.Navigation("Images");
 
                     b.Navigation("Offers");

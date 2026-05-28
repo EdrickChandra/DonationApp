@@ -3,24 +3,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
 
-public enum ConversationType
-{
-    Donation,
-    RequestOffer
-}
-
 public class Conversation
 {
     public int Id { get; set; }
 
     [Required]
     public ConversationType Type { get; set; }
-
-    // Populated when Type = Donation
     public int? ItemId { get; set; }
     public int? ClaimRequestId { get; set; }
 
-    // Populated when Type = RequestOffer
     public int? RequestOfferId { get; set; }
 
     [ForeignKey("ItemId")]

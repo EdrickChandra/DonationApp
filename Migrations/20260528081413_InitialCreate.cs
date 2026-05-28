@@ -33,6 +33,7 @@ namespace DonationApp.Migrations
                     NamaDepan = table.Column<string>(type: "TEXT", nullable: false),
                     NamaBelakang = table.Column<string>(type: "TEXT", nullable: false),
                     Alamat = table.Column<string>(type: "TEXT", nullable: false),
+                    Kota = table.Column<string>(type: "TEXT", nullable: false),
                     Provinsi = table.Column<string>(type: "TEXT", nullable: false),
                     KodePos = table.Column<string>(type: "TEXT", nullable: true),
                     TrustScore = table.Column<decimal>(type: "TEXT", nullable: false),
@@ -280,8 +281,14 @@ namespace DonationApp.Migrations
                     ItemRequestId = table.Column<int>(type: "INTEGER", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     Deskripsi = table.Column<string>(type: "TEXT", nullable: false),
+                    NamaBarang = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Kondisi = table.Column<int>(type: "INTEGER", nullable: false),
+                    Lokasi = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Provinsi = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Jumlah = table.Column<int>(type: "INTEGER", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -309,6 +316,7 @@ namespace DonationApp.Migrations
                     ItemId = table.Column<int>(type: "INTEGER", nullable: false),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     Status = table.Column<int>(type: "INTEGER", nullable: false),
+                    Jumlah = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
@@ -454,10 +462,11 @@ namespace DonationApp.Migrations
                     ReviewerId = table.Column<string>(type: "TEXT", nullable: false),
                     ReviewedUserId = table.Column<string>(type: "TEXT", nullable: false),
                     ClaimRequestId = table.Column<int>(type: "INTEGER", nullable: true),
-                    RequestOfferId = table.Column<int>(type: "INTEGER", nullable: true),
+                    ItemRequestId = table.Column<int>(type: "INTEGER", nullable: true),
                     Rating = table.Column<int>(type: "INTEGER", nullable: false),
                     Komentar = table.Column<string>(type: "TEXT", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    RequestOfferId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -478,6 +487,11 @@ namespace DonationApp.Migrations
                         name: "FK_Feedbacks_ClaimRequests_ClaimRequestId",
                         column: x => x.ClaimRequestId,
                         principalTable: "ClaimRequests",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Feedbacks_ItemRequests_ItemRequestId",
+                        column: x => x.ItemRequestId,
+                        principalTable: "ItemRequests",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Feedbacks_RequestOffers_RequestOfferId",
@@ -681,6 +695,11 @@ namespace DonationApp.Migrations
                 column: "ClaimRequestId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Feedbacks_ItemRequestId",
+                table: "Feedbacks",
+                column: "ItemRequestId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_RequestOfferId",
                 table: "Feedbacks",
                 column: "RequestOfferId");
@@ -691,9 +710,9 @@ namespace DonationApp.Migrations
                 column: "ReviewedUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Feedbacks_ReviewerId_ClaimRequestId_RequestOfferId",
+                name: "IX_Feedbacks_ReviewerId_ClaimRequestId_ItemRequestId",
                 table: "Feedbacks",
-                columns: new[] { "ReviewerId", "ClaimRequestId", "RequestOfferId" },
+                columns: new[] { "ReviewerId", "ClaimRequestId", "ItemRequestId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(

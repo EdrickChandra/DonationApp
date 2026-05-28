@@ -3,15 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
 
-public enum RequestOfferStatus
-{
-    Pending,
-    Accepted,
-    Rejected,
-    Shipped,
-    Delivered
-}
-
 public class RequestOffer
 {
     public int Id { get; set; }
@@ -45,7 +36,7 @@ public class RequestOffer
     [Range(1, 999)]
     public int Jumlah { get; set; } = 1;
 
-    public RequestOfferStatus Status { get; set; } = RequestOfferStatus.Pending;
+    public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }

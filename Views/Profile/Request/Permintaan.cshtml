@@ -30,11 +30,11 @@
                     {
                         var (statusLabel, statusClass) = r.Status switch
                         {
-                            ClaimRequestStatus.Pending   => ("Menunggu", "pbadge-muted"),
-                            ClaimRequestStatus.Accepted  => ("Diterima",  "pbadge-claimed"),
-                            ClaimRequestStatus.Rejected  => ("Ditolak",   "pbadge-rejected"),
-                            ClaimRequestStatus.Shipped   => ("Dikirim",   "pbadge-pending"),
-                            ClaimRequestStatus.Delivered => ("Selesai",   "pbadge-available"),
+                            TransactionStatus.Pending   => ("Menunggu", "pbadge-muted"),
+                            TransactionStatus.Accepted  => ("Diterima",  "pbadge-claimed"),
+                            TransactionStatus.Rejected  => ("Ditolak",   "pbadge-rejected"),
+                            TransactionStatus.Shipped   => ("Dikirim",   "pbadge-pending"),
+                            TransactionStatus.Delivered => ("Selesai",   "pbadge-available"),
                             _                            => ("Unknown",   "pbadge-muted")
                         };
                         <a class="plist-item @(selected?.Id == r.Id ? "active" : "")"
@@ -101,18 +101,18 @@
                         <div class="psec">
                             <div class="psec-label">Status Pengiriman</div>
                             <div class="pstepper">
-                                <div class="pstep @(selected.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
-                                    <div class="pstep-dot @(selected.Status >= ClaimRequestStatus.Accepted ? "done" : "")"><i class="ti ti-check" aria-hidden="true"></i></div>
+                                <div class="pstep @(selected.Status >= TransactionStatus.Accepted ? "done" : "")">
+                                    <div class="pstep-dot @(selected.Status >= TransactionStatus.Accepted ? "done" : "")"><i class="ti ti-check" aria-hidden="true"></i></div>
                                     <div class="pstep-label">Disetujui</div>
                                 </div>
-                                <div class="pstep-line @(selected.Status >= ClaimRequestStatus.Shipped ? "done" : "")"></div>
-                                <div class="pstep @(selected.Status >= ClaimRequestStatus.Shipped ? "done" : "")">
-                                    <div class="pstep-dot @(selected.Status >= ClaimRequestStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
+                                <div class="pstep-line @(selected.Status >= TransactionStatus.Shipped ? "done" : "")"></div>
+                                <div class="pstep @(selected.Status >= TransactionStatus.Shipped ? "done" : "")">
+                                    <div class="pstep-dot @(selected.Status >= TransactionStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
                                     <div class="pstep-label">Dikirim</div>
                                 </div>
-                                <div class="pstep-line @(selected.Status >= ClaimRequestStatus.Delivered ? "done" : "")"></div>
-                                <div class="pstep @(selected.Status >= ClaimRequestStatus.Delivered ? "done" : "")">
-                                    <div class="pstep-dot @(selected.Status >= ClaimRequestStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
+                                <div class="pstep-line @(selected.Status >= TransactionStatus.Delivered ? "done" : "")"></div>
+                                <div class="pstep @(selected.Status >= TransactionStatus.Delivered ? "done" : "")">
+                                    <div class="pstep-dot @(selected.Status >= TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                     <div class="pstep-label">Diterima</div>
                                 </div>
                                 <div class="pstep-line @(alreadyReviewed ? "done" : "")"></div>
@@ -122,7 +122,7 @@
                                 </div>
                             </div>
 
-                            @if (selected.Status == ClaimRequestStatus.Shipped)
+                            @if (selected.Status == TransactionStatus.Shipped)
                             {
                                 <form asp-controller="Donasi" asp-action="MarkDelivered" method="post">
                                     @Html.AntiForgeryToken()
@@ -132,17 +132,17 @@
                                     </button>
                                 </form>
                             }
-                            else if (selected.Status == ClaimRequestStatus.Accepted)
+                            else if (selected.Status == TransactionStatus.Accepted)
                             {
                                 <p style="font-size:12px;color:#64748b;text-align:center;margin-top:8px;">Menunggu donor mengirim barang...</p>
                             }
-                            else if (selected.Status == ClaimRequestStatus.Pending)
+                            else if (selected.Status == TransactionStatus.Pending)
                             {
                                 <p style="font-size:12px;color:#64748b;text-align:center;margin-top:8px;">Menunggu konfirmasi donor...</p>
                             }
                         </div>
 
-                        @if (selected.Status == ClaimRequestStatus.Delivered && !alreadyReviewed)
+                        @if (selected.Status == TransactionStatus.Delivered && !alreadyReviewed)
                         {
                             <div class="psec">
                                 <div class="psec-label">Beri Feedback untuk Donor</div>

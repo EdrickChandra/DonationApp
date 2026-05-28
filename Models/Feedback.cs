@@ -19,15 +19,14 @@ public class Feedback
     [ForeignKey("ReviewedUserId")]
     public ApplicationUser? ReviewedUser { get; set; }
 
-    // Only one of these will be set depending on which flow triggered the review
     public int? ClaimRequestId { get; set; }
-    public int? RequestOfferId { get; set; }
+    public int? ItemRequestId { get; set; }
 
     [ForeignKey("ClaimRequestId")]
     public ClaimRequest? ClaimRequest { get; set; }
 
-    [ForeignKey("RequestOfferId")]
-    public RequestOffer? RequestOffer { get; set; }
+    [ForeignKey("ItemRequestId")]
+    public ItemRequest? ItemRequest { get; set; }
 
     [Range(1, 5)]
     public int Rating { get; set; }

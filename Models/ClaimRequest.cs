@@ -3,15 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
 
-public enum ClaimRequestStatus
-{
-    Pending,
-    Accepted,
-    Rejected,
-    Shipped,
-    Delivered
-}
-
 public class ClaimRequest
 {
     public int Id { get; set; }
@@ -28,7 +19,7 @@ public class ClaimRequest
     [ForeignKey("UserId")]
     public ApplicationUser? User { get; set; }
 
-    public ClaimRequestStatus Status { get; set; } = ClaimRequestStatus.Pending;
+    public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
 
     [Range(1, 999)]
     public int Jumlah { get; set; } = 1;

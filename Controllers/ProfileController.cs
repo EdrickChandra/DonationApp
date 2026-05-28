@@ -41,6 +41,7 @@ public class ProfileController : AppBaseController
             .Include(f => f.Reviewer)
             .Include(f => f.ClaimRequest)
                 .ThenInclude(c => c!.Item)
+            .Include(f => f.ItemRequest)
             .Where(f => f.ReviewedUserId == userId)
             .OrderByDescending(f => f.CreatedAt)
             .Take(5)
@@ -48,7 +49,7 @@ public class ProfileController : AppBaseController
 
         ViewBag.TotalDonasi = totalDonasiTask.Result;
         ViewBag.ActiveDonasi = activeDonasiTask.Result;
-        ViewBag.TotalRequest = totalRequestTask.Result;
+        ViewBag.TotalRequest = totalRequestTask.Result; 
         ViewBag.OpenRequest = openRequestTask.Result;
         ViewBag.AvgRating = Math.Round(avgRatingTask.Result ?? 0, 1);
         ViewBag.TotalReviews = totalReviewsTask.Result;

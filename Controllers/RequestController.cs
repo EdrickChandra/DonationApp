@@ -61,8 +61,6 @@ public class RequestController : AppBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
-
-
     [Authorize]
     public async Task<IActionResult> Permintaan(int? selectedId)
     {
@@ -130,7 +128,6 @@ public class RequestController : AppBaseController
         ViewBag.InitialSection = "request";
         return View("~/Views/Profile/Shell.cshtml");
     }
-
 
     [AllowAnonymous]
     public async Task<IActionResult> Index(ItemCategory? kategori)
@@ -268,7 +265,7 @@ public class RequestController : AppBaseController
 
         if (itemRequest == null) return RedirectToAction("MyRequests");
 
-        if (itemRequest.Offers.Any(o => o.Status == RequestOfferStatus.Accepted))
+        if (itemRequest.Offers.Any(o => o.Status == TransactionStatus.Accepted))
         {
             TempData["RequestError"] = "Request tidak dapat dihapus karena sudah ada penawaran yang diterima.";
             return RedirectToAction("MyRequests");
@@ -322,7 +319,6 @@ public class RequestController : AppBaseController
         if (alreadyOffered || string.IsNullOrWhiteSpace(deskripsi))
             return RedirectToAction("Detail", new { id = itemRequestId });
 
-        // Auto-fill location from user profile
         var user = await _userManager.FindByIdAsync(userId);
         var lokasi = user?.Kota ?? string.Empty;
         var provinsi = user?.Provinsi ?? string.Empty;
@@ -339,7 +335,7 @@ public class RequestController : AppBaseController
             Provinsi = provinsi,
             Deskripsi = deskripsi.Trim(),
             Jumlah = clampedJumlah,
-            Status = RequestOfferStatus.Pending,
+            Status = TransactionStatus.Pending,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -367,7 +363,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("Detail", new { id = itemRequestId });
     }
 
-
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -382,7 +377,7 @@ public class RequestController : AppBaseController
         if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
             return RedirectToAction("MyRequests");
 
-        offer.Status = RequestOfferStatus.Accepted;
+        offer.Status = TransactionStatus.Accepted;
         offer.ItemRequest.Status = ItemRequestStatus.Fulfilled;
 
         _db.Notifications.Add(new Notification
@@ -413,7 +408,7 @@ public class RequestController : AppBaseController
         if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
             return RedirectToAction("MyRequests");
 
-        offer.Status = RequestOfferStatus.Rejected;
+        offer.Status = TransactionStatus.Rejected;
 
         _db.Notifications.Add(new Notification
         {
@@ -542,10 +537,6 @@ public class RequestController : AppBaseController
         var matches = await _matchingService.FindMatchesForItemRequest(savedRequest);
         if (!matches.Any()) return;
 
-        var userItems = await _db.Items
-            .Where(i => i.UserId == userId && i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow)
-            .ToListAsync();
-
         var matchData = matches.Select(m => new
         {
             id = m.Item.Id,
@@ -580,13 +571,12 @@ public class RequestController : AppBaseController
             .Include(o => o.ItemRequest)
             .FirstOrDefaultAsync(o => o.Id == offerId);
 
-        // Only the request owner can mark as shipped
         if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
             return RedirectToAction("MyRequests");
-        if (offer.Status != RequestOfferStatus.Accepted)
+        if (offer.Status != TransactionStatus.Accepted)
             return RedirectToAction("MyRequests");
 
-        offer.Status = RequestOfferStatus.Shipped;
+        offer.Status = TransactionStatus.Shipped;
         offer.UpdatedAt = DateTime.UtcNow;
 
         _db.Notifications.Add(new Notification
@@ -614,13 +604,12 @@ public class RequestController : AppBaseController
             .Include(o => o.ItemRequest)
             .FirstOrDefaultAsync(o => o.Id == offerId);
 
-        // Only the OFFERER (the one who shipped) confirms delivery
         if (offer == null || offer.ItemRequest == null || offer.UserId != userId)
             return RedirectToAction("Permintaan", "Donasi");
-        if (offer.Status != RequestOfferStatus.Shipped)
+        if (offer.Status != TransactionStatus.Shipped)
             return RedirectToAction("Permintaan", "Donasi");
 
-        offer.Status = RequestOfferStatus.Delivered;
+        offer.Status = TransactionStatus.Delivered;
         offer.UpdatedAt = DateTime.UtcNow;
 
         _db.Notifications.Add(new Notification
@@ -636,5 +625,4 @@ public class RequestController : AppBaseController
         await _db.SaveChangesAsync();
         return RedirectToAction("PenawaranDonasi", "Donasi", new { selectedId = offerId });
     }
-
 }

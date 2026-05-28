@@ -3,21 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
 
-public enum NotificationType
-{
-    ClaimRequest,
-    ClaimAccepted,
-    ClaimRejected,
-    ItemShipped,
-    ItemDelivered,
-    NewOffer,
-    OfferAccepted,
-    OfferRejected,
-    NewRating,
-    Report,
-    PointEarned
-}
-
 public class Notification
 {
     public int Id { get; set; }
@@ -33,7 +18,6 @@ public class Notification
 
     public NotificationType Type { get; set; }
 
-    // ID of the related entity (e.g. ItemId, ClaimRequestId) for deep linking
     public string? RefId { get; set; }
 
     public bool IsRead { get; set; } = false;

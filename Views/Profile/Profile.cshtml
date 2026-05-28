@@ -102,7 +102,7 @@
                                     <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                     <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                                 </div>
-                                <span class="profile-badge @(r.Status == ClaimRequestStatus.Accepted ? "profile-badge-claimed" : r.Status == ClaimRequestStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
+                                <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
                             </div>
                         }
                     }
@@ -213,11 +213,11 @@
                                         <div class="permintaan-req-avatar">@avatarLetter2</div>
                                         <span class="permintaan-req-name">@requesterName</span>
                                         <div class="permintaan-req-actions">
-                                            @if (r.Status == ClaimRequestStatus.Accepted)
+                                            @if (r.Status == TransactionStatus.Accepted)
                                             {
                                                 <span style="font-size:12px;color:#166534;font-weight:600;">Diterima</span>
                                             }
-                                            else if (r.Status == ClaimRequestStatus.Rejected)
+                                            else if (r.Status == TransactionStatus.Rejected)
                                             {
                                                 <span style="font-size:12px;color:#991b1b;font-weight:600;">Ditolak</span>
                                             }
@@ -275,7 +275,7 @@
                                 <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                 <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                             </div>
-                            <span class="profile-badge @(r.Status == ClaimRequestStatus.Accepted ? "profile-badge-claimed" : r.Status == ClaimRequestStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
+                            <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
                         </div>
                     }
                 }

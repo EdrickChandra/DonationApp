@@ -48,7 +48,7 @@
                     var rAvatar = r.Reviewer?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                     var rName = r.Reviewer != null ? r.Reviewer.NamaDepan + " " + r.Reviewer.NamaBelakang : "Unknown";
                     var daysAgo = (DateTime.UtcNow - r.CreatedAt).Days;
-                    var itemName = r.ClaimRequest?.Item?.NamaBarang ?? r.RequestOffer?.ItemRequest?.Title ?? "";
+                    var itemName = r.ClaimRequest?.Item?.NamaBarang ?? r.ItemRequest?.Title ?? "";
                     <div class="preview-item">
                         <div class="preview-avatar">@rAvatar</div>
                         <div style="flex:1;">

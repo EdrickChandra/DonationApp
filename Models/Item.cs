@@ -2,30 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DonationApp.Models;
 
-public enum ItemCondition
-{
-    Baru,
-    Bekas
-}
-
-public enum ItemCategory
-{
-    Pakaian,
-    Elektronik,
-    Buku,
-    PerabotRumah,
-    MainanHobi,
-    AlatTulis,
-    AlatMusik,
-    PeralatanDapur
-}
-
-public enum ItemStatus
-{
-    Available,
-    Claimed
-}
-
 public class Item : ListingBase
 {
     [Required]

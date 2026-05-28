@@ -3,23 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DonationApp.Models;
 
-public enum ReportReason
-{
-    Spam,
-    FakeItem,
-    Inappropriate,
-    Scam,
-    Other
-}
-
-public enum ReportStatus
-{
-    Open,
-    Reviewing,
-    Resolved,
-    Dismissed
-}
-
 public class Report
 {
     public int Id { get; set; }
@@ -30,15 +13,18 @@ public class Report
     [ForeignKey("ReporterId")]
     public ApplicationUser? Reporter { get; set; }
 
-    // Target is either a user or a donation — not both
     public string? TargetUserId { get; set; }
     public int? TargetDonationId { get; set; }
+    public int? TargetRequestId { get; set; }
 
     [ForeignKey("TargetUserId")]
     public ApplicationUser? TargetUser { get; set; }
 
     [ForeignKey("TargetDonationId")]
     public Item? TargetDonation { get; set; }
+
+    [ForeignKey("TargetRequestId")]
+    public ItemRequest? TargetRequest { get; set; }
 
     [Required]
     public ReportReason Alasan { get; set; }

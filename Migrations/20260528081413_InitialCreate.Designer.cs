@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DonationApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260526092803_AddOfferFields")]
-    partial class AddOfferFields
+    [Migration("20260528081413_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,6 +83,10 @@ namespace DonationApp.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("KodePos")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Kota")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
@@ -275,6 +279,9 @@ namespace DonationApp.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ItemRequestId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Komentar")
                         .HasColumnType("TEXT");
 
@@ -296,11 +303,13 @@ namespace DonationApp.Migrations
 
                     b.HasIndex("ClaimRequestId");
 
+                    b.HasIndex("ItemRequestId");
+
                     b.HasIndex("RequestOfferId");
 
                     b.HasIndex("ReviewedUserId");
 
-                    b.HasIndex("ReviewerId", "ClaimRequestId", "RequestOfferId")
+                    b.HasIndex("ReviewerId", "ClaimRequestId", "ItemRequestId")
                         .IsUnique();
 
                     b.ToTable("Feedbacks");
@@ -630,6 +639,9 @@ namespace DonationApp.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -869,7 +881,11 @@ namespace DonationApp.Migrations
                         .WithMany("Feedbacks")
                         .HasForeignKey("ClaimRequestId");
 
-                    b.HasOne("DonationApp.Models.RequestOffer", "RequestOffer")
+                    b.HasOne("DonationApp.Models.ItemRequest", "ItemRequest")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("ItemRequestId");
+
+                    b.HasOne("DonationApp.Models.RequestOffer", null)
                         .WithMany("Feedbacks")
                         .HasForeignKey("RequestOfferId");
 
@@ -887,7 +903,7 @@ namespace DonationApp.Migrations
 
                     b.Navigation("ClaimRequest");
 
-                    b.Navigation("RequestOffer");
+                    b.Navigation("ItemRequest");
 
                     b.Navigation("ReviewedUser");
 
@@ -1098,6 +1114,8 @@ namespace DonationApp.Migrations
 
             modelBuilder.Entity("DonationApp.Models.ItemRequest", b =>
                 {
+                    b.Navigation("Feedbacks");
+
                     b.Navigation("Images");
 
                     b.Navigation("Offers");

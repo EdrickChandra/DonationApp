@@ -92,7 +92,6 @@ public class DonasiController : AppBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(Item item, List<IFormFile> Images, string? DetailTambahanJson)
@@ -200,7 +199,7 @@ public class DonasiController : AppBaseController
 
         if (item == null) return RedirectToAction("Index");
 
-        if (item.ClaimRequests.Any(r => r.Status == ClaimRequestStatus.Accepted || r.Status == ClaimRequestStatus.Shipped))
+        if (item.ClaimRequests.Any(r => r.Status == TransactionStatus.Accepted || r.Status == TransactionStatus.Shipped))
         {
             TempData["DonasiError"] = "Donasi tidak dapat dihapus karena sedang dalam proses pengiriman.";
             return RedirectToAction("Index");
@@ -320,7 +319,7 @@ public class DonasiController : AppBaseController
             Provinsi = fromItem.Provinsi,
             Jumlah = clampedJumlah,
             Deskripsi = fromItem.Deskripsi,
-            Status = RequestOfferStatus.Pending,
+            Status = TransactionStatus.Pending,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -445,7 +444,7 @@ public class DonasiController : AppBaseController
         if (request == null || request.Item == null || request.Item.UserId != userId)
             return RedirectToAction("Index");
 
-        request.Status = ClaimRequestStatus.Accepted;
+        request.Status = TransactionStatus.Accepted;
         request.UpdatedAt = DateTime.UtcNow;
 
         request.Item.Jumlah -= request.Jumlah;
@@ -482,7 +481,7 @@ public class DonasiController : AppBaseController
         if (request == null || request.Item == null || request.Item.UserId != userId)
             return RedirectToAction("Index");
 
-        request.Status = ClaimRequestStatus.Rejected;
+        request.Status = TransactionStatus.Rejected;
 
         _db.Notifications.Add(new Notification
         {
@@ -510,10 +509,10 @@ public class DonasiController : AppBaseController
 
         if (request == null || request.Item == null || request.Item.UserId != userId)
             return RedirectToAction("Index");
-        if (request.Status != ClaimRequestStatus.Accepted)
+        if (request.Status != TransactionStatus.Accepted)
             return RedirectToAction("Index");
 
-        request.Status = ClaimRequestStatus.Shipped;
+        request.Status = TransactionStatus.Shipped;
         request.UpdatedAt = DateTime.UtcNow;
 
         _db.Notifications.Add(new Notification
@@ -542,10 +541,10 @@ public class DonasiController : AppBaseController
 
         if (request == null || request.Item == null || request.UserId != userId)
             return RedirectToAction("Permintaan", "Request");
-        if (request.Status != ClaimRequestStatus.Shipped)
+        if (request.Status != TransactionStatus.Shipped)
             return RedirectToAction("Permintaan", "Request");
 
-        request.Status = ClaimRequestStatus.Delivered;
+        request.Status = TransactionStatus.Delivered;
         request.UpdatedAt = DateTime.UtcNow;
 
         _db.Notifications.Add(new Notification
@@ -706,5 +705,4 @@ public class DonasiController : AppBaseController
         ViewBag.InitialSection = "donasi";
         return View("~/Views/Profile/Shell.cshtml");
     }
-
 }

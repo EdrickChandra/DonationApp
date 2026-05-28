@@ -50,18 +50,18 @@
                     @foreach (var d in visibleDonations)
                     {
                         var activeRequests = d.ClaimRequests.Where(r =>
-                            r.Status == ClaimRequestStatus.Accepted ||
-                            r.Status == ClaimRequestStatus.Shipped ||
-                            r.Status == ClaimRequestStatus.Delivered).ToList();
+                            r.Status == TransactionStatus.Accepted ||
+                            r.Status == TransactionStatus.Shipped ||
+                            r.Status == TransactionStatus.Delivered).ToList();
 
                         string statusLabel;
                         string statusClass;
 
-                        if (activeRequests.Any(r => r.Status == ClaimRequestStatus.Shipped))
+                        if (activeRequests.Any(r => r.Status == TransactionStatus.Shipped))
                         { statusLabel = "Dikirim"; statusClass = "pbadge-pending"; }
-                        else if (activeRequests.Any(r => r.Status == ClaimRequestStatus.Accepted))
+                        else if (activeRequests.Any(r => r.Status == TransactionStatus.Accepted))
                         { statusLabel = "Diterima"; statusClass = "pbadge-claimed"; }
-                        else if (activeRequests.Any(r => r.Status == ClaimRequestStatus.Delivered))
+                        else if (activeRequests.Any(r => r.Status == TransactionStatus.Delivered))
                         { statusLabel = "Selesai"; statusClass = "pbadge-available"; }
                         else
                         { statusLabel = d.Status == ItemStatus.Available ? "Tersedia" : "Diambil"; statusClass = d.Status == ItemStatus.Available ? "pbadge-available" : "pbadge-claimed"; }
@@ -105,11 +105,11 @@
                     else
                     {
                         var activeRequests = selected.ClaimRequests.Where(r =>
-                            r.Status == ClaimRequestStatus.Accepted ||
-                            r.Status == ClaimRequestStatus.Shipped ||
-                            r.Status == ClaimRequestStatus.Delivered).ToList();
+                            r.Status == TransactionStatus.Accepted ||
+                            r.Status == TransactionStatus.Shipped ||
+                            r.Status == TransactionStatus.Delivered).ToList();
 
-                        var pendingRequests = selected.ClaimRequests.Where(r => r.Status == ClaimRequestStatus.Pending).ToList();
+                        var pendingRequests = selected.ClaimRequests.Where(r => r.Status == TransactionStatus.Pending).ToList();
                         var hasAnyActive = activeRequests.Any();
 
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
@@ -157,16 +157,16 @@
                                         var rName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
                                         var rStatusLabel = r.Status switch
                                         {
-                                            ClaimRequestStatus.Accepted  => "Menunggu Kirim",
-                                            ClaimRequestStatus.Shipped   => "Dikirim",
-                                            ClaimRequestStatus.Delivered => "Selesai",
+                                            TransactionStatus.Accepted  => "Menunggu Kirim",
+                                            TransactionStatus.Shipped   => "Dikirim",
+                                            TransactionStatus.Delivered => "Selesai",
                                             _ => ""
                                         };
                                         var rStatusClass = r.Status switch
                                         {
-                                            ClaimRequestStatus.Accepted  => "pbadge-claimed",
-                                            ClaimRequestStatus.Shipped   => "pbadge-pending",
-                                            ClaimRequestStatus.Delivered => "pbadge-available",
+                                            TransactionStatus.Accepted  => "pbadge-claimed",
+                                            TransactionStatus.Shipped   => "pbadge-pending",
+                                            TransactionStatus.Delivered => "pbadge-available",
                                             _ => "pbadge-muted"
                                         };
                                         <div>
@@ -192,27 +192,27 @@
                                                     </form>
                                                 </div>
                                                 <div class="pstepper" style="margin-bottom:10px;">
-                                                    <div class="pstep @(r.Status >= ClaimRequestStatus.Accepted ? "done" : "")">
-                                                        <div class="pstep-dot @(r.Status >= ClaimRequestStatus.Accepted ? "done" : "")"><i class="ti ti-check" aria-hidden="true"></i></div>
+                                                    <div class="pstep @(r.Status >= TransactionStatus.Accepted ? "done" : "")">
+                                                        <div class="pstep-dot @(r.Status >= TransactionStatus.Accepted ? "done" : "")"><i class="ti ti-check" aria-hidden="true"></i></div>
                                                         <div class="pstep-label">Disetujui</div>
                                                     </div>
-                                                    <div class="pstep-line @(r.Status >= ClaimRequestStatus.Shipped ? "done" : "")"></div>
-                                                    <div class="pstep @(r.Status >= ClaimRequestStatus.Shipped ? "done" : "")">
-                                                        <div class="pstep-dot @(r.Status >= ClaimRequestStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
+                                                    <div class="pstep-line @(r.Status >= TransactionStatus.Shipped ? "done" : "")"></div>
+                                                    <div class="pstep @(r.Status >= TransactionStatus.Shipped ? "done" : "")">
+                                                        <div class="pstep-dot @(r.Status >= TransactionStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
                                                         <div class="pstep-label">Dikirim</div>
                                                     </div>
-                                                    <div class="pstep-line @(r.Status >= ClaimRequestStatus.Delivered ? "done" : "")"></div>
-                                                    <div class="pstep @(r.Status >= ClaimRequestStatus.Delivered ? "done" : "")">
-                                                        <div class="pstep-dot @(r.Status >= ClaimRequestStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
+                                                    <div class="pstep-line @(r.Status >= TransactionStatus.Delivered ? "done" : "")"></div>
+                                                    <div class="pstep @(r.Status >= TransactionStatus.Delivered ? "done" : "")">
+                                                        <div class="pstep-dot @(r.Status >= TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                                         <div class="pstep-label">Diterima</div>
                                                     </div>
-                                                    <div class="pstep-line @(r.Status == ClaimRequestStatus.Delivered && r.Feedbacks.Any() ? "done" : "")"></div>
+                                                    <div class="pstep-line @(r.Status == TransactionStatus.Delivered && r.Feedbacks.Any() ? "done" : "")"></div>
                                                     <div class="pstep @(r.Feedbacks.Any() ? "done" : "")">
                                                         <div class="pstep-dot @(r.Feedbacks.Any() ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
                                                         <div class="pstep-label">Feedback</div>
                                                     </div>
                                                 </div>
-                                                @if (r.Status == ClaimRequestStatus.Accepted)
+                                                @if (r.Status == TransactionStatus.Accepted)
                                                 {
                                                     <form asp-controller="Donasi" asp-action="MarkShipped" method="post">
                                                         @Html.AntiForgeryToken()
@@ -222,11 +222,11 @@
                                                         </button>
                                                     </form>
                                                 }
-                                                else if (r.Status == ClaimRequestStatus.Shipped)
+                                                else if (r.Status == TransactionStatus.Shipped)
                                                 {
                                                     <p style="font-size:12px;color:#64748b;text-align:center;">Menunggu konfirmasi penerima...</p>
                                                 }
-                                                else if (r.Status == ClaimRequestStatus.Delivered)
+                                                else if (r.Status == TransactionStatus.Delivered)
                                                 {
                                                     <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
                                                 }

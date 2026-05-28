@@ -28,7 +28,6 @@
         {
             <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
 
-                @* LEFT LIST *@
                 <div class="plist" id="penawaran-list">
                     @foreach (var offer in myOffers)
                     {
@@ -39,13 +38,13 @@
                         string statusClass;
                         switch (offer.Status)
                         {
-                            case RequestOfferStatus.Accepted:
+                            case TransactionStatus.Accepted:
                                 statusLabel = "Diterima"; statusClass = "pbadge-claimed"; break;
-                            case RequestOfferStatus.Shipped:
+                            case TransactionStatus.Shipped:
                                 statusLabel = "Dikirim"; statusClass = "pbadge-pending"; break;
-                            case RequestOfferStatus.Delivered:
+                            case TransactionStatus.Delivered:
                                 statusLabel = "Selesai"; statusClass = "pbadge-available"; break;
-                            case RequestOfferStatus.Rejected:
+                            case TransactionStatus.Rejected:
                                 statusLabel = "Ditolak"; statusClass = "pbadge-rejected"; break;
                             default:
                                 statusLabel = "Menunggu"; statusClass = "pbadge-muted"; break;
@@ -70,7 +69,6 @@
                     }
                 </div>
 
-                @* RIGHT DETAIL *@
                 <div class="pdetail" id="penawaran-detail">
                     @if (selected == null)
                     {
@@ -79,7 +77,7 @@
                     else
                     {
                         var req = selected.ItemRequest;
-                        var alreadyReviewed = selected.Feedbacks.Any();
+                        var alreadyReviewed = selected.ItemRequest?.Feedbacks.Any() ?? false;
                         var firstReqImg = req?.Images.FirstOrDefault();
                         var reqOwnerInitial = req?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                         var reqOwnerName = req?.User != null ? req.User.NamaDepan + " " + req.User.NamaBelakang : "Unknown";
@@ -87,19 +85,19 @@
                         string statusLabel; string statusClass; string statusDesc; string dotColor;
                         switch (selected.Status)
                         {
-                            case RequestOfferStatus.Accepted:
+                            case TransactionStatus.Accepted:
                                 statusLabel = "Diterima"; statusClass = "pbadge-claimed";
                                 statusDesc = "Penawaran Anda diterima — siap untuk dikirim.";
                                 dotColor = "#2563eb"; break;
-                            case RequestOfferStatus.Shipped:
+                            case TransactionStatus.Shipped:
                                 statusLabel = "Dikirim"; statusClass = "pbadge-pending";
                                 statusDesc = "Barang sudah ditandai dikirim. Menunggu konfirmasi penerimaan.";
                                 dotColor = "#f59e0b"; break;
-                            case RequestOfferStatus.Delivered:
+                            case TransactionStatus.Delivered:
                                 statusLabel = "Selesai"; statusClass = "pbadge-available";
                                 statusDesc = "Barang telah diterima. Transaksi selesai.";
                                 dotColor = "#22c55e"; break;
-                            case RequestOfferStatus.Rejected:
+                            case TransactionStatus.Rejected:
                                 statusLabel = "Ditolak"; statusClass = "pbadge-rejected";
                                 statusDesc = "Penawaran Anda tidak dipilih kali ini.";
                                 dotColor = "#ef4444"; break;
@@ -109,7 +107,6 @@
                                 dotColor = "#f59e0b"; break;
                         }
 
-                        @* Header: which request *@
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (firstReqImg != null)
                             {
@@ -136,7 +133,6 @@
                             </div>
                         </div>
 
-                        @* Offer details *@
                         <div class="psec">
                             <div class="psec-label">Penawaran Anda</div>
                             <div style="display:flex;gap:12px;align-items:flex-start;">
@@ -162,8 +158,7 @@
                             </div>
                         </div>
 
-                        @* Shipping stepper — visible once accepted *@
-                        @if (selected.Status != RequestOfferStatus.Pending && selected.Status != RequestOfferStatus.Rejected)
+                        @if (selected.Status != TransactionStatus.Pending && selected.Status != TransactionStatus.Rejected)
                         {
                             <div class="psec">
                                 <div class="psec-label">Status Pengiriman</div>
@@ -172,14 +167,14 @@
                                         <div class="pstep-dot done"><i class="ti ti-check" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
-                                    <div class="pstep-line @(selected.Status >= RequestOfferStatus.Shipped ? "done" : "")"></div>
-                                    <div class="pstep @(selected.Status >= RequestOfferStatus.Shipped ? "done" : "")">
-                                        <div class="pstep-dot @(selected.Status >= RequestOfferStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
+                                    <div class="pstep-line @(selected.Status >= TransactionStatus.Shipped ? "done" : "")"></div>
+                                    <div class="pstep @(selected.Status >= TransactionStatus.Shipped ? "done" : "")">
+                                        <div class="pstep-dot @(selected.Status >= TransactionStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Dikirim</div>
                                     </div>
-                                    <div class="pstep-line @(selected.Status == RequestOfferStatus.Delivered ? "done" : "")"></div>
-                                    <div class="pstep @(selected.Status == RequestOfferStatus.Delivered ? "done" : "")">
-                                        <div class="pstep-dot @(selected.Status == RequestOfferStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
+                                    <div class="pstep-line @(selected.Status == TransactionStatus.Delivered ? "done" : "")"></div>
+                                    <div class="pstep @(selected.Status == TransactionStatus.Delivered ? "done" : "")">
+                                        <div class="pstep-dot @(selected.Status == TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
                                     <div class="pstep-line @(alreadyReviewed ? "done" : "")"></div>
@@ -189,15 +184,12 @@
                                     </div>
                                 </div>
 
-                                @if (selected.Status == RequestOfferStatus.Accepted)
+                                @if (selected.Status == TransactionStatus.Accepted)
                                 {
-                                    @* Request owner marks shipped — but this view is the OFFERER's view.
-                                       The offerer waits for the request owner to mark shipped. *@
                                     <p style="font-size:12px;color:#64748b;text-align:center;">Menunggu peminta menandai barang dikirim...</p>
                                 }
-                                else if (selected.Status == RequestOfferStatus.Shipped)
+                                else if (selected.Status == TransactionStatus.Shipped)
                                 {
-                                    @* Offerer confirms they received it *@
                                     <form asp-controller="Request" asp-action="MarkOfferDelivered" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="offerId" value="@selected.Id" />
@@ -206,7 +198,7 @@
                                         </button>
                                     </form>
                                 }
-                                else if (selected.Status == RequestOfferStatus.Delivered)
+                                else if (selected.Status == TransactionStatus.Delivered)
                                 {
                                     <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah dikonfirmasi diterima</p>
                                 }
@@ -214,7 +206,6 @@
                         }
                         else
                         {
-                            @* Simple status row for pending/rejected *@
                             <div class="psec">
                                 <div class="psec-label">Status</div>
                                 <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
@@ -225,13 +216,12 @@
                             </div>
                         }
 
-                        @* Feedback — only for delivered offers *@
-                        @if (selected.Status == RequestOfferStatus.Delivered)
+                        @if (selected.Status == TransactionStatus.Delivered)
                         {
                             <div class="psec">
                                 @if (alreadyReviewed)
                                 {
-                                    var myReview = selected.Feedbacks.First();
+                                    var myReview = selected.ItemRequest!.Feedbacks.First();
                                     <div class="psec-label">Feedback Anda</div>
                                     <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
                                         <div style="display:flex;gap:2px;">
@@ -251,7 +241,7 @@
                                     <div class="psec-label">Beri Feedback untuk Peminta</div>
                                     <form asp-controller="Reputation" asp-action="Submit" method="post" style="margin-top:10px;">
                                         @Html.AntiForgeryToken()
-                                        <input type="hidden" name="requestOfferId" value="@selected.Id" />
+                                        <input type="hidden" name="itemRequestId" value="@req?.Id" />
                                         <input type="hidden" name="rating" id="ratingValue" value="0" />
                                         <div style="display:flex;gap:4px;margin-bottom:12px;">
                                             @for (int star = 1; star <= 5; star++)
@@ -277,22 +267,22 @@
 </div>
 
 <script>
-(function() {
-    document.querySelectorAll('.pstar-btn').forEach(function(btn) {
-        btn.addEventListener('mouseover', function() {
-            var val = parseInt(this.dataset.value);
-            document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+    (function() {
+        document.querySelectorAll('.pstar-btn').forEach(function(btn) {
+            btn.addEventListener('mouseover', function() {
+                var val = parseInt(this.dataset.value);
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+            });
+            btn.addEventListener('mouseout', function() {
+                var sel = parseInt(document.getElementById('ratingValue')?.value || 0);
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
+            });
+            btn.addEventListener('click', function() {
+                var val = parseInt(this.dataset.value);
+                var rv = document.getElementById('ratingValue');
+                if (rv) rv.value = val;
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+            });
         });
-        btn.addEventListener('mouseout', function() {
-            var sel = parseInt(document.getElementById('ratingValue')?.value || 0);
-            document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
-        });
-        btn.addEventListener('click', function() {
-            var val = parseInt(this.dataset.value);
-            var rv = document.getElementById('ratingValue');
-            if (rv) rv.value = val;
-            document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
-        });
-    });
-})();
+    })();
 </script>

@@ -17,5 +17,4 @@ public class RequestLimit
 
     public DateTime PeriodStart { get; set; } = DateTime.UtcNow;
 
-    // PeriodEnd is not stored — derive it as PeriodStart.AddDays(N) in code
 }

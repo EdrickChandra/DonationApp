@@ -20,15 +20,14 @@ public class ReputationController : AppBaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Submit(int? claimRequestId, int? requestOfferId, int rating, string? komentar)
+    public async Task<IActionResult> Submit(int? claimRequestId, int? itemRequestId, int rating, string? komentar)
     {
         var userId = _userManager.GetUserId(User)!;
 
         if (rating < 1 || rating > 5)
             return RedirectToAction("Permintaan", "Request");
 
-        // Must supply exactly one source
-        if (claimRequestId == null && requestOfferId == null)
+        if (claimRequestId == null && itemRequestId == null)
             return RedirectToAction("Permintaan", "Request");
 
         string reviewedUserId;
@@ -44,7 +43,7 @@ public class ReputationController : AppBaseController
                 return RedirectToAction("Permintaan", "Request");
             if (claimRequest.UserId != userId)
                 return RedirectToAction("Permintaan", "Request");
-            if (claimRequest.Status != ClaimRequestStatus.Delivered)
+            if (claimRequest.Status != TransactionStatus.Delivered)
                 return RedirectToAction("Permintaan", "Request");
             if (claimRequest.Feedbacks.Any(f => f.ReviewerId == userId))
                 return RedirectToAction("Permintaan", "Request");
@@ -55,23 +54,27 @@ public class ReputationController : AppBaseController
         }
         else
         {
-            var offer = await _db.RequestOffers
-                .Include(o => o.ItemRequest)
-                .Include(o => o.Feedbacks)
-                .FirstOrDefaultAsync(o => o.Id == requestOfferId!.Value);
+            var itemRequest = await _db.ItemRequests
+                .Include(r => r.Offers)
+                .Include(r => r.Feedbacks)
+                .FirstOrDefaultAsync(r => r.Id == itemRequestId!.Value);
 
-            if (offer == null || offer.ItemRequest == null)
+            if (itemRequest == null)
                 return RedirectToAction("MyRequests", "Request");
-            if (offer.ItemRequest.UserId != userId)
+            if (itemRequest.UserId != userId)
                 return RedirectToAction("MyRequests", "Request");
-            if (offer.Status != RequestOfferStatus.Accepted)
-                return RedirectToAction("MyRequests", "Request");
-            if (offer.Feedbacks.Any(f => f.ReviewerId == userId))
-                return RedirectToAction("MyRequests", "Request");
-            if (offer.UserId == userId)
+            if (itemRequest.Feedbacks.Any(f => f.ReviewerId == userId))
                 return RedirectToAction("MyRequests", "Request");
 
-            reviewedUserId = offer.UserId;
+            var acceptedOffer = itemRequest.Offers
+                .FirstOrDefault(o => o.Status == TransactionStatus.Delivered);
+
+            if (acceptedOffer == null)
+                return RedirectToAction("MyRequests", "Request");
+            if (acceptedOffer.UserId == userId)
+                return RedirectToAction("MyRequests", "Request");
+
+            reviewedUserId = acceptedOffer.UserId;
         }
 
         var feedback = new Feedback
@@ -79,7 +82,7 @@ public class ReputationController : AppBaseController
             ReviewerId = userId,
             ReviewedUserId = reviewedUserId,
             ClaimRequestId = claimRequestId,
-            RequestOfferId = requestOfferId,
+            ItemRequestId = itemRequestId,
             Rating = rating,
             Komentar = string.IsNullOrWhiteSpace(komentar) ? null : komentar.Trim(),
             CreatedAt = DateTime.UtcNow
@@ -87,7 +90,6 @@ public class ReputationController : AppBaseController
 
         _db.Feedbacks.Add(feedback);
 
-        // Update donor TrustScore
         var existingRatings = await _db.Feedbacks
             .Where(f => f.ReviewedUserId == reviewedUserId)
             .Select(f => f.Rating)
@@ -95,11 +97,11 @@ public class ReputationController : AppBaseController
 
         var newAverage = (existingRatings.Sum() + rating) / (double)(existingRatings.Count + 1);
 
-        var donor = await _userManager.FindByIdAsync(reviewedUserId);
-        if (donor != null)
+        var reviewedUser = await _userManager.FindByIdAsync(reviewedUserId);
+        if (reviewedUser != null)
         {
-            donor.TrustScore = (decimal)Math.Round(newAverage, 1);
-            await _userManager.UpdateAsync(donor);
+            reviewedUser.TrustScore = (decimal)Math.Round(newAverage, 1);
+            await _userManager.UpdateAsync(reviewedUser);
         }
 
         _db.Notifications.Add(new Notification

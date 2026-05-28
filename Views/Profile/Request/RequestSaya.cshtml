@@ -1,296 +1,261 @@
 @using DonationApp.Models
 @using DonationApp.Services
 @{
-    var myRequests = ViewBag.MyRequests as List<ItemRequest>;
-    var selected = ViewBag.Selected as ItemRequest;
-    var matchesJson = ViewBag.Matches as string;
-    var matchCount = ViewBag.MatchCount as int? ?? 0;
-    var matchContext = ViewBag.MatchContext as string ?? "";
-    var sourceId = selected?.Id.ToString() ?? (myRequests?.FirstOrDefault()?.Id ?? 0).ToString();
+    var myOffers = ViewBag.MyOffers as List<RequestOffer>;
+    var selected = ViewBag.Selected as RequestOffer;
 }
 
 <div class="ppage">
     <div class="ppage-inner" style="max-width:100%;padding:0;">
 
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:0.5px solid #e2e8f0;">
+        <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:0.5px solid #e2e8f0;">
             <div class="ptab-bar" style="margin:0;border:none;">
-                <a asp-controller="Request" asp-action="MyRequests" class="ptab active">Request Saya</a>
-                <a asp-controller="Request" asp-action="Permintaan" class="ptab">Permintaan Donasi</a>
-                <a asp-controller="Request" asp-action="CreateView" class="ptab">Buat Request</a>
+                <a asp-controller="Donasi" asp-action="Index" class="ptab">Donasi Saya</a>
+                <a asp-controller="Donasi" asp-action="PenawaranDonasi" class="ptab active">Penawaran Donasi</a>
+                <a asp-controller="Donasi" asp-action="Create" class="ptab">Buat Donasi</a>
             </div>
-            <a asp-controller="Request" asp-action="CreateView" class="pbtn pbtn-primary" style="font-size:12px;padding:6px 14px;flex-shrink:0;">
-                <i class="ti ti-plus" aria-hidden="true"></i> Buat Request
-            </a>
         </div>
 
-        @if (TempData["RequestSuccess"] != null)
-        {
-            <div style="margin:12px 16px 0;background:#f0fdf4;border:0.5px solid #bbf7d0;color:#166534;padding:10px 14px;border-radius:8px;font-size:13px;">@TempData["RequestSuccess"]</div>
-        }
-        @if (TempData["RequestError"] != null)
-        {
-            <div style="margin:12px 16px 0;" class="pform-error-banner">@TempData["RequestError"]</div>
-        }
-
-        @if (myRequests == null || !myRequests.Any())
+        @if (myOffers == null || !myOffers.Any())
         {
             <div style="padding:48px;text-align:center;">
-                <i class="ti ti-list-search" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
-                <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Belum ada request barang.</p>
-                <a asp-controller="Request" asp-action="CreateView" class="pbtn pbtn-primary">Buat Request Pertama</a>
+                <i class="ti ti-package-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
+                <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Belum ada penawaran yang dibuat.</p>
+                <a asp-controller="Request" asp-action="Index" class="pbtn pbtn-primary">Lihat Request Barang</a>
             </div>
         }
         else
         {
             <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
 
-                @* LEFT LIST *@
-                <div class="plist" id="request-list">
-                    @foreach (var r in myRequests)
+                <div class="plist" id="penawaran-list">
+                    @foreach (var offer in myOffers)
                     {
-                        var daysLeft = (r.ExpiresAt - DateTime.UtcNow).Days;
-                        var firstImg = r.Images.FirstOrDefault();
-                        var isOpen = r.Status == ItemRequestStatus.Open;
-
-                        var acceptedOffer = r.Offers.FirstOrDefault(o =>
-                            o.Status == RequestOfferStatus.Accepted ||
-                            o.Status == RequestOfferStatus.Shipped ||
-                            o.Status == RequestOfferStatus.Delivered);
+                        var req = offer.ItemRequest;
+                        var firstReqImg = req?.Images.FirstOrDefault();
 
                         string statusLabel;
                         string statusClass;
-                        if (acceptedOffer?.Status == RequestOfferStatus.Shipped)
-                        { statusLabel = "Dikirim"; statusClass = "pbadge-pending"; }
-                        else if (acceptedOffer?.Status == RequestOfferStatus.Delivered)
-                        { statusLabel = "Selesai"; statusClass = "pbadge-available"; }
-                        else if (acceptedOffer?.Status == RequestOfferStatus.Accepted)
-                        { statusLabel = "Diterima"; statusClass = "pbadge-claimed"; }
-                        else if (r.Status == ItemRequestStatus.Fulfilled)
-                        { statusLabel = "Terpenuhi"; statusClass = "pbadge-available"; }
-                        else if (isOpen)
-                        { statusLabel = "Open"; statusClass = "pbadge-claimed"; }
-                        else
-                        { statusLabel = r.Status.ToString(); statusClass = "pbadge-muted"; }
+                        switch (offer.Status)
+                        {
+                            case TransactionStatus.Accepted:
+                                statusLabel = "Diterima"; statusClass = "pbadge-claimed"; break;
+                            case TransactionStatus.Shipped:
+                                statusLabel = "Dikirim"; statusClass = "pbadge-pending"; break;
+                            case TransactionStatus.Delivered:
+                                statusLabel = "Selesai"; statusClass = "pbadge-available"; break;
+                            case TransactionStatus.Rejected:
+                                statusLabel = "Ditolak"; statusClass = "pbadge-rejected"; break;
+                            default:
+                                statusLabel = "Menunggu"; statusClass = "pbadge-muted"; break;
+                        }
 
-                        <a class="plist-item @(selected?.Id == r.Id ? "active" : "")"
-                           href="/Request/MyRequests?selectedId=@r.Id">
-                            @if (firstImg != null)
+                        <a class="plist-item @(selected?.Id == offer.Id ? "active" : "")"
+                           href="/Donasi/PenawaranDonasi?selectedId=@offer.Id">
+                            @if (firstReqImg != null)
                             {
-                                <img src="@firstImg.FilePath" class="plist-thumb" style="object-fit:cover;" />
+                                <img src="@firstReqImg.FilePath" class="plist-thumb" style="object-fit:cover;" />
                             }
                             else
                             {
                                 <div class="plist-thumb"><i class="ti ti-list-search" aria-hidden="true"></i></div>
                             }
                             <div style="flex:1;min-width:0;">
-                                <div class="plist-name">@r.Title</div>
-                                <div class="plist-sub">
-                                    @CategoryHelper.DisplayName(r.Kategori)
-                                    @if (isOpen) { <span>· @daysLeft hari lagi</span> }
-                                    @if (r.Offers.Any()) { <span>· @r.Offers.Count penawaran</span> }
-                                </div>
+                                <div class="plist-name">@(req?.Title ?? "Request dihapus")</div>
+                                <div class="plist-sub">@offer.NamaBarang · @offer.Jumlah pcs</div>
                             </div>
                             <span class="pbadge @statusClass">@statusLabel</span>
                         </a>
                     }
                 </div>
 
-                @* RIGHT DETAIL *@
-                <div class="pdetail" id="request-detail">
+                <div class="pdetail" id="penawaran-detail">
                     @if (selected == null)
                     {
-                        <div class="pdetail-empty">Pilih request untuk melihat detail.</div>
+                        <div class="pdetail-empty">Pilih penawaran untuk melihat detail.</div>
                     }
                     else
                     {
-                        var isOpen = selected.Status == ItemRequestStatus.Open;
-                        var daysLeft = (selected.ExpiresAt - DateTime.UtcNow).Days;
-                        var firstImg = selected.Images.FirstOrDefault();
-                        var pendingOffers = selected.Offers.Where(o => o.Status == RequestOfferStatus.Pending).ToList();
-                        var activeOffer = selected.Offers.FirstOrDefault(o =>
-                            o.Status == RequestOfferStatus.Accepted ||
-                            o.Status == RequestOfferStatus.Shipped ||
-                            o.Status == RequestOfferStatus.Delivered);
-                        var rejectedOffers = selected.Offers.Where(o => o.Status == RequestOfferStatus.Rejected).ToList();
+                        var req = selected.ItemRequest;
+                        var alreadyReviewed = selected.ItemRequest?.Feedbacks.Any() ?? false;
+                        var firstReqImg = req?.Images.FirstOrDefault();
+                        var reqOwnerInitial = req?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
+                        var reqOwnerName = req?.User != null ? req.User.NamaDepan + " " + req.User.NamaBelakang : "Unknown";
 
-                        @* Header *@
+                        string statusLabel; string statusClass; string statusDesc; string dotColor;
+                        switch (selected.Status)
+                        {
+                            case TransactionStatus.Accepted:
+                                statusLabel = "Diterima"; statusClass = "pbadge-claimed";
+                                statusDesc = "Penawaran Anda diterima — siap untuk dikirim.";
+                                dotColor = "#2563eb"; break;
+                            case TransactionStatus.Shipped:
+                                statusLabel = "Dikirim"; statusClass = "pbadge-pending";
+                                statusDesc = "Barang sudah ditandai dikirim. Menunggu konfirmasi penerimaan.";
+                                dotColor = "#f59e0b"; break;
+                            case TransactionStatus.Delivered:
+                                statusLabel = "Selesai"; statusClass = "pbadge-available";
+                                statusDesc = "Barang telah diterima. Transaksi selesai.";
+                                dotColor = "#22c55e"; break;
+                            case TransactionStatus.Rejected:
+                                statusLabel = "Ditolak"; statusClass = "pbadge-rejected";
+                                statusDesc = "Penawaran Anda tidak dipilih kali ini.";
+                                dotColor = "#ef4444"; break;
+                            default:
+                                statusLabel = "Menunggu"; statusClass = "pbadge-muted";
+                                statusDesc = "Menunggu konfirmasi dari peminta.";
+                                dotColor = "#f59e0b"; break;
+                        }
+
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
-                            @if (firstImg != null)
+                            @if (firstReqImg != null)
                             {
-                                <img src="@firstImg.FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                <img src="@firstReqImg.FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                            }
+                            else
+                            {
+                                <div class="plist-thumb" style="width:60px;height:60px;flex-shrink:0;"><i class="ti ti-list-search" aria-hidden="true" style="font-size:22px;"></i></div>
                             }
                             <div style="flex:1;">
-                                <div class="pdetail-title" style="margin-bottom:8px;">@selected.Title</div>
-                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
-                                    @if (selected.KondisiMinimum.HasValue) { <span class="pbadge pbadge-muted">Min: @selected.KondisiMinimum</span> }
-                                    <span class="pbadge pbadge-muted">@selected.Jumlah pcs</span>
-                                    <span class="pbadge pbadge-muted">@selected.Lokasi</span>
-                                    @if (isOpen) { <span class="pbadge pbadge-muted">@daysLeft hari lagi</span> }
+                                <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Request dari</div>
+                                <div class="pdetail-title" style="margin-bottom:8px;">@(req?.Title ?? "Request dihapus")</div>
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">@reqOwnerInitial</div>
+                                    <span style="font-size:12px;color:#64748b;">@reqOwnerName</span>
                                 </div>
                             </div>
-                            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
-                                @if (isOpen)
+                            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+                                <span class="pbadge @statusClass">@statusLabel</span>
+                                @if (req != null)
                                 {
-                                    <button onclick="runMatch(@selected.Id, this)" class="pbtn" style="font-size:12px;padding:5px 12px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-color:#2563eb;">
-                                        <i class="ti ti-search" aria-hidden="true"></i> Cari Cocok
-                                    </button>
-                                    <a href="/Request/EditView/@selected.Id" class="pbtn" style="font-size:12px;padding:5px 12px;">
-                                        <i class="ti ti-edit" aria-hidden="true"></i> Edit
-                                    </a>
-                                    <form asp-controller="Request" asp-action="DeleteRequest" method="post" onsubmit="return confirm('Hapus request ini?')">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@selected.Id" />
-                                        <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:5px 12px;">
-                                            <i class="ti ti-trash" aria-hidden="true"></i> Hapus
-                                        </button>
-                                    </form>
+                                    <a asp-controller="Request" asp-action="Detail" asp-route-id="@req.Id" style="font-size:11px;color:#2563eb;text-decoration:none;">Lihat request →</a>
                                 }
-                                <a asp-controller="Request" asp-action="Detail" asp-route-id="@selected.Id" class="pbtn" style="font-size:12px;padding:5px 12px;">
-                                    <i class="ti ti-external-link" aria-hidden="true"></i> Lihat Publik
-                                </a>
                             </div>
                         </div>
 
-                        @* Description *@
                         <div class="psec">
-                            <div class="psec-label">Deskripsi</div>
-                            <p style="font-size:13px;color:#334155;line-height:1.6;margin:0;">@selected.Deskripsi</p>
+                            <div class="psec-label">Penawaran Anda</div>
+                            <div style="display:flex;gap:12px;align-items:flex-start;">
+                                @if (selected.Images.Any())
+                                {
+                                    <img src="@selected.Images.First().FilePath" style="width:64px;height:64px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                }
+                                <div style="flex:1;">
+                                    <div style="font-size:14px;font-weight:600;color:#0f172a;margin-bottom:4px;">@selected.NamaBarang</div>
+                                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                                        <span class="pbadge pbadge-muted">@selected.Kondisi</span>
+                                        <span class="pbadge pbadge-muted">@selected.Jumlah pcs</span>
+                                        @if (!string.IsNullOrEmpty(selected.Lokasi))
+                                        {
+                                            <span class="pbadge pbadge-muted">
+                                                <i class="ti ti-map-pin" style="font-size:10px;" aria-hidden="true"></i>
+                                                @selected.Lokasi@(!string.IsNullOrEmpty(selected.Provinsi) ? ", " + selected.Provinsi : "")
+                                            </span>
+                                        }
+                                    </div>
+                                    <div style="font-size:13px;color:#64748b;line-height:1.5;">@selected.Deskripsi</div>
+                                </div>
+                            </div>
                         </div>
 
-                        @* Active offer with shipping stepper *@
-                        @if (activeOffer != null)
+                        @if (selected.Status != TransactionStatus.Pending && selected.Status != TransactionStatus.Rejected)
                         {
-                            var offerAvatar = activeOffer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
-                            var offerName = activeOffer.User != null ? activeOffer.User.NamaDepan + " " + activeOffer.User.NamaBelakang : "Unknown";
-                            var isDelivered = activeOffer.Status == RequestOfferStatus.Delivered;
-
                             <div class="psec">
-                                <div class="psec-label">Penawaran Diterima</div>
-                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-                                    <div class="preview-avatar" style="width:30px;height:30px;font-size:12px;flex-shrink:0;">@offerAvatar</div>
-                                    <div style="flex:1;">
-                                        <div style="font-size:13px;font-weight:600;color:#0f172a;">@offerName</div>
-                                        <div style="font-size:11px;color:#64748b;">@activeOffer.NamaBarang · @activeOffer.Kondisi · @activeOffer.Jumlah pcs</div>
-                                    </div>
-                                </div>
-
-                                @* Stepper *@
+                                <div class="psec-label">Status Pengiriman</div>
                                 <div class="pstepper" style="margin-bottom:14px;">
                                     <div class="pstep done">
                                         <div class="pstep-dot done"><i class="ti ti-check" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
-                                    <div class="pstep-line @(activeOffer.Status >= RequestOfferStatus.Shipped ? "done" : "")"></div>
-                                    <div class="pstep @(activeOffer.Status >= RequestOfferStatus.Shipped ? "done" : "")">
-                                        <div class="pstep-dot @(activeOffer.Status >= RequestOfferStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
+                                    <div class="pstep-line @(selected.Status >= TransactionStatus.Shipped ? "done" : "")"></div>
+                                    <div class="pstep @(selected.Status >= TransactionStatus.Shipped ? "done" : "")">
+                                        <div class="pstep-dot @(selected.Status >= TransactionStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Dikirim</div>
                                     </div>
-                                    <div class="pstep-line @(activeOffer.Status == RequestOfferStatus.Delivered ? "done" : "")"></div>
-                                    <div class="pstep @(activeOffer.Status == RequestOfferStatus.Delivered ? "done" : "")">
-                                        <div class="pstep-dot @(activeOffer.Status == RequestOfferStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
+                                    <div class="pstep-line @(selected.Status == TransactionStatus.Delivered ? "done" : "")"></div>
+                                    <div class="pstep @(selected.Status == TransactionStatus.Delivered ? "done" : "")">
+                                        <div class="pstep-dot @(selected.Status == TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
-                                    <div class="pstep-line @(activeOffer.Feedbacks.Any() ? "done" : "")"></div>
-                                    <div class="pstep @(activeOffer.Feedbacks.Any() ? "done" : "")">
-                                        <div class="pstep-dot @(activeOffer.Feedbacks.Any() ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
+                                    <div class="pstep-line @(alreadyReviewed ? "done" : "")"></div>
+                                    <div class="pstep @(alreadyReviewed ? "done" : "")">
+                                        <div class="pstep-dot @(alreadyReviewed ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Feedback</div>
                                     </div>
                                 </div>
 
-                                @* Action buttons *@
-                                @if (activeOffer.Status == RequestOfferStatus.Accepted)
+                                @if (selected.Status == TransactionStatus.Accepted)
                                 {
-                                    <form asp-controller="Request" asp-action="MarkOfferShipped" method="post">
+                                    <p style="font-size:12px;color:#64748b;text-align:center;">Menunggu peminta menandai barang dikirim...</p>
+                                }
+                                else if (selected.Status == TransactionStatus.Shipped)
+                                {
+                                    <form asp-controller="Request" asp-action="MarkOfferDelivered" method="post">
                                         @Html.AntiForgeryToken()
-                                        <input type="hidden" name="offerId" value="@activeOffer.Id" />
-                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="font-size:12px;">
-                                            <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
+                                        <input type="hidden" name="offerId" value="@selected.Id" />
+                                        <button type="submit" class="pbtn pbtn-success pbtn-block" style="font-size:12px;">
+                                            <i class="ti ti-package" aria-hidden="true"></i> Konfirmasi Barang Diterima
                                         </button>
                                     </form>
                                 }
-                                else if (activeOffer.Status == RequestOfferStatus.Shipped)
+                                else if (selected.Status == TransactionStatus.Delivered)
                                 {
-                                    <p style="font-size:12px;color:#64748b;text-align:center;padding:4px 0;">Menunggu konfirmasi penerimaan dari pengirim...</p>
-                                }
-                                else if (isDelivered)
-                                {
-                                    <p style="font-size:12px;color:#16a34a;text-align:center;padding:4px 0;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                    <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah dikonfirmasi diterima</p>
                                 }
                             </div>
                         }
-
-                        @* Pending offers *@
-                        @if (pendingOffers.Any())
+                        else
                         {
                             <div class="psec">
-                                <div class="psec-label">Penawaran Masuk (@pendingOffers.Count)</div>
-                                <div style="display:flex;flex-direction:column;gap:8px;">
-                                    @foreach (var offer in pendingOffers)
-                                    {
-                                        var avatar = offer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
-                                        var name = offer.User != null ? offer.User.NamaDepan + " " + offer.User.NamaBelakang : "Unknown";
-                                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
-                                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                                                <div class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;">@avatar</div>
-                                                <div style="flex:1;">
-                                                    <div style="font-size:13px;font-weight:600;color:#0f172a;">@name</div>
-                                                    <div style="font-size:11px;color:#64748b;">@offer.NamaBarang · @offer.Kondisi · @offer.Jumlah pcs</div>
-                                                </div>
-                                                @if (offer.Images.Any())
-                                                {
-                                                    <img src="@offer.Images.First().FilePath" style="width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;" />
-                                                }
-                                            </div>
-                                            @if (!string.IsNullOrEmpty(offer.Lokasi))
-                                            {
-                                                <div style="font-size:12px;color:#64748b;margin-bottom:6px;">
-                                                    <i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i>
-                                                    @offer.Lokasi@(!string.IsNullOrEmpty(offer.Provinsi) ? ", " + offer.Provinsi : "")
-                                                </div>
-                                            }
-                                            <div style="font-size:12px;color:#64748b;margin-bottom:10px;line-height:1.5;">@offer.Deskripsi</div>
-                                            @if (isOpen && activeOffer == null)
-                                            {
-                                                <div style="display:flex;gap:6px;">
-                                                    <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="offerId" value="@offer.Id" />
-                                                        <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 12px;">Terima</button>
-                                                    </form>
-                                                    <form asp-controller="Request" asp-action="RejectOffer" method="post" style="display:inline;">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="offerId" value="@offer.Id" />
-                                                        <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 12px;">Tolak</button>
-                                                    </form>
-                                                </div>
-                                            }
-                                        </div>
-                                    }
+                                <div class="psec-label">Status</div>
+                                <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+                                    <div style="width:8px;height:8px;border-radius:50%;background:@dotColor;flex-shrink:0;"></div>
+                                    <span style="font-size:13px;color:#334155;">@statusDesc</span>
                                 </div>
+                                <div style="font-size:11px;color:#94a3b8;margin-top:6px;">Ditawarkan @((DateTime.UtcNow - selected.CreatedAt).Days) hari lalu</div>
                             </div>
                         }
 
-                        @* Rejected offers history *@
-                        @if (rejectedOffers.Any())
+                        @if (selected.Status == TransactionStatus.Delivered)
                         {
                             <div class="psec">
-                                <div class="psec-label">Penawaran Ditolak (@rejectedOffers.Count)</div>
-                                <div style="display:flex;flex-direction:column;gap:6px;">
-                                    @foreach (var offer in rejectedOffers)
-                                    {
-                                        var avatar = offer.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
-                                        var name = offer.User != null ? offer.User.NamaDepan + " " + offer.User.NamaBelakang : "Unknown";
-                                        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
-                                            <div class="preview-avatar" style="width:26px;height:26px;font-size:11px;flex-shrink:0;">@avatar</div>
-                                            <div style="flex:1;min-width:0;">
-                                                <div style="font-size:13px;font-weight:500;color:#0f172a;">@name</div>
-                                                <div style="font-size:11px;color:#64748b;">@offer.NamaBarang · @offer.Jumlah pcs</div>
-                                            </div>
-                                            <span class="pbadge pbadge-rejected">Ditolak</span>
+                                @if (alreadyReviewed)
+                                {
+                                    var myReview = selected.ItemRequest!.Feedbacks.First();
+                                    <div class="psec-label">Feedback Anda</div>
+                                    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+                                        <div style="display:flex;gap:2px;">
+                                            @for (int star = 1; star <= 5; star++)
+                                            {
+                                                <span style="font-size:20px;color:@(star <= myReview.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
+                                            }
                                         </div>
-                                    }
-                                </div>
+                                        @if (!string.IsNullOrEmpty(myReview.Komentar))
+                                        {
+                                            <span style="font-size:13px;color:#64748b;">— @myReview.Komentar</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="psec-label">Beri Feedback untuk Peminta</div>
+                                    <form asp-controller="Reputation" asp-action="Submit" method="post" style="margin-top:10px;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="itemRequestId" value="@req?.Id" />
+                                        <input type="hidden" name="rating" id="ratingValue" value="0" />
+                                        <div style="display:flex;gap:4px;margin-bottom:12px;">
+                                            @for (int star = 1; star <= 5; star++)
+                                            {
+                                                <button type="button" class="pstar-btn" data-value="@star">★</button>
+                                            }
+                                        </div>
+                                        <div class="pform-group">
+                                            <textarea class="pform-input" name="komentar" rows="3"
+                                                      placeholder="Ceritakan pengalaman berdonasi..." style="resize:vertical;"></textarea>
+                                        </div>
+                                        <button type="submit" class="pbtn pbtn-primary pbtn-block">Kirim Feedback</button>
+                                    </form>
+                                }
                             </div>
                         }
                     }
@@ -301,25 +266,23 @@
     </div>
 </div>
 
-@await Html.PartialAsync("~/Views/Profile/Bar/_MatchModal.cshtml", new ViewDataDictionary(Html.MetadataProvider, Html.ViewData.ModelState) {
-    { "MatchesJson", matchesJson },
-    { "MatchCount", matchCount },
-    { "MatchContext", matchContext },
-    { "SourceId", sourceId }
-})
-
 <script>
-    function runMatch(requestId, btn) {
-        var orig = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="ti ti-loader-2" style="animation:spin 0.6s linear infinite;display:inline-block;" aria-hidden="true"></i>';
-        fetch('/Request/FindMatches?requestId=' + requestId)
-        .then(function(r) { return r.json(); })
-        .then(function(data) {
-            btn.disabled = false; btn.innerHTML = orig;
-            if (data.success) window.openMatchModal(data.matches, data.context, data.sourceId);
-            else alert(data.error || 'Gagal mencari kecocokan.');
-        })
-        .catch(function() { btn.disabled = false; btn.innerHTML = orig; alert('Terjadi kesalahan.'); });
-    }
+    (function() {
+        document.querySelectorAll('.pstar-btn').forEach(function(btn) {
+            btn.addEventListener('mouseover', function() {
+                var val = parseInt(this.dataset.value);
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+            });
+            btn.addEventListener('mouseout', function() {
+                var sel = parseInt(document.getElementById('ratingValue')?.value || 0);
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
+            });
+            btn.addEventListener('click', function() {
+                var val = parseInt(this.dataset.value);
+                var rv = document.getElementById('ratingValue');
+                if (rv) rv.value = val;
+                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+            });
+        });
+    })();
 </script>
