@@ -15,13 +15,16 @@ public class DonasiController : AppBaseController
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _env;
     private readonly MatchingService _matching;
+    private readonly PointsService _pointsService;
 
-    public DonasiController(AppDbContext db, UserManager<ApplicationUser> userManager, IWebHostEnvironment env, MatchingService matching)
-        : base(db, userManager)
+    public DonasiController(AppDbContext db, UserManager<ApplicationUser> userManager,
+     IWebHostEnvironment env, MatchingService matching, PointsService pointsService)
+     : base(db, userManager)
     {
         _userManager = userManager;
         _env = env;
         _matching = matching;
+        _pointsService = pointsService;
     }
 
     public async Task<IActionResult> Index(int? selectedId)
@@ -558,6 +561,7 @@ public class DonasiController : AppBaseController
         });
 
         await _db.SaveChangesAsync();
+        await _pointsService.AwardPointsAsync(request.Item.UserId, claimRequestId, null);
         return RedirectToAction("Permintaan", "Request");
     }
 

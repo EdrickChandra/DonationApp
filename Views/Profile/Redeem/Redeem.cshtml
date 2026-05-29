@@ -1,0 +1,444 @@
+﻿@using DonationApp.Models
+@{
+    var items = ViewBag.RedeemItems as List<RedeemItem> ?? new List<RedeemItem>();
+    var history = ViewBag.RedeemHistory as List<RedeemTransaction> ?? new List<RedeemTransaction>();
+    var pointHistory = ViewBag.PointHistory as List<PointTransaction> ?? new List<PointTransaction>();
+    var userPoints = (int)(ViewBag.UserPoints ?? 0);
+}
+
+<div class="ppage">
+    <div class="ppage-inner" style="max-width:860px;">
+
+        <div class="redeem-hero">
+            <div class="redeem-hero-left">
+                <div class="redeem-coin-icon">
+                    <i class="ti ti-coin" aria-hidden="true"></i>
+                </div>
+                <div>
+                    <div class="redeem-points-label">Poin Anda</div>
+                    <div class="redeem-points-value">@userPoints <span>poin</span></div>
+                    <div class="redeem-points-hint">Setiap donasi selesai = 10 poin</div>
+                </div>
+            </div>
+            <div class="redeem-hero-right">
+                <div class="redeem-hero-stat">
+                    <div class="redeem-hero-stat-val">@pointHistory.Where(p => p.Amount > 0).Sum(p => p.Amount)</div>
+                    <div class="redeem-hero-stat-label">Total diperoleh</div>
+                </div>
+                <div class="redeem-hero-stat">
+                    <div class="redeem-hero-stat-val">@history.Count</div>
+                    <div class="redeem-hero-stat-label">Penukaran</div>
+                </div>
+            </div>
+        </div>
+
+        @if (TempData["RedeemSuccess"] != null)
+        {
+            <div style="background:#dcfce7;border:1px solid #86efac;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:8px;">
+                <i class="ti ti-circle-check" aria-hidden="true"></i>
+                @TempData["RedeemSuccess"]
+            </div>
+        }
+        @if (TempData["RedeemError"] != null)
+        {
+            <div class="pform-error-banner" style="display:flex;align-items:center;gap:8px;">
+                <i class="ti ti-alert-circle" aria-hidden="true"></i>
+                @TempData["RedeemError"]
+            </div>
+        }
+
+        <div class="ptab-bar" style="margin-bottom:20px;">
+            <button class="ptab active" onclick="switchRedeemTab('katalog', this)">
+                <i class="ti ti-gift" aria-hidden="true"></i> Katalog
+            </button>
+            <button class="ptab" onclick="switchRedeemTab('riwayat', this)">
+                <i class="ti ti-history" aria-hidden="true"></i> Riwayat Penukaran
+            </button>
+            <button class="ptab" onclick="switchRedeemTab('poin', this)">
+                <i class="ti ti-chart-bar" aria-hidden="true"></i> Riwayat Poin
+            </button>
+        </div>
+
+        <div id="redeem-tab-katalog">
+            @if (!items.Any())
+            {
+                <div class="preview-card" style="padding:48px;text-align:center;">
+                    <i class="ti ti-gift-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
+                    <p style="font-size:13px;color:#64748b;">Belum ada item yang tersedia untuk ditukar.</p>
+                </div>
+            }
+            else
+            {
+                <div class="redeem-grid">
+                    @foreach (var item in items)
+                    {
+                        var canRedeem = userPoints >= item.PointCost && item.Stock > 0;
+                        <div class="redeem-card @(!canRedeem ? "redeem-card-disabled" : "")">
+                            <div class="redeem-card-img">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.Name" />
+                                }
+                                else
+                                {
+                                    <div class="redeem-card-img-placeholder">
+                                        <i class="ti ti-gift" aria-hidden="true"></i>
+                                    </div>
+                                }
+                                @if (item.Stock <= 0)
+                                {
+                                    <div class="redeem-card-sold-out">Habis</div>
+                                }
+                            </div>
+                            <div class="redeem-card-body">
+                                <div class="redeem-card-name">@item.Name</div>
+                                <div class="redeem-card-desc">@item.Description</div>
+                                <div class="redeem-card-footer">
+                                    <div class="redeem-card-cost">
+                                        <i class="ti ti-coin" aria-hidden="true"></i>
+                                        @item.PointCost poin
+                                    </div>
+                                    @if (item.Stock > 0)
+                                    {
+                                        <span style="font-size:11px;color:#94a3b8;">Stok: @item.Stock</span>
+                                    }
+                                </div>
+                                @if (canRedeem)
+                                {
+                                    <form asp-controller="Redeem" asp-action="Redeem" method="post"
+                                          onsubmit="return confirm('Tukar @item.Name seharga @item.PointCost poin?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="redeemItemId" value="@item.Id" />
+                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="margin-top:10px;font-size:12px;">
+                                            <i class="ti ti-exchange" aria-hidden="true"></i> Tukar Sekarang
+                                        </button>
+                                    </form>
+                                }
+                                else if (item.Stock <= 0)
+                                {
+                                    <button class="pbtn pbtn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>Stok Habis</button>
+                                }
+                                else
+                                {
+                                    <button class="pbtn pbtn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>
+                                        Kurang @(item.PointCost - userPoints) poin lagi
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div id="redeem-tab-riwayat" style="display:none;">
+            @if (!history.Any())
+            {
+                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
+                    Belum ada riwayat penukaran.
+                </div>
+            }
+            else
+            {
+                <div class="preview-card">
+                    @foreach (var r in history)
+                    {
+                        var statusLabel = r.Status switch
+                        {
+                            RedeemStatus.Pending => "Diproses",
+                            RedeemStatus.Fulfilled => "Selesai",
+                            RedeemStatus.Cancelled => "Dibatalkan",
+                            _ => "-"
+                        };
+                        var statusClass = r.Status switch
+                        {
+                            RedeemStatus.Pending => "pbadge-pending",
+                            RedeemStatus.Fulfilled => "pbadge-available",
+                            RedeemStatus.Cancelled => "pbadge-rejected",
+                            _ => "pbadge-muted"
+                        };
+                        <div class="preview-item">
+                            <div style="width:36px;height:36px;border-radius:8px;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="ti ti-gift" style="color:#854d0e;font-size:18px;" aria-hidden="true"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <div class="preview-name">@(r.RedeemItem?.Name ?? "Item")</div>
+                                <div style="font-size:11px;color:#64748b;margin-top:2px;">
+                                    <i class="ti ti-coin" style="font-size:11px;" aria-hidden="true"></i>
+                                    @r.PointsSpent poin · @r.CreatedAt.ToString("dd MMM yyyy")
+                                </div>
+                            </div>
+                            <span class="pbadge @statusClass">@statusLabel</span>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div id="redeem-tab-poin" style="display:none;">
+            @if (!pointHistory.Any())
+            {
+                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
+                    Belum ada riwayat poin.
+                </div>
+            }
+            else
+            {
+                <div class="preview-card">
+                    @foreach (var p in pointHistory)
+                    {
+                        var typeLabel = p.Type switch
+                        {
+                            PointTransactionType.DonationCompleted => "Donasi selesai",
+
+                            PointTransactionType.SpendPoint => "Penukaran item",
+                            _ => "Lainnya"
+                        };
+                        var isPositive = p.Amount > 0;
+                        <div class="preview-item">
+                            <div style="width:36px;height:36px;border-radius:8px;background:@(isPositive ? "#dcfce7" : "#fee2e2");display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="ti @(isPositive ? "ti-arrow-up" : "ti-arrow-down")" style="color:@(isPositive ? "#166534" : "#dc2626");font-size:16px;" aria-hidden="true"></i>
+                            </div>
+                            <div style="flex:1;">
+                                <div class="preview-name">@typeLabel</div>
+                                <div style="font-size:11px;color:#64748b;margin-top:2px;">@p.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div>
+                            </div>
+                            <div style="font-size:14px;font-weight:700;color:@(isPositive ? "#16a34a" : "#dc2626");font-family:'Plus Jakarta Sans',sans-serif;">
+                                @(isPositive ? "+" : "")@p.Amount
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .redeem-hero {
+        background: linear-gradient(135deg, #0f1f3d 0%, #1e3a5f 100%);
+        border-radius: 14px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        gap: 16px;
+    }
+
+    .redeem-hero-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .redeem-coin-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 12px;
+        background: rgba(234,179,8,0.2);
+        border: 1.5px solid rgba(234,179,8,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+        .redeem-coin-icon i {
+            font-size: 28px;
+            color: #eab308;
+        }
+
+    .redeem-points-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        margin-bottom: 4px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .redeem-points-value {
+        font-size: 32px;
+        font-weight: 800;
+        color: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        line-height: 1;
+    }
+
+        .redeem-points-value span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+    .redeem-points-hint {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 4px;
+    }
+
+    .redeem-hero-right {
+        display: flex;
+        gap: 24px;
+        flex-shrink: 0;
+    }
+
+    .redeem-hero-stat {
+        text-align: center;
+    }
+
+    .redeem-hero-stat-val {
+        font-size: 20px;
+        font-weight: 700;
+        color: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .redeem-hero-stat-label {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 2px;
+    }
+
+    .redeem-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 14px;
+    }
+
+    .redeem-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+        .redeem-card:not(.redeem-card-disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+    .redeem-card-disabled {
+        opacity: 0.6;
+    }
+
+    .redeem-card-img {
+        height: 140px;
+        background: #f1f5f9;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .redeem-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .redeem-card-img-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 44px;
+        color: #cbd5e1;
+    }
+
+    .redeem-card-sold-out {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .redeem-card-body {
+        padding: 14px;
+    }
+
+    .redeem-card-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin-bottom: 4px;
+    }
+
+    .redeem-card-desc {
+        font-size: 12px;
+        color: #64748b;
+        line-height: 1.5;
+        margin-bottom: 10px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .redeem-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .redeem-card-cost {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #854d0e;
+        background: #fef9c3;
+        padding: 4px 10px;
+        border-radius: 99px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+        .redeem-card-cost i {
+            font-size: 13px;
+        }
+    @@media (max-width: 768px) {
+        .redeem-hero {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .redeem-hero-right {
+            width: 100%;
+            justify-content: space-around;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .redeem-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+    }
+</style>
+
+<script>
+    (function() {
+        function switchRedeemTab(tab, btn) {
+            ['katalog','riwayat','poin'].forEach(function(t) {
+                var el = document.getElementById('redeem-tab-' + t);
+                if (el) el.style.display = t === tab ? 'block' : 'none';
+            });
+            document.querySelectorAll('.ptab-bar .ptab').forEach(function(b) {
+                b.classList.remove('active');
+            });
+            if (btn) btn.classList.add('active');
+        }
+        window.switchRedeemTab = switchRedeemTab;
+    })();
+</script>

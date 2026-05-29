@@ -32,6 +32,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddSignalR();
 builder.Services.AddScoped<MatchingService>();
+builder.Services.AddScoped<PointsService>();
 
 builder.Services.AddSession(options =>
 {
@@ -40,12 +41,59 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (!db.RedeemItems.Any())
+    {
+        db.RedeemItems.AddRange(
+            new RedeemItem { Name = "Voucher Belanja Rp10.000", Description = "Voucher belanja online senilai Rp10.000", PointCost = 50, Stock = 100, IsActive = true },
+            new RedeemItem { Name = "Voucher Belanja Rp25.000", Description = "Voucher belanja online senilai Rp25.000", PointCost = 120, Stock = 50, IsActive = true },
+            new RedeemItem { Name = "Stiker IDonasi Eksklusif", Description = "Paket stiker eksklusif dari IDonasi", PointCost = 30, Stock = 200, IsActive = true },
+            new RedeemItem { Name = "Pin IDonasi", Description = "Pin eksklusif IDonasi untuk koleksi", PointCost = 20, Stock = 150, IsActive = true }
+        );
+        db.SaveChanges();
+    }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    var adminEmail = "admin@idonasi.com";
+    var existing = await userManager.FindByEmailAsync(adminEmail);
+
+    if (existing == null)
+    {
+        var admin = new ApplicationUser
+        {
+            UserName = "Admin",
+            Email = adminEmail,
+            NamaDepan = "Admin",
+            NamaBelakang = "IDonasi",
+            Alamat = "Jakarta",
+            Kota = "Jakarta Pusat",
+            Provinsi = "DKI Jakarta",
+            IsAdmin = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await userManager.CreateAsync(admin, "Admin123!");
+    }
+    else if (!existing.IsAdmin)
+    {
+        existing.IsAdmin = true;
+        await userManager.UpdateAsync(existing);
+    }
 }
 
 app.UseHttpsRedirection();

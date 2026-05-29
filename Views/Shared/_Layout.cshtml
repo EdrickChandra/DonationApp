@@ -26,7 +26,7 @@
                 <input type="hidden" name="tab" id="searchTabHidden" value="donasi" />
             </form>
         }
-
+        
         <div class="nav-links-desktop" style="margin-left:12px;">
             <a class="nav-page-link" asp-controller="Home" asp-action="Index">Donasi</a>
             <a class="nav-page-link" asp-controller="Request" asp-action="Index">Request</a>
@@ -56,8 +56,16 @@
                         <span class="nav-username">@(User.Identity?.Name ?? "")</span>
                         <span style="font-size:10px;">▼</span>
                     </div>
+
                     <div class="dropdown-menu" id="dropdownMenu">
                         <a class="dropdown-item" asp-controller="Profile" asp-action="Edit">Profil</a>
+                        @{
+                            var navUser = ViewBag.NavUser as DonationApp.Models.ApplicationUser;
+                        }
+                        @if (navUser != null && navUser.IsAdmin)
+                        {
+                            <a class="dropdown-item" asp-controller="Admin" asp-action="Reports">Panel Admin</a>
+                        }
                         <a class="dropdown-item" asp-controller="Donasi" asp-action="Index">Donasi Saya</a>
                         <a class="dropdown-item" asp-controller="Request" asp-action="MyRequests">Request Saya</a>
                         <a class="dropdown-item" asp-controller="Pesan" asp-action="Index">Pesan</a>

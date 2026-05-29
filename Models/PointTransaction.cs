@@ -18,12 +18,16 @@ public class PointTransaction
 
     public int? ClaimRequestId { get; set; }
     public int? RequestOfferId { get; set; }
+    public int? RedeemItemId { get; set; }
 
     [ForeignKey("ClaimRequestId")]
     public ClaimRequest? ClaimRequest { get; set; }
 
     [ForeignKey("RequestOfferId")]
     public RequestOffer? RequestOffer { get; set; }
+
+    [ForeignKey("RedeemItemId")]
+    public RedeemItem? RedeemItem { get; set; }
 
     public int Amount { get; set; }
 

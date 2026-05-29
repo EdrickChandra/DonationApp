@@ -89,6 +89,5 @@ public enum ReportStatus
 public enum PointTransactionType
 {
     DonationCompleted,
-    OfferAccepted,
-    Other
+    SpendPoint
 }

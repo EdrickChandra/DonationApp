@@ -14,13 +14,16 @@ public class RequestController : AppBaseController
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IWebHostEnvironment _environment;
     private readonly MatchingService _matchingService;
+    private readonly PointsService _pointsService;
 
-    public RequestController(AppDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment environment, MatchingService matchingService)
+    public RequestController(AppDbContext context, UserManager<ApplicationUser> userManager,
+        IWebHostEnvironment environment, MatchingService matchingService, PointsService pointsService)
         : base(context, userManager)
     {
         _userManager = userManager;
         _environment = environment;
         _matchingService = matchingService;
+        _pointsService = pointsService;
     }
 
     [Authorize]
@@ -623,6 +626,7 @@ public class RequestController : AppBaseController
         });
 
         await _db.SaveChangesAsync();
+        await _pointsService.AwardPointsAsync(offer.UserId, null, offerId);
         return RedirectToAction("PenawaranDonasi", "Donasi", new { selectedId = offerId });
     }
 }

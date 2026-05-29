@@ -30,6 +30,8 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<RequestLimit> RequestLimits { get; set; }
 
+    public DbSet<RedeemItem> RedeemItems { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
