@@ -60,7 +60,7 @@
                     <div>
                         <div class="admin-field-label">Pelapor</div>
                         <div class="admin-field-value">@(Model.Reporter?.NamaDepan + " " + Model.Reporter?.NamaBelakang)</div>
-                        <div style="font-size:11px;color:#94a3b8;">@Model.Reporter?.Email</div>
+                        <div class="text-xs-dim">@Model.Reporter?.Email</div>
                     </div>
                     <div>
                         <div class="admin-field-label">Tanggal Laporan</div>
@@ -102,7 +102,7 @@
                             <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">
                                 @(Model.TargetUser.NamaDepan + " " + Model.TargetUser.NamaBelakang)
                             </div>
-                            <div style="font-size:12px;color:#64748b;">@Model.TargetUser.Email</div>
+                            <div class="text-sm-muted">@Model.TargetUser.Email</div>
                         </div>
                         @if (Model.TargetUser.IsBanned)
                         {
@@ -124,7 +124,7 @@
                         }
                         <div>
                             <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetDonation.NamaBarang</div>
-                            <div style="font-size:12px;color:#64748b;">@Model.TargetDonation.Kategori · @Model.TargetDonation.Lokasi</div>
+                            <div class="text-sm-muted">@Model.TargetDonation.Kategori · @Model.TargetDonation.Lokasi</div>
                         </div>
                         <a href="/Donasi/Detail/@Model.TargetDonation.Id" target="_blank"
                            style="margin-left:auto;font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">
@@ -146,7 +146,7 @@
                         }
                         <div>
                             <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetRequest.Title</div>
-                            <div style="font-size:12px;color:#64748b;">@Model.TargetRequest.Kategori · @Model.TargetRequest.Lokasi</div>
+                            <div class="text-sm-muted">@Model.TargetRequest.Kategori · @Model.TargetRequest.Lokasi</div>
                         </div>
                         <a href="/Request/Detail/@Model.TargetRequest.Id" target="_blank"
                            style="margin-left:auto;font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">
@@ -166,9 +166,9 @@
                             <div style="padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
                                     <span style="font-size:12px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@a.Action</span>
-                                    <span style="font-size:11px;color:#94a3b8;">@a.CreatedAt.ToString("dd MMM yyyy, HH:mm")</span>
+                                    <span class="text-xs-dim">@a.CreatedAt.ToString("dd MMM yyyy, HH:mm")</span>
                                 </div>
-                                <div style="font-size:12px;color:#64748b;">oleh @(a.Admin?.NamaDepan + " " + a.Admin?.NamaBelakang)</div>
+                                <div class="text-sm-muted">oleh @(a.Admin?.NamaDepan + " " + a.Admin?.NamaBelakang)</div>
                                 @if (!string.IsNullOrEmpty(a.Note))
                                 {
                                     <div style="font-size:12px;color:#334155;margin-top:4px;font-style:italic;">@a.Note</div>

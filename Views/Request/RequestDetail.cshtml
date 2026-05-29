@@ -73,7 +73,7 @@
 
                 <div class="duser-row">
                     <div class="avatar">@avatarLetter</div>
-                    <div style="flex:1;min-width:0;">
+                    <div class="flex-min">
                         <div class="detail-poster-name">@posterName</div>
                         <div style="display:flex;align-items:center;gap:5px;margin-top:1px;">
                             @if (totalReviews > 0)
@@ -82,11 +82,11 @@
                                 {
                                     <span style="color:@(s <= Math.Round(avgRating) ? "#EF9F27" : "#cbd5e1");font-size:11px;">★</span>
                                 }
-                                <span style="font-size:11px;color:#64748b;">@avgRating.ToString("0.0") · @totalReviews ulasan</span>
+                                <span class="text-xs-muted">@avgRating.ToString("0.0") · @totalReviews ulasan</span>
                             }
                             else
                             {
-                                <span style="font-size:11px;color:#94a3b8;">Belum ada ulasan</span>
+                                <span class="text-xs-dim">Belum ada ulasan</span>
                             }
                         </div>
                     </div>
@@ -133,7 +133,7 @@
 
             <div class="dcard">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                    <span style="font-size:13px;color:#64748b;">@Model.Offers.Count penawaran masuk</span>
+                    <span class="text-muted">@Model.Offers.Count penawaran masuk</span>
                 </div>
 
                 @if (!User.Identity!.IsAuthenticated)

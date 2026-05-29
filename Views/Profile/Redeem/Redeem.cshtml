@@ -64,7 +64,7 @@
             {
                 <div class="preview-card empty-state">
                     <i class="ti ti-gift-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
-                    <p style="font-size:13px;color:#64748b;">Belum ada item yang tersedia untuk ditukar.</p>
+                    <p class="text-muted">Belum ada item yang tersedia untuk ditukar.</p>
                 </div>
             }
             else
@@ -100,7 +100,7 @@
                                     </div>
                                     @if (item.Stock > 0)
                                     {
-                                        <span style="font-size:11px;color:#94a3b8;">Stok: @item.Stock</span>
+                                        <span class="text-xs-dim">Stok: @item.Stock</span>
                                     }
                                 </div>
                                 @if (canRedeem)

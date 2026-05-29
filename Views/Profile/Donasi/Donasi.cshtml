@@ -78,7 +78,7 @@
                             {
                                 <div class="plist-thumb"><i class="ti ti-gift" aria-hidden="true"></i></div>
                             }
-                            <div style="flex:1;min-width:0;">
+                            <div class="flex-min">
                                 <div class="plist-name">@d.NamaBarang</div>
                                 <div class="plist-sub">
                                     @CategoryHelper.DisplayName(d.Kategori)
@@ -175,7 +175,7 @@
                                                 <div class="avatar avatar-sm">@rAvatar</div>
                                                 <div style="flex:1;">
                                                     <div style="font-size:13px;font-weight:500;color:#0f172a;">@rName</div>
-                                                    <div style="font-size:11px;color:#64748b;">@r.Jumlah pcs · @r.User?.Alamat</div>
+                                                    <div class="text-xs-muted">@r.Jumlah pcs · @r.User?.Alamat</div>
                                                 </div>
                                                 <span class="badge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
                                                 <i class="ti ti-chevron-down" id="chevron-@r.Id" style="font-size:14px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
@@ -251,7 +251,7 @@
                                     <div class="avatar avatar-sm">@rAvatar</div>
                                     <div style="flex:1;">
                                         <span class="preq-name">@rName</span>
-                                        <div style="font-size:11px;color:#64748b;">Minta @r.Jumlah pcs</div>
+                                        <div class="text-xs-muted">Minta @r.Jumlah pcs</div>
                                     </div>
                                     <div class="preq-actions">
                                         <form asp-controller="Donasi" asp-action="Accept" method="post" style="display:inline;">

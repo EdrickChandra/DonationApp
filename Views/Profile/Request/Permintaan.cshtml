@@ -47,7 +47,7 @@
                             {
                                 <div class="plist-thumb"><i class="ti ti-package" aria-hidden="true"></i></div>
                             }
-                            <div style="flex:1;min-width:0;">
+                            <div class="flex-min">
                                 <div class="plist-name">@r.Item?.NamaBarang</div>
                                 <div class="plist-sub">@r.Jumlah pcs · @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</div>
                             </div>
@@ -85,7 +85,7 @@
                                 <div class="avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
                                 <div>
                                     <div style="font-size:13px;font-weight:500;color:#0f172a;">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
-                                    <div style="font-size:11px;color:#64748b;">@selected.Item?.User?.Alamat</div>
+                                    <div class="text-xs-muted">@selected.Item?.User?.Alamat</div>
                                 </div>
                                 <form asp-controller="Donasi" asp-action="Chat" method="post" style="margin-left:auto;">
                                     @Html.AntiForgeryToken()
@@ -176,7 +176,7 @@
                                 </div>
                                 @if (!string.IsNullOrEmpty(myReview.Komentar))
                                 {
-                                    <p style="font-size:13px;color:#64748b;">@myReview.Komentar</p>
+                                    <p class="text-muted">@myReview.Komentar</p>
                                 }
                             </div>
                         }
