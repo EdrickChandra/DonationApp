@@ -32,7 +32,7 @@
         }
         @if (TempData["DonasiError"] != null)
         {
-            <div style="margin:12px 16px 0;" class="pform-error-banner">@TempData["DonasiError"]</div>
+            <div style="margin:12px 16px 0;" class="form-error-banner">@TempData["DonasiError"]</div>
         }
 
         @if (visibleDonations == null || !visibleDonations.Any())
@@ -58,13 +58,13 @@
                         string statusClass;
 
                         if (activeRequests.Any(r => r.Status == TransactionStatus.Shipped))
-                        { statusLabel = "Dikirim"; statusClass = "pbadge-pending"; }
+                        { statusLabel = "Dikirim"; statusClass = "badge-pending"; }
                         else if (activeRequests.Any(r => r.Status == TransactionStatus.Accepted))
-                        { statusLabel = "Diterima"; statusClass = "pbadge-claimed"; }
+                        { statusLabel = "Diterima"; statusClass = "badge-claimed"; }
                         else if (activeRequests.Any(r => r.Status == TransactionStatus.Delivered))
-                        { statusLabel = "Selesai"; statusClass = "pbadge-available"; }
+                        { statusLabel = "Selesai"; statusClass = "badge-available"; }
                         else
-                        { statusLabel = d.Status == ItemStatus.Available ? "Tersedia" : "Diambil"; statusClass = d.Status == ItemStatus.Available ? "pbadge-available" : "pbadge-claimed"; }
+                        { statusLabel = d.Status == ItemStatus.Available ? "Tersedia" : "Diambil"; statusClass = d.Status == ItemStatus.Available ? "badge-available" : "badge-claimed"; }
 
                         var daysLeft = (d.ExpiresAt - DateTime.UtcNow).Days;
 
@@ -92,7 +92,7 @@
                                     }
                                 </div>
                             </div>
-                            <span class="pbadge @statusClass">@statusLabel</span>
+                            <span class="badge @statusClass">@statusLabel</span>
                         </a>
                     }
                 </div>
@@ -120,10 +120,10 @@
                             <div style="flex:1;">
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.NamaBarang</div>
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
-                                    <span class="pbadge pbadge-muted">@selected.Kondisi</span>
-                                    <span class="pbadge pbadge-muted">Sisa @selected.Jumlah pcs</span>
-                                    <span class="pbadge pbadge-muted">@selected.Lokasi</span>
+                                    <span class="badge badge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
+                                    <span class="badge badge-muted">@selected.Kondisi</span>
+                                    <span class="badge badge-muted">Sisa @selected.Jumlah pcs</span>
+                                    <span class="badge badge-muted">@selected.Lokasi</span>
                                 </div>
                             </div>
                             <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
@@ -164,10 +164,10 @@
                                         };
                                         var rStatusClass = r.Status switch
                                         {
-                                            TransactionStatus.Accepted  => "pbadge-claimed",
-                                            TransactionStatus.Shipped   => "pbadge-pending",
-                                            TransactionStatus.Delivered => "pbadge-available",
-                                            _ => "pbadge-muted"
+                                            TransactionStatus.Accepted  => "badge-claimed",
+                                            TransactionStatus.Shipped   => "badge-pending",
+                                            TransactionStatus.Delivered => "badge-available",
+                                            _ => "badge-muted"
                                         };
                                         <div>
                                             <div class="penerima-row" onclick="togglePenerima('penerima-detail-@r.Id')"
@@ -177,7 +177,7 @@
                                                     <div style="font-size:13px;font-weight:500;color:#0f172a;">@rName</div>
                                                     <div style="font-size:11px;color:#64748b;">@r.Jumlah pcs · @r.User?.Alamat</div>
                                                 </div>
-                                                <span class="pbadge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
+                                                <span class="badge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
                                                 <i class="ti ti-chevron-down" id="chevron-@r.Id" style="font-size:14px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
                                             </div>
                                             <div id="penerima-detail-@r.Id" style="display:none;padding:12px;background:#f8fafc;border:1px solid #c4c9d4;border-top:none;border-radius:0 0 8px 8px;margin-bottom:2px;">

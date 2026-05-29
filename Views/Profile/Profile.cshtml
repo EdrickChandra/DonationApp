@@ -78,7 +78,7 @@
                                     <p class="profile-item-name">@d.NamaBarang</p>
                                     <p class="profile-item-sub">@d.Kategori · @daysLeft hari lagi</p>
                                 </div>
-                                <span class="profile-badge @(d.Status == ItemStatus.Available ? "profile-badge-available" : "profile-badge-claimed")">@d.Status</span>
+                                <span class="badge @(d.Status == ItemStatus.Available ? "badge-available" : "badge-claimed")">@d.Status</span>
                             </div>
                         }
                     }
@@ -102,7 +102,7 @@
                                     <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                     <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                                 </div>
-                                <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
+                                <span class="badge @(r.Status == TransactionStatus.Accepted ? "badge-claimed" : r.Status == TransactionStatus.Rejected ? "badge-rejected" : "badge-pending")">@r.Status</span>
                             </div>
                         }
                     }
@@ -275,7 +275,7 @@
                                 <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                 <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                             </div>
-                            <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
+                            <span class="badge @(r.Status == TransactionStatus.Accepted ? "badge-claimed" : r.Status == TransactionStatus.Rejected ? "badge-rejected" : "badge-pending")">@r.Status</span>
                         </div>
                     }
                 }

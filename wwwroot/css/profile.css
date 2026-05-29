@@ -414,69 +414,6 @@ main:has(.pnav) {
 
     .pstep-line.done { background: var(--green); }
 
-/* ── Badges ── */
-.pbadge {
-    font-size: 11px;
-    padding: 2px 8px;
-    border-radius: 99px;
-    font-weight: 600;
-    flex-shrink: 0;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.pbadge-available { background: var(--badge-green-bg); color: var(--badge-green-txt); }
-.pbadge-pending   { background: var(--badge-yellow-bg); color: var(--badge-yellow-txt); }
-.pbadge-claimed   { background: var(--badge-blue-bg); color: var(--badge-blue-txt); }
-.pbadge-rejected  { background: var(--red-bg); color: var(--red-text); }
-.pbadge-muted     { background: var(--gray-100); color: var(--text-light); border: 1px solid var(--gray-200); }
-
-/* ── Forms ── */
-.pform-group { margin-bottom: 16px; }
-
-.pform-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-mid);
-    margin-bottom: 6px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.pform-hint { font-weight: 400; color: var(--text-light); }
-
-.pform-input {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--gray-200);
-    border-radius: 6px;
-    background: var(--gray-50);
-    color: var(--text-dark);
-    font-size: 13px;
-    font-family: 'DM Sans', sans-serif;
-    transition: border-color 0.15s;
-    outline: none;
-}
-
-    .pform-input:focus { border-color: var(--blue); }
-    .pform-input.error { border-color: var(--red); }
-
-.pform-error {
-    display: none;
-    font-size: 12px;
-    color: var(--red);
-    margin-top: 4px;
-}
-
-.pform-error-banner {
-    background: var(--red-bg);
-    border: 1px solid var(--red-border);
-    color: var(--red-text);
-    font-size: 13px;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-}
-
 /* ── Chat (Pesan) ── */
 .pchat-shell {
     display: flex;
@@ -770,23 +707,6 @@ main:has(.pnav) {
 /* ── Condition buttons ── */
 .pcond-group { display: flex; gap: 8px; }
 
-/* ── Upload zone ── */
-.pupload-zone {
-    border: 1.5px dashed var(--gray-300);
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    color: var(--text-light);
-    font-size: 13px;
-    transition: border-color 0.15s, background 0.15s;
-}
-    .pupload-zone:hover {
-        border-color: var(--blue);
-        background: var(--blue-tint);
-        color: var(--blue);
-    }
-
 /* ── Mobile overrides ── */
 @media (max-width: 768px) {
     #profile-shell {
@@ -982,7 +902,7 @@ main:has(.pnav) {
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
 
-    .pform-input {
+    .form-input {
         font-size: 16px;
     }
 

@@ -224,8 +224,8 @@ nav {
 
 .form-input {
     width: 100%;
-    background: var(--gray-100);
-    border: 1px solid var(--gray-300);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: 6px;
     padding: 9px 12px;
     font-family: 'DM Sans', sans-serif;
@@ -235,12 +235,30 @@ nav {
     transition: border-color 0.15s;
 }
 
-.form-input:focus {
-    border-color: var(--blue);
-}
+.form-input:focus { border-color: var(--blue); }
+.form-input.error { border-color: var(--red); }
 
 select.form-input {
     cursor: pointer;
+}
+
+.form-hint { font-weight: 400; color: var(--text-light); }
+
+.form-error {
+    display: none;
+    font-size: 12px;
+    color: var(--red);
+    margin-top: 4px;
+}
+
+.form-error-banner {
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+    color: var(--red-text);
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
 }
 
 .validation-message {
@@ -331,6 +349,8 @@ textarea.form-input {
 
 .upload-zone:hover {
     border-color: var(--blue);
+    background: var(--blue-tint);
+    color: var(--blue);
 }
 
 .input-row {
@@ -387,6 +407,36 @@ textarea.form-input {
     align-items: center;
     gap: 4px;
 }
+
+/* ═══════════════════════════════════════════
+   BADGE SYSTEM
+   ═══════════════════════════════════════════ */
+
+.badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 99px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    flex-shrink: 0;
+    padding: 2px 8px;
+}
+
+.badge-lg { padding: 4px 12px; font-weight: 700; }
+
+/* Status / semantic colors */
+.badge-available { background: var(--badge-green-bg); color: var(--badge-green-txt); }
+.badge-pending   { background: var(--badge-yellow-bg); color: var(--badge-yellow-txt); }
+.badge-claimed   { background: var(--badge-blue-bg); color: var(--badge-blue-txt); }
+.badge-rejected  { background: var(--red-bg); color: var(--red-text); }
+.badge-muted     { background: var(--gray-100); color: var(--text-light); border: 1px solid var(--gray-200); }
+
+/* Color aliases (for detail/category badges) */
+.badge-green  { background: var(--badge-green-bg); color: var(--badge-green-txt); }
+.badge-blue   { background: var(--badge-blue-bg); color: var(--badge-blue-txt); }
+.badge-sky    { background: var(--badge-sky-bg); color: var(--badge-sky-txt); }
+.badge-yellow { background: var(--badge-yellow-bg); color: var(--badge-yellow-txt); }
+.badge-red    { background: var(--red-bg); color: var(--red-text); }
 
 /* ═══════════════════════════════════════════
    BUTTON SYSTEM

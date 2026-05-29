@@ -41,7 +41,7 @@
         }
         @if (TempData["RedeemError"] != null)
         {
-            <div class="pform-error-banner" style="display:flex;align-items:center;gap:8px;">
+            <div class="form-error-banner" style="display:flex;align-items:center;gap:8px;">
                 <i class="ti ti-alert-circle" aria-hidden="true"></i>
                 @TempData["RedeemError"]
             </div>
@@ -152,10 +152,10 @@
                         };
                         var statusClass = r.Status switch
                         {
-                            RedeemStatus.Pending => "pbadge-pending",
-                            RedeemStatus.Fulfilled => "pbadge-available",
-                            RedeemStatus.Cancelled => "pbadge-rejected",
-                            _ => "pbadge-muted"
+                            RedeemStatus.Pending => "badge-pending",
+                            RedeemStatus.Fulfilled => "badge-available",
+                            RedeemStatus.Cancelled => "badge-rejected",
+                            _ => "badge-muted"
                         };
                         <div class="preview-item">
                             <div style="width:36px;height:36px;border-radius:8px;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -168,7 +168,7 @@
                                     @r.PointsSpent poin · @r.CreatedAt.ToString("dd MMM yyyy")
                                 </div>
                             </div>
-                            <span class="pbadge @statusClass">@statusLabel</span>
+                            <span class="badge @statusClass">@statusLabel</span>
                         </div>
                     }
                 </div>

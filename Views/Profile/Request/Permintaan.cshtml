@@ -30,12 +30,12 @@
                     {
                         var (statusLabel, statusClass) = r.Status switch
                         {
-                            TransactionStatus.Pending   => ("Menunggu", "pbadge-muted"),
-                            TransactionStatus.Accepted  => ("Diterima",  "pbadge-claimed"),
-                            TransactionStatus.Rejected  => ("Ditolak",   "pbadge-rejected"),
-                            TransactionStatus.Shipped   => ("Dikirim",   "pbadge-pending"),
-                            TransactionStatus.Delivered => ("Selesai",   "pbadge-available"),
-                            _                            => ("Unknown",   "pbadge-muted")
+                            TransactionStatus.Pending   => ("Menunggu", "badge-muted"),
+                            TransactionStatus.Accepted  => ("Diterima",  "badge-claimed"),
+                            TransactionStatus.Rejected  => ("Ditolak",   "badge-rejected"),
+                            TransactionStatus.Shipped   => ("Dikirim",   "badge-pending"),
+                            TransactionStatus.Delivered => ("Selesai",   "badge-available"),
+                            _                            => ("Unknown",   "badge-muted")
                         };
                         <a class="plist-item @(selected?.Id == r.Id ? "active" : "")"
                            href="/Request/Permintaan?selectedId=@r.Id">
@@ -51,7 +51,7 @@
                                 <div class="plist-name">@r.Item?.NamaBarang</div>
                                 <div class="plist-sub">@r.Jumlah pcs · @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</div>
                             </div>
-                            <span class="pbadge @statusClass">@statusLabel</span>
+                            <span class="badge @statusClass">@statusLabel</span>
                         </a>
                     }
                 </div>
@@ -73,8 +73,8 @@
                             <div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.Item?.NamaBarang</div>
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Item?.Kategori ?? ItemCategory.Pakaian)</span>
-                                    <span class="pbadge pbadge-muted">@selected.Jumlah pcs diminta</span>
+                                    <span class="badge badge-claimed">@CategoryHelper.DisplayName(selected.Item?.Kategori ?? ItemCategory.Pakaian)</span>
+                                    <span class="badge badge-muted">@selected.Jumlah pcs diminta</span>
                                 </div>
                             </div>
                         </div>
@@ -156,8 +156,8 @@
                                             <button type="button" class="btn-star" data-value="@star">★</button>
                                         }
                                     </div>
-                                    <div class="pform-group">
-                                        <textarea class="pform-input" name="komentar" rows="3" placeholder="Ceritakan pengalaman Anda..." style="resize:vertical;"></textarea>
+                                    <div class="form-group">
+                                        <textarea class="form-input" name="komentar" rows="3" placeholder="Ceritakan pengalaman Anda..." style="resize:vertical;"></textarea>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-block">Kirim Feedback</button>
                                 </form>

@@ -40,7 +40,7 @@
 
         @if (TempData["RequestError"] != null)
         {
-            <div class="pform-error-banner">@TempData["RequestError"]</div>
+            <div class="form-error-banner">@TempData["RequestError"]</div>
         }
         @if (TempData["RequestSuccess"] != null)
         {
@@ -61,41 +61,41 @@
                 }
                 <input type="hidden" id="ReqDetailTambahanJson" name="DetailTambahanJson" />
 
-                <div class="pform-group">
-                    <label class="pform-label">Judul Request</label>
-                    <input class="pform-input" name="Title" value="@editRequest?.Title" placeholder="Cari sepatu ukuran 42..." required />
-                    <span class="pform-error" data-for="Title">Judul request wajib diisi.</span>
+                <div class="form-group">
+                    <label class="form-label">Judul Request</label>
+                    <input class="form-input" name="Title" value="@editRequest?.Title" placeholder="Cari sepatu ukuran 42..." required />
+                    <span class="form-error" data-for="Title">Judul request wajib diisi.</span>
                 </div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Kategori</label>
-                    <select class="pform-input" name="Kategori" id="req-kategori" onchange="showReqFields(this.value)" required>
+                <div class="form-group">
+                    <label class="form-label">Kategori</label>
+                    <select class="form-input" name="Kategori" id="req-kategori" onchange="showReqFields(this.value)" required>
                         <option value="">Pilih Kategori</option>
                         @foreach (var cat in CategoryHelper.AllCategories())
                         {
                             <option value="@((int)cat)" selected="@(editRequest != null && editRequest.Kategori == cat)">@CategoryHelper.DisplayName(cat)</option>
                         }
                     </select>
-                    <span class="pform-error" data-for="Kategori">Kategori wajib dipilih.</span>
+                    <span class="form-error" data-for="Kategori">Kategori wajib dipilih.</span>
                 </div>
 
                 <div id="req-detail-fields"></div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Kondisi Minimum</label>
+                <div class="form-group">
+                    <label class="form-label">Kondisi Minimum</label>
                     <button type="button" class="btn-condition" data-value="0">Baru</button>
                     <button type="button" class="btn-condition" data-value="1">Bekas</button>
                 </div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Jumlah yang Dibutuhkan</label>
-                    <input class="pform-input" name="Jumlah" type="number" min="1" max="99" value="@(editRequest?.Jumlah ?? 1)" style="width:120px;" />
+                <div class="form-group">
+                    <label class="form-label">Jumlah yang Dibutuhkan</label>
+                    <input class="form-input" name="Jumlah" type="number" min="1" max="99" value="@(editRequest?.Jumlah ?? 1)" style="width:120px;" />
                 </div>
 
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="pform-group">
-                        <label class="pform-label">Provinsi</label>
-                        <select class="pform-input" name="Provinsi" id="req-provinsi" onchange="updateReqKota(this.value)" required>
+                    <div class="form-group">
+                        <label class="form-label">Provinsi</label>
+                        <select class="form-input" name="Provinsi" id="req-provinsi" onchange="updateReqKota(this.value)" required>
                             <option value="">Pilih Provinsi</option>
                             @foreach (var prov in new[] { "Aceh", "Bali", "Banten", "Bengkulu", "DI Yogyakarta", "DKI Jakarta", "Gorontalo", "Jambi", "Jawa Barat", "Jawa Tengah", "Jawa Timur", "Kalimantan Barat", "Kalimantan Selatan", "Kalimantan Tengah", "Kalimantan Timur", "Kalimantan Utara", "Kepulauan Bangka Belitung", "Kepulauan Riau", "Lampung", "Maluku", "Maluku Utara", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Papua", "Papua Barat", "Riau", "Sulawesi Barat", "Sulawesi Selatan", "Sulawesi Tengah", "Sulawesi Tenggara", "Sulawesi Utara", "Sumatera Barat", "Sumatera Selatan", "Sumatera Utara" })
                             {
@@ -103,25 +103,25 @@
                             }
                         </select>
                     </div>
-                    <div class="pform-group">
-                        <label class="pform-label">Kota</label>
-                        <select class="pform-input" name="Lokasi" id="req-kota" required>
+                    <div class="form-group">
+                        <label class="form-label">Kota</label>
+                        <select class="form-input" name="Lokasi" id="req-kota" required>
                             <option value="">Pilih Provinsi dulu</option>
                         </select>
-                        <span class="pform-error" data-for="Lokasi">Kota wajib dipilih.</span>
+                        <span class="form-error" data-for="Lokasi">Kota wajib dipilih.</span>
                     </div>
                 </div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Deskripsi</label>
-                    <textarea class="pform-input" name="Deskripsi" rows="4" placeholder="Jelaskan barang yang Anda cari secara detail..." required style="resize:vertical;">@editRequest?.Deskripsi</textarea>
-                    <span class="pform-error" data-for="Deskripsi">Deskripsi wajib diisi.</span>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea class="form-input" name="Deskripsi" rows="4" placeholder="Jelaskan barang yang Anda cari secara detail..." required style="resize:vertical;">@editRequest?.Deskripsi</textarea>
+                    <span class="form-error" data-for="Deskripsi">Deskripsi wajib diisi.</span>
                 </div>
 
                 @if (isEdit && editRequest!.Images.Any())
                 {
-                    <div class="pform-group">
-                        <label class="pform-label">Foto Saat Ini</label>
+                    <div class="form-group">
+                        <label class="form-label">Foto Saat Ini</label>
                         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
                             @foreach (var img in editRequest.Images)
                             {
@@ -139,10 +139,10 @@
                     </div>
                 }
 
-                <div class="pform-group">
-                    <label class="pform-label">
+                <div class="form-group">
+                    <label class="form-label">
                         @(isEdit ? "Tambah Foto Baru" : "Foto Referensi")
-                        <span class="pform-hint">(opsional, maks. 5, 5MB, JPG/PNG)</span>
+                        <span class="form-hint">(opsional, maks. 5, 5MB, JPG/PNG)</span>
                     </label>
                     <input type="file" id="req-file-input" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
                     <div id="req-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
@@ -192,15 +192,15 @@
         if (!fields) return;
         fields.forEach(function(f) {
             var div = document.createElement('div');
-            div.className = 'pform-group';
+            div.className = 'form-group';
             var label = document.createElement('label');
-            label.className = 'pform-label';
+            label.className = 'form-label';
             label.textContent = f.label;
             div.appendChild(label);
             var input;
             if (f.type === 'select') {
                 input = document.createElement('select');
-                input.className = 'pform-input';
+                input.className = 'form-input';
                 input.id = 'req-field-' + f.key;
                 input.dataset.key = f.key;
                 var empty = document.createElement('option');
@@ -214,7 +214,7 @@
                 });
             } else {
                 input = document.createElement('input');
-                input.className = 'pform-input';
+                input.className = 'form-input';
                 input.type = 'text';
                 input.placeholder = f.placeholder || '';
                 input.id = 'req-field-' + f.key;
