@@ -19,7 +19,7 @@
 
         @if (claimRequests == null || !claimRequests.Any())
         {
-            <div style="padding:48px;text-align:center;font-size:13px;color:#64748b;">Belum ada permintaan donasi.</div>
+            <div class="empty-state">Belum ada permintaan donasi.</div>
         }
         else
         {
@@ -68,7 +68,7 @@
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (selected.Item?.Images.Any() == true)
                             {
-                                <img src="@selected.Item.Images.First().FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                <img src="@selected.Item.Images.First().FilePath" class="img-60" />
                             }
                             <div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.Item?.NamaBarang</div>
@@ -82,7 +82,7 @@
                         <div class="psec">
                             <div class="psec-label">Donor</div>
                             <div style="display:flex;align-items:center;gap:10px;">
-                                <div class="preview-avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
+                                <div class="avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
                                 <div>
                                     <div style="font-size:13px;font-weight:500;color:#0f172a;">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
                                     <div style="font-size:11px;color:#64748b;">@selected.Item?.User?.Alamat</div>

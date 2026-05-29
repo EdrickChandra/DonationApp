@@ -120,7 +120,7 @@
                         @if (Model.TargetDonation.Images.Any())
                         {
                             <img src="@Model.TargetDonation.Images.First().FilePath"
-                                 style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                 class="img-60" />
                         }
                         <div>
                             <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetDonation.NamaBarang</div>
@@ -142,7 +142,7 @@
                         @if (Model.TargetRequest.Images.Any())
                         {
                             <img src="@Model.TargetRequest.Images.First().FilePath"
-                                 style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                 class="img-60" />
                         }
                         <div>
                             <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetRequest.Title</div>

@@ -134,7 +134,7 @@
                             @foreach (var img in editItem.Images)
                             {
                                 <div style="position:relative;width:88px;height:88px;">
-                                    <img src="@img.FilePath" style="width:88px;height:88px;border-radius:8px;object-fit:cover;" />
+                                    <img src="@img.FilePath" class="img-88" />
                                     <form asp-controller="Donasi" asp-action="DeleteImage" method="post" style="display:inline;">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="imageId" value="@img.Id" />

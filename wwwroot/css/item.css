@@ -243,19 +243,6 @@
     gap: 6px;
 }
 
-.card-poster-av {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: var(--blue-base);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-}
 
 .card-poster-name {
     font-size: 11px;
@@ -551,19 +538,6 @@
     margin-bottom: 20px;
 }
 
-.detail-poster-av {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--blue-base);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-}
 
 .detail-poster-name {
     font-size: 13px;

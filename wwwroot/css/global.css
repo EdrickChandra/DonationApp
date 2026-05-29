@@ -160,7 +160,11 @@ nav {
     font-weight: 700;
     font-size: 13px;
     color: var(--white);
+    flex-shrink: 0;
 }
+
+.avatar.avatar-xs { width: 20px; height: 20px; font-size: 9px; }
+.avatar.avatar-sm { width: 28px; height: 28px; font-size: 12px; font-weight: 600; background: var(--gray-100); color: var(--text-mid); }
 
 .nav-dropdown {
     position: relative;
@@ -630,6 +634,31 @@ textarea.form-input {
     transition: color 0.15s;
 }
 .btn-chat-img:hover { color: var(--blue); }
+
+/* ═══════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════ */
+
+/* Typography */
+.text-muted    { font-size: 13px; color: var(--text-light); }
+.text-sm-muted { font-size: 12px; color: var(--text-light); }
+.text-xs-muted { font-size: 11px; color: var(--text-light); }
+.text-xs-dim   { font-size: 11px; color: var(--gray-400); }
+.label-caps    { font-size: 11px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.text-strong   { font-size: 13px; font-weight: 500; color: var(--text-dark); }
+
+/* Layout */
+.flex-1   { flex: 1; }
+.flex-min { flex: 1; min-width: 0; }
+
+/* Image thumbnails */
+.img-44 { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+.img-60 { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+.img-64 { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+.img-88 { width: 88px; height: 88px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+
+/* Empty state */
+.empty-state { padding: 48px; text-align: center; font-size: 13px; color: var(--text-light); }
 
 @media (max-width: 768px) {
     body {

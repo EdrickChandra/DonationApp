@@ -62,7 +62,7 @@
         <div id="redeem-tab-katalog">
             @if (!items.Any())
             {
-                <div class="preview-card" style="padding:48px;text-align:center;">
+                <div class="preview-card empty-state">
                     <i class="ti ti-gift-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
                     <p style="font-size:13px;color:#64748b;">Belum ada item yang tersedia untuk ditukar.</p>
                 </div>
@@ -134,7 +134,7 @@
         <div id="redeem-tab-riwayat" style="display:none;">
             @if (!history.Any())
             {
-                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
+                <div class="preview-card empty-state">
                     Belum ada riwayat penukaran.
                 </div>
             }
@@ -178,7 +178,7 @@
         <div id="redeem-tab-poin" style="display:none;">
             @if (!pointHistory.Any())
             {
-                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
+                <div class="preview-card empty-state">
                     Belum ada riwayat poin.
                 </div>
             }
