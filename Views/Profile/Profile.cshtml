@@ -137,8 +137,8 @@
                             <label class="form-label">Kondisi Barang</label>
                             <input type="hidden" id="kondisiInput" name="Kondisi" value="@((int)ItemCondition.Baru)" />
                             <div class="condition-group">
-                                <button type="button" class="condition-btn selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
-                                <button type="button" class="condition-btn" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                                <button type="button" class="btn-condition selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                                <button type="button" class="btn-condition" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
                             </div>
                         </div>
 
@@ -162,7 +162,7 @@
                             <div id="previewContainer" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
                         </div>
 
-                        <button type="submit" class="submit-btn" onclick="return validateImages()">Posting Donasi</button>
+                        <button type="submit" class="btn btn-primary btn-block" onclick="return validateImages()">Posting Donasi</button>
                     </form>
                 </div>
             </div>
@@ -346,7 +346,7 @@
 
                         <div class="chat-input-bar" id="chatInputBar" style="display:none;">
                             <textarea class="chat-input" id="chatInput" placeholder="Tulis pesan..." rows="1"></textarea>
-                            <button class="chat-send-btn" id="chatSendBtn" onclick="sendMessage()">Kirim</button>
+                            <button class="btn btn-success" id="chatSendBtn" onclick="sendMessage()">Kirim</button>
                         </div>
                     </div>
                 </div>
@@ -451,7 +451,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="submit-btn">Simpan Perubahan</button>
+                        <button type="submit" class="btn btn-primary btn-block">Simpan Perubahan</button>
                     </form>
                 </div>
             </div>

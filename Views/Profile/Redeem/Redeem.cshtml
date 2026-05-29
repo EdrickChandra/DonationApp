@@ -109,18 +109,18 @@
                                           onsubmit="return confirm('Tukar @item.Name seharga @item.PointCost poin?')">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="redeemItemId" value="@item.Id" />
-                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="margin-top:10px;font-size:12px;">
+                                        <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;font-size:12px;">
                                             <i class="ti ti-exchange" aria-hidden="true"></i> Tukar Sekarang
                                         </button>
                                     </form>
                                 }
                                 else if (item.Stock <= 0)
                                 {
-                                    <button class="pbtn pbtn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>Stok Habis</button>
+                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>Stok Habis</button>
                                 }
                                 else
                                 {
-                                    <button class="pbtn pbtn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>
+                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>
                                         Kurang @(item.PointCost - userPoints) poin lagi
                                     </button>
                                 }

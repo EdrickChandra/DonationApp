@@ -23,7 +23,7 @@
             {
                 <form asp-controller="Profile" asp-action="MarkAllRead" method="post">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="pbtn" style="font-size:12px;padding:5px 12px;">Tandai semua dibaca</button>
+                    <button type="submit" class="btn btn-secondary btn-sm">Tandai semua dibaca</button>
                 </form>
             }
         </div>
@@ -52,7 +52,7 @@
                             <form asp-controller="Profile" asp-action="MarkRead" method="post">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@n.Id" />
-                                <button type="submit" class="pnotif-mark" title="Tandai dibaca">
+                                <button type="submit" class="btn-mark-read" title="Tandai dibaca">
                                     <i class="ti ti-check" aria-hidden="true"></i>
                                 </button>
                             </form>

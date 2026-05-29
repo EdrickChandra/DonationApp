@@ -39,7 +39,7 @@
         {
             <div style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
                 Belum ada donasi.
-                <a asp-controller="Donasi" asp-action="Create" class="pbtn pbtn-primary" style="display:inline-flex;margin-top:12px;">Buat Donasi Pertama</a>
+                <a asp-controller="Donasi" asp-action="Create" class="btn btn-primary" style="display:inline-flex;margin-top:12px;">Buat Donasi Pertama</a>
             </div>
         }
         else
@@ -127,18 +127,18 @@
                                 </div>
                             </div>
                             <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
-                                <button onclick="runMatch(@selected.Id, this)" class="pbtn" style="font-size:12px;padding:5px 12px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-color:#2563eb;">
+                                <button onclick="runMatch(@selected.Id, this)" class="btn btn-secondary btn-sm" style="background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-color:#2563eb;">
                                     <i class="ti ti-search" aria-hidden="true"></i> Cari Kecocokan
                                 </button>
                                 @if (!hasAnyActive)
                                 {
-                                    <a href="/Donasi/Edit/@selected.Id" class="pbtn" style="font-size:12px;padding:5px 12px;">
+                                    <a href="/Donasi/Edit/@selected.Id" class="btn btn-secondary btn-sm">
                                         <i class="ti ti-edit" aria-hidden="true"></i> Edit
                                     </a>
                                     <form asp-controller="Donasi" asp-action="Delete" method="post" onsubmit="return confirm('Hapus donasi ini?')">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@selected.Id" />
-                                        <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:5px 12px;">
+                                        <button type="submit" class="btn btn-danger btn-sm">
                                             <i class="ti ti-trash" aria-hidden="true"></i> Hapus
                                         </button>
                                     </form>
@@ -186,7 +186,7 @@
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="itemId" value="@selected.Id" />
                                                         <input type="hidden" name="otherUserId" value="@r.UserId" />
-                                                        <button type="submit" class="pbtn pbtn-primary" style="font-size:12px;padding:5px 12px;">
+                                                        <button type="submit" class="btn btn-primary btn-sm">
                                                             <i class="ti ti-message-2" aria-hidden="true"></i> Chat
                                                         </button>
                                                     </form>
@@ -217,7 +217,7 @@
                                                     <form asp-controller="Donasi" asp-action="MarkShipped" method="post">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="claimRequestId" value="@r.Id" />
-                                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="font-size:12px;">
+                                                        <button type="submit" class="btn btn-primary btn-block">
                                                             <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
                                                         </button>
                                                     </form>
@@ -257,18 +257,18 @@
                                         <form asp-controller="Donasi" asp-action="Accept" method="post" style="display:inline;">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="requestId" value="@r.Id" />
-                                            <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
+                                            <button type="submit" class="btn btn-success btn-sm">Terima</button>
                                         </form>
                                         <form asp-controller="Donasi" asp-action="Reject" method="post" style="display:inline;">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="requestId" value="@r.Id" />
-                                            <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>
+                                            <button type="submit" class="btn btn-danger btn-sm">Tolak</button>
                                         </form>
                                         <form asp-controller="Donasi" asp-action="Chat" method="post" style="display:inline;">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="itemId" value="@selected.Id" />
                                             <input type="hidden" name="otherUserId" value="@r.UserId" />
-                                            <button type="submit" class="pbtn pbtn-primary" style="font-size:12px;padding:4px 10px;">Chat</button>
+                                            <button type="submit" class="btn btn-primary btn-sm">Chat</button>
                                         </form>
                                     </div>
                                 </div>

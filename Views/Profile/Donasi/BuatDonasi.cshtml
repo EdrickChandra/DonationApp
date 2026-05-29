@@ -37,7 +37,7 @@
 
         <div class="ppage-header">
             <h1 class="ppage-title">@pageTitle</h1>
-            <a asp-controller="Donasi" asp-action="Index" class="pbtn" style="font-size:12px;">
+            <a asp-controller="Donasi" asp-action="Index" class="btn btn-secondary btn-sm">
                 <i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali
             </a>
         </div>
@@ -89,8 +89,8 @@
                     <label class="pform-label">Kondisi Barang</label>
                     <input type="hidden" id="kondisiInput" name="Kondisi" value="@((int)(editItem?.Kondisi ?? ItemCondition.Baru))" />
                     <div class="pcond-group">
-                        <button type="button" class="pcond-btn @(editItem == null || editItem.Kondisi == ItemCondition.Baru ? "selected" : "")" data-value="@((int)ItemCondition.Baru)">Baru</button>
-                        <button type="button" class="pcond-btn @(editItem?.Kondisi == ItemCondition.Bekas ? "selected" : "")" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                        <button type="button" class="btn-condition @(editItem == null || editItem.Kondisi == ItemCondition.Baru ? "selected" : "")" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                        <button type="button" class="btn-condition @(editItem?.Kondisi == ItemCondition.Bekas ? "selected" : "")" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
                     </div>
                 </div>
 
@@ -160,7 +160,7 @@
                     <div id="donasi-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
                 </div>
 
-                <button type="submit" class="pbtn pbtn-primary pbtn-block" onclick="return validateDonasi()">
+                <button type="submit" class="btn btn-primary btn-block" onclick="return validateDonasi()">
                     @(isEdit ? "Simpan Perubahan" : "Posting Donasi")
                 </button>
             </form>
@@ -254,9 +254,9 @@
     var katEl = document.getElementById('donasi-kategori');
     if (katEl && katEl.value) showDonasFields(katEl.value);
 
-    document.querySelectorAll('.pcond-btn').forEach(function(btn) {
+    document.querySelectorAll('.btn-condition').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            document.querySelectorAll('.pcond-btn').forEach(function(b) { b.classList.remove('selected'); });
+            document.querySelectorAll('.btn-condition').forEach(function(b) { b.classList.remove('selected'); });
             this.classList.add('selected');
             document.getElementById('kondisiInput').value = this.dataset.value;
         });

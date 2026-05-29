@@ -34,8 +34,8 @@
                 <label class="form-label">Kondisi Barang</label>
                 <input type="hidden" id="kondisiInput" name="Kondisi" value="@((int)ItemCondition.Baru)" />
                 <div class="condition-group">
-                    <button type="button" class="condition-btn selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
-                    <button type="button" class="condition-btn" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                    <button type="button" class="btn-condition selected" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                    <button type="button" class="btn-condition" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
                 </div>
                 <span class="validation-message" asp-validation-for="Kondisi"></span>
             </div>
@@ -63,7 +63,7 @@
                 <div id="previewContainer" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;"></div>
             </div>
 
-            <button type="submit" class="submit-btn" onclick="return validateImages()">Posting Donasi</button>
+            <button type="submit" class="btn btn-primary btn-block" onclick="return validateImages()">Posting Donasi</button>
 
         </form>
     </div>

@@ -29,8 +29,8 @@
         <div class="dpage-left">
             <div class="dpage-img-wrap">
                 <img id="mainImage" src="@images[0].FilePath" class="dpage-main-img" onclick="openZoom()" />
-                <button onclick="slideImage(-1)" class="detail-slide-btn left">‹</button>
-                <button onclick="slideImage(1)" class="detail-slide-btn right">›</button>
+                <button onclick="slideImage(-1)" class="btn-slide left">‹</button>
+                <button onclick="slideImage(1)" class="btn-slide right">›</button>
                 <span id="imageCounter" class="detail-counter">1 / @images.Count</span>
             </div>
             <div class="detail-thumbs">
@@ -118,16 +118,16 @@
             <div class="dcard">
                 @if (isOwner)
                 {
-                    <button class="detail-btn detail-btn-disabled" disabled>Barang Anda</button>
+                    <button class="btn btn-ghost btn-lg btn-block" disabled>Barang Anda</button>
                 }
                 else if (hasRequested)
                 {
-                    <button class="detail-btn detail-btn-disabled" style="margin-bottom:8px;" disabled>Sudah Diminta</button>
+                    <button class="btn btn-ghost btn-lg btn-block" style="margin-bottom:8px;" disabled>Sudah Diminta</button>
                     <form asp-controller="Donasi" asp-action="Chat" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="itemId" value="@Model.Id" />
                         <input type="hidden" name="otherUserId" value="@Model.UserId" />
-                        <button type="submit" class="detail-btn-ghost">
+                        <button type="submit" class="btn btn-ghost btn-lg btn-block">
                             <i class="ti ti-message-2" aria-hidden="true"></i> Chat dengan Donor
                         </button>
                     </form>
@@ -156,14 +156,14 @@
                             <input type="hidden" name="jumlah" value="1" />
                         }
 
-                        <button type="submit" class="detail-btn">
+                        <button type="submit" class="btn btn-primary btn-lg btn-block">
                             <i class="ti ti-hand-stop" aria-hidden="true"></i> Minta Barang
                         </button>
                     </form>
                 }
                 else
                 {
-                    <a asp-controller="Account" asp-action="Login" class="detail-btn">Masuk untuk Meminta</a>
+                    <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg btn-block">Masuk untuk Meminta</a>
                 }
 
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;">
@@ -172,10 +172,10 @@
                         Sisa @daysLeft hari
                     </div>
                     <div style="display:flex;gap:8px;">
-                        <button class="detail-btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="reportDetail()">
+                        <button class="btn btn-ghost btn-sm" onclick="reportDetail()">
                             <i class="ti ti-flag" aria-hidden="true" style="color:#ef4444;"></i> Lapor
                         </button>
-                        <button class="detail-btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="copyDetailLink()">
+                        <button class="btn btn-ghost btn-sm" onclick="copyDetailLink()">
                             <i class="ti ti-copy" aria-hidden="true"></i> Salin Link
                         </button>
                     </div>

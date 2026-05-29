@@ -91,7 +91,7 @@
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="itemId" value="@selected.Item?.Id" />
                                     <input type="hidden" name="otherUserId" value="@selected.Item?.UserId" />
-                                    <button type="submit" class="pbtn pbtn-primary" style="font-size:12px;padding:5px 12px;">
+                                    <button type="submit" class="btn btn-primary btn-sm">
                                         <i class="ti ti-message-2" aria-hidden="true"></i> Chat
                                     </button>
                                 </form>
@@ -127,7 +127,7 @@
                                 <form asp-controller="Donasi" asp-action="MarkDelivered" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="claimRequestId" value="@selected.Id" />
-                                    <button type="submit" class="pbtn pbtn-success pbtn-block">
+                                    <button type="submit" class="btn btn-success btn-block">
                                         <i class="ti ti-package" aria-hidden="true"></i> Tandai Sudah Diterima
                                     </button>
                                 </form>
@@ -153,13 +153,13 @@
                                     <div style="display:flex;gap:4px;margin-bottom:12px;">
                                         @for (int star = 1; star <= 5; star++)
                                         {
-                                            <button type="button" class="pstar-btn" data-value="@star">★</button>
+                                            <button type="button" class="btn-star" data-value="@star">★</button>
                                         }
                                     </div>
                                     <div class="pform-group">
                                         <textarea class="pform-input" name="komentar" rows="3" placeholder="Ceritakan pengalaman Anda..." style="resize:vertical;"></textarea>
                                     </div>
-                                    <button type="submit" class="pbtn pbtn-primary pbtn-block">Kirim Feedback</button>
+                                    <button type="submit" class="btn btn-primary btn-block">Kirim Feedback</button>
                                 </form>
                             </div>
                         }
@@ -189,20 +189,20 @@
 
 <script>
     (function() {
-        document.querySelectorAll('.pstar-btn').forEach(function(btn) {
+        document.querySelectorAll('.btn-star').forEach(function(btn) {
             btn.addEventListener('mouseover', function() {
                 var val = parseInt(this.dataset.value);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+                document.querySelectorAll('.btn-star').forEach(function(s, i) { s.classList.toggle('active', i < val); });
             });
             btn.addEventListener('mouseout', function() {
                 var sel = parseInt(document.getElementById('ratingValue')?.value || 0);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
+                document.querySelectorAll('.btn-star').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
             });
             btn.addEventListener('click', function() {
                 var val = parseInt(this.dataset.value);
                 var rv = document.getElementById('ratingValue');
                 if (rv) rv.value = val;
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+                document.querySelectorAll('.btn-star').forEach(function(s, i) { s.classList.toggle('active', i < val); });
             });
         });
     })();

@@ -21,7 +21,7 @@
             <div style="padding:48px;text-align:center;">
                 <i class="ti ti-package-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
                 <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Belum ada penawaran yang dibuat.</p>
-                <a asp-controller="Request" asp-action="Index" class="pbtn pbtn-primary">Lihat Request Barang</a>
+                <a asp-controller="Request" asp-action="Index" class="btn btn-primary">Lihat Request Barang</a>
             </div>
         }
         else
@@ -193,7 +193,7 @@
                                     <form asp-controller="Request" asp-action="MarkOfferDelivered" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="offerId" value="@selected.Id" />
-                                        <button type="submit" class="pbtn pbtn-success pbtn-block" style="font-size:12px;">
+                                        <button type="submit" class="btn btn-success btn-block">
                                             <i class="ti ti-package" aria-hidden="true"></i> Konfirmasi Barang Diterima
                                         </button>
                                     </form>
@@ -246,14 +246,14 @@
                                         <div style="display:flex;gap:4px;margin-bottom:12px;">
                                             @for (int star = 1; star <= 5; star++)
                                             {
-                                                <button type="button" class="pstar-btn" data-value="@star">★</button>
+                                                <button type="button" class="btn-star" data-value="@star">★</button>
                                             }
                                         </div>
                                         <div class="pform-group">
                                             <textarea class="pform-input" name="komentar" rows="3"
                                                       placeholder="Ceritakan pengalaman berdonasi..." style="resize:vertical;"></textarea>
                                         </div>
-                                        <button type="submit" class="pbtn pbtn-primary pbtn-block">Kirim Feedback</button>
+                                        <button type="submit" class="btn btn-primary btn-block">Kirim Feedback</button>
                                     </form>
                                 }
                             </div>
