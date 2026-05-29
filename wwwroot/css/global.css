@@ -57,6 +57,10 @@ html{
     --chat-tint: #f0f9f4;
     /* Star */
     --star-color: #EF9F27;
+    /* Extra grays / accent */
+    --gray-700: #374151;
+    --amber: #f59e0b;
+    --red-light: #fecaca;
 }
 
 body {
@@ -268,44 +272,6 @@ select.form-input {
     display: block;
 }
 
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-overlay.open {
-    display: flex;
-}
-
-.modal-box {
-    background: #d1d5db;
-    border-radius: 12px;
-    padding: 24px;
-    width: 520px;
-    max-width: 90vw;
-    position: relative;
-}
-
-.modal-close {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: var(--text-mid);
-}
-
-.modal-footer {
-    display: flex;
-    justify-content: flex-end;
-}
 
 .back-btn {
     display: inline-flex;
@@ -503,7 +469,7 @@ textarea.form-input {
     color: var(--red-text);
     border-color: var(--red-bg);
 }
-.btn-danger-soft:hover { background: #fecaca; }
+.btn-danger-soft:hover { background: var(--red-light); }
 
 /* ── Ghost / outline ── */
 .btn-ghost {
@@ -625,7 +591,7 @@ textarea.form-input {
     padding: 0;
 }
 .btn-card-menu:hover { background: var(--gray-100); }
-.btn-card-menu i { font-size: 14px; color: #374151; }
+.btn-card-menu i { font-size: 14px; color: var(--gray-700); }
 
 /* ── Star rating ── */
 .btn-star {
@@ -736,7 +702,5 @@ textarea.form-input {
         grid-template-columns: 1fr;
     }
 
-    .modal-box {
-        padding: 16px;
-    }
 }
+

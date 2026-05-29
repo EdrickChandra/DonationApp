@@ -1,5 +1,5 @@
 .auth-card {
-    background: #ffffff;
+    background: var(--white);
     border-radius: 12px;
     padding: 32px 28px;
     width: 100%;
@@ -17,7 +17,7 @@
 
 .auth-subtitle {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-light);
     margin-bottom: 24px;
 }
 

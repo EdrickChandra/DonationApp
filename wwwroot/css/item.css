@@ -266,9 +266,6 @@
     max-width: 90px;
 }
 
-.card-cta {
-    display: none;
-}
 
 .card-kondisi-baru {
     position: absolute;
@@ -319,7 +316,7 @@
     width: 100%;
     padding: 7px 14px;
     font-size: 12px;
-    color: #374151;
+    color: var(--gray-700);
     background: none;
     border: none;
     cursor: pointer;
@@ -434,8 +431,6 @@
     gap: 32px;
 }
 
-.detail-media {
-}
 
 .detail-img-wrap {
     background: var(--gray-200);
@@ -624,7 +619,7 @@
 }
 
     .detail-timer i {
-        color: #f59e0b;
+        color: var(--amber);
         font-size: 16px;
     }
 
