@@ -65,7 +65,7 @@
                 <div id="ovDonasi">
                     @if (donations == null || !donations.Any())
                     {
-                        <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada donasi.</p>
+                        <p class="empty-text">Belum ada donasi.</p>
                     }
                     else
                     {
@@ -74,7 +74,7 @@
                             var daysLeft = (d.ExpiresAt - DateTime.UtcNow).Days;
                             <div class="profile-item-row">
                                 <img src="@d.Images.First().FilePath" class="img-44" />
-                                <div style="flex:1;">
+                                <div class="flex-1">
                                     <p class="profile-item-name">@d.NamaBarang</p>
                                     <p class="profile-item-sub">@d.Kategori · @daysLeft hari lagi</p>
                                 </div>
@@ -87,7 +87,7 @@
                 <div id="ovRequest" style="display:none;">
                     @if (requests == null || !requests.Any())
                     {
-                        <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada request.</p>
+                        <p class="empty-text">Belum ada request.</p>
                     }
                     else
                     {
@@ -98,7 +98,7 @@
                                 {
                                     <img src="@r.Item.Images.First().FilePath" class="img-44" />
                                 }
-                                <div style="flex:1;">
+                                <div class="flex-1">
                                     <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                     <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                                 </div>
@@ -180,7 +180,7 @@
                 <p class="profile-section-title">Permintaan Masuk</p>
                 @if (myDonations == null || !myDonations.Any())
                 {
-                    <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada permintaan masuk.</p>
+                    <p class="empty-text">Belum ada permintaan masuk.</p>
                 }
                 else
                 {
@@ -260,7 +260,7 @@
                 <p class="profile-section-title">Request Saya</p>
                 @if (requests == null || !requests.Any())
                 {
-                    <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Belum ada request.</p>
+                    <p class="empty-text">Belum ada request.</p>
                 }
                 else
                 {
@@ -271,7 +271,7 @@
                             {
                                 <img src="@r.Item.Images.First().FilePath" class="img-44" />
                             }
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                 <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                             </div>
@@ -369,14 +369,14 @@
 
                 @if (notifications == null || !notifications.Any())
                 {
-                    <p style="font-size:13px;color:#64748b;text-align:center;padding:24px 0;">Tidak ada notifikasi.</p>
+                    <p class="empty-text">Tidak ada notifikasi.</p>
                 }
                 else
                 {
                     @foreach (var n in notifications)
                     {
                         <div class="notif-row @(n.IsRead ? "" : "notif-unread")">
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <p class="notif-message">@n.Message</p>
                                 <p class="notif-time">@((DateTime.UtcNow - n.CreatedAt).Days) hari lalu</p>
                             </div>

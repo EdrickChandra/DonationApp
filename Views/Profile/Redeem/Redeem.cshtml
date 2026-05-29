@@ -63,7 +63,7 @@
             @if (!items.Any())
             {
                 <div class="preview-card empty-state">
-                    <i class="ti ti-gift-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
+                    <i class="ti ti-gift-off" class="empty-icon" aria-hidden="true"></i>
                     <p class="text-muted">Belum ada item yang tersedia untuk ditukar.</p>
                 </div>
             }
@@ -161,7 +161,7 @@
                             <div style="width:36px;height:36px;border-radius:8px;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="ti ti-gift" style="color:#854d0e;font-size:18px;" aria-hidden="true"></i>
                             </div>
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div class="preview-name">@(r.RedeemItem?.Name ?? "Item")</div>
                                 <div style="font-size:11px;color:#64748b;margin-top:2px;">
                                     <i class="ti ti-coin" style="font-size:11px;" aria-hidden="true"></i>
@@ -199,7 +199,7 @@
                             <div style="width:36px;height:36px;border-radius:8px;background:@(isPositive ? "#dcfce7" : "#fee2e2");display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="ti @(isPositive ? "ti-arrow-up" : "ti-arrow-down")" style="color:@(isPositive ? "#166534" : "#dc2626");font-size:16px;" aria-hidden="true"></i>
                             </div>
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div class="preview-name">@typeLabel</div>
                                 <div style="font-size:11px;color:#64748b;margin-top:2px;">@p.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div>
                             </div>

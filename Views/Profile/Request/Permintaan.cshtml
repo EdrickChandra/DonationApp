@@ -84,7 +84,7 @@
                             <div style="display:flex;align-items:center;gap:10px;">
                                 <div class="avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
                                 <div>
-                                    <div style="font-size:13px;font-weight:500;color:#0f172a;">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
+                                    <div class="text-strong">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
                                     <div class="text-xs-muted">@selected.Item?.User?.Alamat</div>
                                 </div>
                                 <form asp-controller="Donasi" asp-action="Chat" method="post" style="margin-left:auto;">

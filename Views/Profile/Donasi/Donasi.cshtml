@@ -117,7 +117,7 @@
                             {
                                 <img src="@selected.Images.First().FilePath" class="img-60" />
                             }
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.NamaBarang</div>
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                     <span class="badge badge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
@@ -173,8 +173,8 @@
                                             <div class="penerima-row" onclick="togglePenerima('penerima-detail-@r.Id')"
                                                  style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#e2e8f0;border-radius:8px;cursor:pointer;border:1px solid #c4c9d4;transition:background 0.15s;">
                                                 <div class="avatar avatar-sm">@rAvatar</div>
-                                                <div style="flex:1;">
-                                                    <div style="font-size:13px;font-weight:500;color:#0f172a;">@rName</div>
+                                                <div class="flex-1">
+                                                    <div class="text-strong">@rName</div>
                                                     <div class="text-xs-muted">@r.Jumlah pcs · @r.User?.Alamat</div>
                                                 </div>
                                                 <span class="badge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
@@ -228,7 +228,7 @@
                                                 }
                                                 else if (r.Status == TransactionStatus.Delivered)
                                                 {
-                                                    <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                                    <p class="text-success-center"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
                                                 }
                                             </div>
                                         </div>
@@ -249,7 +249,7 @@
                                 var rName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
                                 <div class="preq-row">
                                     <div class="avatar avatar-sm">@rAvatar</div>
-                                    <div style="flex:1;">
+                                    <div class="flex-1">
                                         <span class="preq-name">@rName</span>
                                         <div class="text-xs-muted">Minta @r.Jumlah pcs</div>
                                     </div>

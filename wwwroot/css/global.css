@@ -659,6 +659,11 @@ textarea.form-input {
 
 /* Empty state */
 .empty-state { padding: 48px; text-align: center; font-size: 13px; color: var(--text-light); }
+.empty-text  { font-size: 13px; color: var(--text-light); text-align: center; padding: 24px 0; }
+.empty-icon  { font-size: 40px; color: var(--gray-400); display: block; margin-bottom: 12px; }
+
+/* Status text */
+.text-success-center { font-size: 12px; color: var(--green-dark); text-align: center; }
 
 @media (max-width: 768px) {
     body {

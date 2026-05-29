@@ -19,7 +19,7 @@
         @if (myOffers == null || !myOffers.Any())
         {
             <div class="empty-state">
-                <i class="ti ti-package-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
+                <i class="ti ti-package-off" class="empty-icon" aria-hidden="true"></i>
                 <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Belum ada penawaran yang dibuat.</p>
                 <a asp-controller="Request" asp-action="Index" class="btn btn-primary">Lihat Request Barang</a>
             </div>
@@ -116,7 +116,7 @@
                             {
                                 <div class="plist-thumb" style="width:60px;height:60px;flex-shrink:0;"><i class="ti ti-list-search" aria-hidden="true" style="font-size:22px;"></i></div>
                             }
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Request dari</div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@(req?.Title ?? "Request dihapus")</div>
                                 <div style="display:flex;align-items:center;gap:6px;">
@@ -140,7 +140,7 @@
                                 {
                                     <img src="@selected.Images.First().FilePath" class="img-64" />
                                 }
-                                <div style="flex:1;">
+                                <div class="flex-1">
                                     <div style="font-size:14px;font-weight:600;color:#0f172a;margin-bottom:4px;">@selected.NamaBarang</div>
                                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
                                         <span class="badge badge-muted">@selected.Kondisi</span>
@@ -200,7 +200,7 @@
                                 }
                                 else if (selected.Status == TransactionStatus.Delivered)
                                 {
-                                    <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah dikonfirmasi diterima</p>
+                                    <p class="text-success-center"><i class="ti ti-check" aria-hidden="true"></i> Barang telah dikonfirmasi diterima</p>
                                 }
                             </div>
                         }

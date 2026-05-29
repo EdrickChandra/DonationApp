@@ -92,7 +92,7 @@
                     <input class="form-input" name="Jumlah" type="number" min="1" max="99" value="@(editRequest?.Jumlah ?? 1)" style="width:120px;" />
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="input-row">
                     <div class="form-group">
                         <label class="form-label">Provinsi</label>
                         <select class="form-input" name="Provinsi" id="req-provinsi" onchange="updateReqKota(this.value)" required>

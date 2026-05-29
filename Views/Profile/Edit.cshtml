@@ -18,7 +18,7 @@
             <form asp-action="Edit" method="post">
                 @Html.AntiForgeryToken()
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="input-row">
                     <div class="form-group">
                         <label class="form-label">Nama Depan</label>
                         <input class="form-input" name="NamaDepan" value="@Model.NamaDepan" required />
@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="input-row">
                     <div class="form-group">
                         <label class="form-label">Email</label>
                         <input class="form-input" value="@Model.Email" disabled />
@@ -45,7 +45,7 @@
                     <input class="form-input" name="Alamat" value="@Model.Alamat" placeholder="Jl. Contoh No. 1" />
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div class="input-row">
                     <div class="form-group">
                         <label class="form-label">Provinsi</label>
                         <select class="form-input" name="Provinsi" id="edit-provinsi" onchange="updateEditKota(this.value)">
