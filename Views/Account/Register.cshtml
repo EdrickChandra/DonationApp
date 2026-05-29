@@ -49,10 +49,6 @@
                     <label class="form-label" asp-for="Provinsi">Provinsi</label>
                     <select class="form-input" asp-for="Provinsi" id="reg-provinsi" onchange="updateRegKota(this.value)">
                         <option value="">Pilih Provinsi</option>
-                        @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
-                        {
-                            <option>@prov</option>
-                        }
                     </select>
                     <span class="validation-message" asp-validation-for="Provinsi"></span>
                 </div>
@@ -96,5 +92,6 @@
         function updateRegKota(provinsi) {
             populateKota(provinsi, document.getElementById('reg-kota'), '');
         }
+        populateProvinsi(document.getElementById('reg-provinsi'), '');
     </script>
 }

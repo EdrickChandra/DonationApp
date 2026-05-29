@@ -99,10 +99,6 @@
                         <label class="form-label">Provinsi</label>
                         <select class="form-input" name="Provinsi" id="donasi-provinsi" onchange="updateDonasiKota(this.value)" required>
                             <option value="">Pilih Provinsi</option>
-                            @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
-                            {
-                                <option selected="@(defaultProvinsi == prov)">@prov</option>
-                            }
                         </select>
                         <span class="form-error" data-for="Provinsi">Provinsi wajib dipilih.</span>
                     </div>
@@ -180,11 +176,9 @@
 
     // Auto-fill provinsi and kota on load
     (function() {
-        if (defaultProvinsi) {
-            var provSel = document.getElementById('donasi-provinsi');
-            if (provSel) provSel.value = defaultProvinsi;
-            updateDonasiKota(defaultProvinsi);
-        }
+        var provSel = document.getElementById('donasi-provinsi');
+        if (provSel) populateProvinsi(provSel, defaultProvinsi);
+        if (defaultProvinsi) updateDonasiKota(defaultProvinsi);
     })();
 
     var categoryFields = {

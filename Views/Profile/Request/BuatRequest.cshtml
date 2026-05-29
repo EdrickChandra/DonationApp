@@ -97,10 +97,6 @@
                         <label class="form-label">Provinsi</label>
                         <select class="form-input" name="Provinsi" id="req-provinsi" onchange="updateReqKota(this.value)" required>
                             <option value="">Pilih Provinsi</option>
-                            @foreach (var prov in new[] { "Aceh", "Bali", "Banten", "Bengkulu", "DI Yogyakarta", "DKI Jakarta", "Gorontalo", "Jambi", "Jawa Barat", "Jawa Tengah", "Jawa Timur", "Kalimantan Barat", "Kalimantan Selatan", "Kalimantan Tengah", "Kalimantan Timur", "Kalimantan Utara", "Kepulauan Bangka Belitung", "Kepulauan Riau", "Lampung", "Maluku", "Maluku Utara", "Nusa Tenggara Barat", "Nusa Tenggara Timur", "Papua", "Papua Barat", "Riau", "Sulawesi Barat", "Sulawesi Selatan", "Sulawesi Tengah", "Sulawesi Tenggara", "Sulawesi Utara", "Sumatera Barat", "Sumatera Selatan", "Sumatera Utara" })
-                            {
-                                <option selected="@((editRequest?.Provinsi ?? userProvinsi) == prov)">@prov</option>
-                            }
                         </select>
                     </div>
                     <div class="form-group">
@@ -233,11 +229,9 @@
         populateKota(provinsi, document.getElementById('req-kota'), existingLokasi);
     }
 
-    if (existingProvinsi) {
-        var provSelect = document.getElementById('req-provinsi');
-        if (provSelect) provSelect.value = existingProvinsi;
-        updateReqKota(existingProvinsi);
-    }
+    var provSelect = document.getElementById('req-provinsi');
+    if (provSelect) populateProvinsi(provSelect, existingProvinsi);
+    if (existingProvinsi) updateReqKota(existingProvinsi);
 
     var reqImageStore = [];
 
