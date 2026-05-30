@@ -186,6 +186,33 @@
                                                 <i class="ti ti-chevron-down" id="chevron-@o.Id" style="font-size:14px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
                                             </div>
                                             <div id="offer-detail-@o.Id" style="display:none;padding:12px;background:#f8fafc;border:1px solid #c4c9d4;border-top:none;border-radius:0 0 8px 8px;margin-bottom:2px;">
+                                                @{
+                                                    var activeOfferImg = o.Images.FirstOrDefault();
+                                                }
+                                                <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+                                                    @if (activeOfferImg != null)
+                                                    {
+                                                        <img src="@activeOfferImg.FilePath" style="width:64px;height:64px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                                    }
+                                                    <div style="flex:1;">
+                                                        <div style="font-size:14px;font-weight:600;color:#0f172a;margin-bottom:4px;">@o.NamaBarang</div>
+                                                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                                                            <span class="pbadge pbadge-muted">@o.Kondisi</span>
+                                                            <span class="pbadge pbadge-muted">@o.Jumlah pcs</span>
+                                                            @if (!string.IsNullOrEmpty(o.Lokasi))
+                                                            {
+                                                                <span class="pbadge pbadge-muted">
+                                                                    <i class="ti ti-map-pin" style="font-size:10px;" aria-hidden="true"></i>
+                                                                    @o.Lokasi@(!string.IsNullOrEmpty(o.Provinsi) ? ", " + o.Provinsi : "")
+                                                                </span>
+                                                            }
+                                                        </div>
+                                                        @if (!string.IsNullOrEmpty(o.Deskripsi))
+                                                        {
+                                                            <div style="font-size:13px;color:#64748b;line-height:1.5;">@o.Deskripsi</div>
+                                                        }
+                                                    </div>
+                                                </div>
                                                 <div class="pstepper" style="margin-bottom:10px;">
                                                     <div class="pstep @(o.Status >= TransactionStatus.Accepted ? "done" : "")">
                                                         <div class="pstep-dot @(o.Status >= TransactionStatus.Accepted ? "done" : "")"><i class="ti ti-check" aria-hidden="true"></i></div>
