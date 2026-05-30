@@ -576,7 +576,7 @@ public class RequestController : AppBaseController
             .Include(o => o.ItemRequest)
             .FirstOrDefaultAsync(o => o.Id == offerId);
 
-        if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
+        if (offer == null || offer.ItemRequest == null || offer.UserId != userId)
             return RedirectToAction("MyRequests");
         if (offer.Status != TransactionStatus.Accepted)
             return RedirectToAction("MyRequests");
@@ -586,16 +586,16 @@ public class RequestController : AppBaseController
 
         _db.Notifications.Add(new Notification
         {
-            UserId = offer.UserId,
+            UserId = offer.ItemRequest.UserId,
             Message = $"Barang \"{offer.NamaBarang}\" ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah dikirim. Silakan konfirmasi penerimaan.",
             Type = NotificationType.ItemShipped,
             RefId = offerId.ToString(),
-            Link = "/Donasi/PenawaranDonasi",
+            Link = "/Request/MyRequests",
             CreatedAt = DateTime.UtcNow
         });
 
         await _db.SaveChangesAsync();
-        return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
+        return RedirectToAction("PenawaranDonasi", "Donasi", new { selectedId = offer.Id });
     }
 
     [Authorize]
@@ -609,26 +609,26 @@ public class RequestController : AppBaseController
             .Include(o => o.ItemRequest)
             .FirstOrDefaultAsync(o => o.Id == offerId);
 
-        if (offer == null || offer.ItemRequest == null || offer.UserId != userId)
-            return RedirectToAction("Permintaan", "Donasi");
+        if (offer == null || offer.ItemRequest == null || offer.ItemRequest.UserId != userId)
+            return RedirectToAction("MyRequests");
         if (offer.Status != TransactionStatus.Shipped)
-            return RedirectToAction("Permintaan", "Donasi");
+            return RedirectToAction("MyRequests");
 
         offer.Status = TransactionStatus.Delivered;
         offer.UpdatedAt = DateTime.UtcNow;
 
         _db.Notifications.Add(new Notification
         {
-            UserId = offer.ItemRequest.UserId,
+            UserId = offer.UserId,
             Message = $"Barang \"{offer.NamaBarang}\" ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah dikonfirmasi diterima.",
             Type = NotificationType.ItemDelivered,
             RefId = offer.ItemRequestId.ToString(),
-            Link = "/Request/MyRequests",
+            Link = "/Donasi/PenawaranDonasi",
             CreatedAt = DateTime.UtcNow
         });
 
         await _db.SaveChangesAsync();
         await _pointsService.AwardPointsAsync(offer.UserId, null, offerId);
-        return RedirectToAction("PenawaranDonasi", "Donasi", new { selectedId = offerId });
+        return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
     }
 }

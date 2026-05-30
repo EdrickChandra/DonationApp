@@ -203,17 +203,17 @@
                                                 </div>
                                                 @if (o.Status == TransactionStatus.Accepted)
                                                 {
-                                                    <form asp-controller="Request" asp-action="MarkOfferShipped" method="post">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="offerId" value="@o.Id" />
-                                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="font-size:12px;">
-                                                            <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
-                                                        </button>
-                                                    </form>
+                                                    <p style="font-size:12px;color:#64748b;text-align:center;">Menunggu pengirim mengirim barang...</p>
                                                 }
                                                 else if (o.Status == TransactionStatus.Shipped)
                                                 {
-                                                    <p style="font-size:12px;color:#64748b;text-align:center;">Menunggu konfirmasi penerima...</p>
+                                                    <form asp-controller="Request" asp-action="MarkOfferDelivered" method="post">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="offerId" value="@o.Id" />
+                                                        <button type="submit" class="pbtn pbtn-success pbtn-block" style="font-size:12px;">
+                                                            <i class="ti ti-package" aria-hidden="true"></i> Konfirmasi Barang Diterima
+                                                        </button>
+                                                    </form>
                                                 }
                                                 else if (o.Status == TransactionStatus.Delivered)
                                                 {
@@ -245,12 +245,12 @@
                                         </div>
                                     </a>
                                     <div class="preq-actions">
-                                        <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;">
+                                        <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;" onsubmit="return confirm('Terima penawaran dari @oName?')">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="offerId" value="@o.Id" />
                                             <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
                                         </form>
-                                        <form asp-controller="Request" asp-action="RejectOffer" method="post" style="display:inline;">
+                                        <form asp-controller="Request" asp-action="RejectOffer" method="post" style="display:inline;" onsubmit="return confirm('Tolak penawaran dari @oName?')">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="offerId" value="@o.Id" />
                                             <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>

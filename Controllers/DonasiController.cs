@@ -447,6 +447,12 @@ public class DonasiController : AppBaseController
         if (request == null || request.Item == null || request.Item.UserId != userId)
             return RedirectToAction("Index");
 
+        if (request.Item.Jumlah <= 0)
+        {
+            TempData["DonasiError"] = "Stok barang sudah habis.";
+            return RedirectToAction("Index");
+        }
+
         request.Status = TransactionStatus.Accepted;
         request.UpdatedAt = DateTime.UtcNow;
 

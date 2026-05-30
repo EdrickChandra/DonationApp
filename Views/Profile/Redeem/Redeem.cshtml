@@ -1,7 +1,7 @@
 ﻿@using DonationApp.Models
 @{
     var items = ViewBag.RedeemItems as List<RedeemItem> ?? new List<RedeemItem>();
-    var history = ViewBag.RedeemHistory as List<RedeemTransaction> ?? new List<RedeemTransaction>();
+    var history = ViewBag.RedeemHistory as List<PointTransaction> ?? new List<PointTransaction>();
     var pointHistory = ViewBag.PointHistory as List<PointTransaction> ?? new List<PointTransaction>();
     var userPoints = (int)(ViewBag.UserPoints ?? 0);
 }
@@ -143,20 +143,6 @@
                 <div class="preview-card">
                     @foreach (var r in history)
                     {
-                        var statusLabel = r.Status switch
-                        {
-                            RedeemStatus.Pending => "Diproses",
-                            RedeemStatus.Fulfilled => "Selesai",
-                            RedeemStatus.Cancelled => "Dibatalkan",
-                            _ => "-"
-                        };
-                        var statusClass = r.Status switch
-                        {
-                            RedeemStatus.Pending => "pbadge-pending",
-                            RedeemStatus.Fulfilled => "pbadge-available",
-                            RedeemStatus.Cancelled => "pbadge-rejected",
-                            _ => "pbadge-muted"
-                        };
                         <div class="preview-item">
                             <div style="width:36px;height:36px;border-radius:8px;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="ti ti-gift" style="color:#854d0e;font-size:18px;" aria-hidden="true"></i>
@@ -165,10 +151,10 @@
                                 <div class="preview-name">@(r.RedeemItem?.Name ?? "Item")</div>
                                 <div style="font-size:11px;color:#64748b;margin-top:2px;">
                                     <i class="ti ti-coin" style="font-size:11px;" aria-hidden="true"></i>
-                                    @r.PointsSpent poin · @r.CreatedAt.ToString("dd MMM yyyy")
+                                    @Math.Abs(r.Amount) poin · @r.CreatedAt.ToString("dd MMM yyyy")
                                 </div>
                             </div>
-                            <span class="pbadge @statusClass">@statusLabel</span>
+                            <span class="pbadge pbadge-available">Ditukar</span>
                         </div>
                     }
                 </div>

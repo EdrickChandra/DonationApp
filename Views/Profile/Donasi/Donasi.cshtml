@@ -228,11 +228,60 @@
                                                 }
                                                 else if (r.Status == TransactionStatus.Delivered)
                                                 {
-                                                    <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                                    <p style="font-size:12px;color:#16a34a;text-align:center;margin-bottom:10px;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                                    @{
+                                                        var donorReviewed = r.Feedbacks.Any(f => f.ReviewerId == selected.UserId);
+                                                    }
+                                                    @if (donorReviewed)
+                                                    {
+                                                        var donorReview = r.Feedbacks.First(f => f.ReviewerId == selected.UserId);
+                                                        <div style="padding:10px;background:#f1f5f9;border-radius:8px;">
+                                                            <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:4px;">Feedback Anda</div>
+                                                            <div style="display:flex;gap:2px;margin-bottom:4px;">
+                                                                @for (int s = 1; s <= 5; s++)
+                                                                {
+                                                                    <span style="font-size:14px;color:@(s <= donorReview.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
+                                                                }
+                                                            </div>
+                                                            @if (!string.IsNullOrEmpty(donorReview.Komentar))
+                                                            {
+                                                                <p style="font-size:12px;color:#64748b;margin:0;">@donorReview.Komentar</p>
+                                                            }
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div style="padding:10px;background:#f8fafc;border-radius:8px;">
+                                                            <div style="font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:8px;">Beri Feedback untuk Penerima</div>
+                                                            <form asp-controller="Reputation" asp-action="Submit" method="post">
+                                                                @Html.AntiForgeryToken()
+                                                                <input type="hidden" name="claimRequestId" value="@r.Id" />
+                                                                <input type="hidden" name="rating" id="ratingValue-@r.Id" value="0" />
+                                                                <div style="display:flex;gap:4px;margin-bottom:8px;">
+                                                                    @for (int star = 1; star <= 5; star++)
+                                                                    {
+                                                                        <button type="button" class="pstar-btn" data-group="@r.Id" data-value="@star">★</button>
+                                                                    }
+                                                                </div>
+                                                                <textarea class="pform-input" name="komentar" rows="2" placeholder="Ceritakan pengalaman Anda..." style="resize:vertical;font-size:12px;margin-bottom:8px;"></textarea>
+                                                                <button type="submit" class="pbtn pbtn-primary pbtn-block" style="font-size:12px;">Kirim Feedback</button>
+                                                            </form>
+                                                        </div>
+                                                    }
                                                 }
                                             </div>
                                         </div>
                                     }
+                                </div>
+                            </div>
+                        }
+
+                        @if (selected.Jumlah <= 0 && !hasAnyActive)
+                        {
+                            <div class="psec">
+                                <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+                                    <span class="pbadge pbadge-muted">Stok Habis</span>
+                                    <span style="font-size:12px;color:#64748b;">Tidak dapat menerima permintaan baru.</span>
                                 </div>
                             </div>
                         }
@@ -254,12 +303,19 @@
                                         <div style="font-size:11px;color:#64748b;">Minta @r.Jumlah pcs</div>
                                     </div>
                                     <div class="preq-actions">
-                                        <form asp-controller="Donasi" asp-action="Accept" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="requestId" value="@r.Id" />
-                                            <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
-                                        </form>
-                                        <form asp-controller="Donasi" asp-action="Reject" method="post" style="display:inline;">
+                                        @if (selected.Jumlah > 0)
+                                        {
+                                            <form asp-controller="Donasi" asp-action="Accept" method="post" style="display:inline;" onsubmit="return confirm('Terima permintaan dari @rName?')">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="requestId" value="@r.Id" />
+                                                <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button class="pbtn" style="font-size:12px;padding:4px 10px;opacity:0.5;" disabled>Stok Habis</button>
+                                        }
+                                        <form asp-controller="Donasi" asp-action="Reject" method="post" style="display:inline;" onsubmit="return confirm('Tolak permintaan dari @rName?')">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="requestId" value="@r.Id" />
                                             <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>
@@ -298,6 +354,25 @@
         el.style.display = isOpen ? 'none' : 'block';
         if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
     }
+
+    document.querySelectorAll('.pstar-btn[data-group]').forEach(function(btn) {
+        btn.addEventListener('mouseover', function() {
+            var g = this.dataset.group, v = parseInt(this.dataset.value);
+            document.querySelectorAll('.pstar-btn[data-group="'+g+'"]').forEach(function(s,i){ s.classList.toggle('active', i < v); });
+        });
+        btn.addEventListener('mouseout', function() {
+            var g = this.dataset.group;
+            var rv = document.getElementById('ratingValue-'+g);
+            var sel = parseInt(rv ? rv.value : 0);
+            document.querySelectorAll('.pstar-btn[data-group="'+g+'"]').forEach(function(s,i){ s.classList.toggle('active', i < sel); });
+        });
+        btn.addEventListener('click', function() {
+            var g = this.dataset.group, v = parseInt(this.dataset.value);
+            var rv = document.getElementById('ratingValue-'+g);
+            if(rv) rv.value = v;
+            document.querySelectorAll('.pstar-btn[data-group="'+g+'"]').forEach(function(s,i){ s.classList.toggle('active', i < v); });
+        });
+    });
 
     function runMatch(itemId, btn) {
         var orig = btn.innerHTML;
