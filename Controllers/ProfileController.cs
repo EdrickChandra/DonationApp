@@ -21,7 +21,7 @@ public class ProfileController : AppBaseController
     public IActionResult Index(string? section)
     {
         ViewBag.InitialSection = section ?? "overview";
-        return View("~/Views/Profile/Shell.cshtml");
+        return base.View("~/Views/Profile/Shell.cshtml");
     }
 
     public async Task<IActionResult> Overview()
@@ -59,7 +59,7 @@ public class ProfileController : AppBaseController
             return PartialView("~/Views/Profile/Overview.cshtml");
 
         ViewBag.InitialSection = "overview";
-        return View("~/Views/Profile/Shell.cshtml");
+        return base.View("~/Views/Profile/Shell.cshtml");
     }
 
     public async Task<IActionResult> Edit()
@@ -71,7 +71,7 @@ public class ProfileController : AppBaseController
             return PartialView("~/Views/Profile/Edit.cshtml", user);
 
         ViewBag.InitialSection = "profil";
-        return View("~/Views/Profile/Shell.cshtml");
+        return base.View("~/Views/Profile/Shell.cshtml");
     }
 
     [AllowAnonymous]
@@ -118,7 +118,7 @@ public class ProfileController : AppBaseController
         ViewBag.ActiveDonations = activeDonations;
         ViewBag.ActiveRequests = activeRequests;
 
-        return View("~/Views/Profile/PublicProfile.cshtml");
+        return base.View("~/Views/Profile/PublicProfile.cshtml");
     }
 
     [HttpPost]
@@ -167,7 +167,7 @@ public class ProfileController : AppBaseController
             return PartialView("~/Views/Profile/Notifikasi/Notifikasi.cshtml");
 
         ViewBag.InitialSection = "notifikasi";
-        return View("~/Views/Profile/Shell.cshtml");
+        return base.View("~/Views/Profile/Shell.cshtml");
     }
 
     [HttpPost]
