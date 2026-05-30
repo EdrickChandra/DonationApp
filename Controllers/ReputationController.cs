@@ -20,14 +20,14 @@ public class ReputationController : AppBaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Submit(int? claimRequestId, int? itemRequestId, int rating, string? komentar)
+    public async Task<IActionResult> Submit(int? claimRequestId, int? itemRequestId, int? requestOfferId, int rating, string? komentar)
     {
         var userId = _userManager.GetUserId(User)!;
 
         if (rating < 1 || rating > 5)
             return RedirectToAction("Permintaan", "Request");
 
-        if (claimRequestId == null && itemRequestId == null)
+        if (claimRequestId == null && itemRequestId == null && requestOfferId == null)
             return RedirectToAction("Permintaan", "Request");
 
         string reviewedUserId;
@@ -41,16 +41,56 @@ public class ReputationController : AppBaseController
 
             if (claimRequest == null || claimRequest.Item == null)
                 return RedirectToAction("Permintaan", "Request");
-            if (claimRequest.UserId != userId)
-                return RedirectToAction("Permintaan", "Request");
             if (claimRequest.Status != TransactionStatus.Delivered)
                 return RedirectToAction("Permintaan", "Request");
             if (claimRequest.Feedbacks.Any(f => f.ReviewerId == userId))
                 return RedirectToAction("Permintaan", "Request");
-            if (claimRequest.Item.UserId == userId)
-                return RedirectToAction("Permintaan", "Request");
 
-            reviewedUserId = claimRequest.Item.UserId;
+            if (claimRequest.UserId == userId)
+            {
+                reviewedUserId = claimRequest.Item.UserId;
+            }
+            else if (claimRequest.Item.UserId == userId)
+            {
+                reviewedUserId = claimRequest.UserId;
+            }
+            else
+            {
+                return RedirectToAction("Permintaan", "Request");
+            }
+        }
+        else if (requestOfferId.HasValue)
+        {
+            var offer = await _db.RequestOffers
+                .Include(o => o.ItemRequest)
+                .FirstOrDefaultAsync(o => o.Id == requestOfferId.Value);
+
+            if (offer == null || offer.ItemRequest == null)
+                return RedirectToAction("MyRequests", "Request");
+            if (offer.Status != TransactionStatus.Delivered)
+                return RedirectToAction("MyRequests", "Request");
+
+            var existingFeedback = await _db.Feedbacks
+                .AnyAsync(f => f.ReviewerId == userId && f.ItemRequestId == offer.ItemRequestId
+                    && ((f.ReviewedUserId == offer.UserId) || (f.ReviewedUserId == offer.ItemRequest.UserId)));
+
+            if (existingFeedback)
+                return RedirectToAction("MyRequests", "Request");
+
+            if (offer.ItemRequest.UserId == userId)
+            {
+                reviewedUserId = offer.UserId;
+            }
+            else if (offer.UserId == userId)
+            {
+                reviewedUserId = offer.ItemRequest.UserId;
+            }
+            else
+            {
+                return RedirectToAction("MyRequests", "Request");
+            }
+
+            itemRequestId = offer.ItemRequestId;
         }
         else
         {
@@ -61,20 +101,29 @@ public class ReputationController : AppBaseController
 
             if (itemRequest == null)
                 return RedirectToAction("MyRequests", "Request");
-            if (itemRequest.UserId != userId)
-                return RedirectToAction("MyRequests", "Request");
-            if (itemRequest.Feedbacks.Any(f => f.ReviewerId == userId))
-                return RedirectToAction("MyRequests", "Request");
 
             var acceptedOffer = itemRequest.Offers
                 .FirstOrDefault(o => o.Status == TransactionStatus.Delivered);
 
             if (acceptedOffer == null)
                 return RedirectToAction("MyRequests", "Request");
-            if (acceptedOffer.UserId == userId)
-                return RedirectToAction("MyRequests", "Request");
 
-            reviewedUserId = acceptedOffer.UserId;
+            if (itemRequest.UserId == userId)
+            {
+                if (itemRequest.Feedbacks.Any(f => f.ReviewerId == userId))
+                    return RedirectToAction("MyRequests", "Request");
+                reviewedUserId = acceptedOffer.UserId;
+            }
+            else if (acceptedOffer.UserId == userId)
+            {
+                if (itemRequest.Feedbacks.Any(f => f.ReviewerId == userId))
+                    return RedirectToAction("MyRequests", "Request");
+                reviewedUserId = itemRequest.UserId;
+            }
+            else
+            {
+                return RedirectToAction("MyRequests", "Request");
+            }
         }
 
         var feedback = new Feedback
@@ -115,8 +164,8 @@ public class ReputationController : AppBaseController
 
         await _db.SaveChangesAsync();
 
-        return claimRequestId.HasValue
-            ? RedirectToAction("Permintaan", "Request")
-            : RedirectToAction("MyRequests", "Request");
+        if (claimRequestId.HasValue)
+            return RedirectToAction("Permintaan", "Request");
+        return RedirectToAction("MyRequests", "Request");
     }
 }
