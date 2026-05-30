@@ -215,7 +215,7 @@ public class RequestController : AppBaseController
         await _db.SaveChangesAsync();
         await RunMatchingAndStoreTempData(itemRequest.Id, userId);
 
-        return RedirectToAction("MyRequests");
+        return RedirectToAction("MyRequests", new { selectedId = itemRequest.Id });
     }
 
     [Authorize]

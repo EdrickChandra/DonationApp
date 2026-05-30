@@ -133,7 +133,7 @@ public class DonasiController : AppBaseController
         await _db.SaveChangesAsync();
         await RunMatchingAndStoreTempData(item.Id);
 
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { selectedId = item.Id });
     }
 
     [HttpPost]
@@ -300,7 +300,10 @@ public class DonasiController : AppBaseController
         if (itemRequest == null || itemRequest.UserId == userId || itemRequest.Status != ItemRequestStatus.Open)
             return Json(new { success = false, error = "Request tidak valid." });
 
-        var fromItem = await _db.Items.FirstOrDefaultAsync(i => i.Id == fromItemId && i.UserId == userId);
+        var fromItem = await _db.Items
+            .Include(i => i.Images)
+            .Include(i => i.ClaimRequests)
+            .FirstOrDefaultAsync(i => i.Id == fromItemId && i.UserId == userId);
         if (fromItem == null)
             return Json(new { success = false, error = "Item tidak ditemukan." });
 
@@ -328,6 +331,17 @@ public class DonasiController : AppBaseController
 
         _db.RequestOffers.Add(offer);
         await _db.SaveChangesAsync();
+
+        if (!fromItem.ClaimRequests.Any())
+        {
+            foreach (var img in fromItem.Images.ToList())
+            {
+                img.OwnerType = ImageOwnerType.RequestOffer;
+                img.ItemId = null;
+                img.RequestOfferId = offer.Id;
+            }
+            _db.Items.Remove(fromItem);
+        }
 
         var offerer = await _userManager.FindByIdAsync(userId);
         var offererName = offerer != null ? offerer.NamaDepan + " " + offerer.NamaBelakang : "Seseorang";
