@@ -157,6 +157,7 @@
                                     {
                                         var oAvatar = o.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                                         var oName = o.User != null ? o.User.NamaDepan + " " + o.User.NamaBelakang : "Unknown";
+                                        var oHasFeedback = o.Feedbacks.Any(f => f.ReviewerId == selected.UserId);
                                         var oStatusLabel = o.Status switch
                                         {
                                             TransactionStatus.Accepted  => "Menunggu Kirim",
@@ -199,6 +200,11 @@
                                                     <div class="pstep @(o.Status >= TransactionStatus.Delivered ? "done" : "")">
                                                         <div class="pstep-dot @(o.Status >= TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                                         <div class="pstep-label">Diterima</div>
+                                                    </div>
+                                                    <div class="pstep-line @(oHasFeedback ? "done" : "")"></div>
+                                                    <div class="pstep @(oHasFeedback ? "done" : "")">
+                                                        <div class="pstep-dot @(oHasFeedback ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
+                                                        <div class="pstep-label">Feedback</div>
                                                     </div>
                                                 </div>
                                                 @if (o.Status == TransactionStatus.Accepted)

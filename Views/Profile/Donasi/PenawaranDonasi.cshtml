@@ -77,7 +77,6 @@
                     else
                     {
                         var req = selected.ItemRequest;
-                        var alreadyReviewed = selected.ItemRequest?.Feedbacks.Any() ?? false;
                         var firstReqImg = req?.Images.FirstOrDefault();
                         var reqOwnerInitial = req?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                         var reqOwnerName = req?.User != null ? req.User.NamaDepan + " " + req.User.NamaBelakang : "Unknown";
@@ -177,11 +176,6 @@
                                         <div class="pstep-dot @(selected.Status == TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
-                                    <div class="pstep-line @(alreadyReviewed ? "done" : "")"></div>
-                                    <div class="pstep @(alreadyReviewed ? "done" : "")">
-                                        <div class="pstep-dot @(alreadyReviewed ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
-                                        <div class="pstep-label">Feedback</div>
-                                    </div>
                                 </div>
 
                                 @if (selected.Status == TransactionStatus.Accepted)
@@ -216,48 +210,6 @@
                             </div>
                         }
 
-                        @if (selected.Status == TransactionStatus.Delivered)
-                        {
-                            <div class="psec">
-                                @if (alreadyReviewed)
-                                {
-                                    var myReview = selected.ItemRequest!.Feedbacks.First();
-                                    <div class="psec-label">Feedback Anda</div>
-                                    <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
-                                        <div style="display:flex;gap:2px;">
-                                            @for (int star = 1; star <= 5; star++)
-                                            {
-                                                <span style="font-size:20px;color:@(star <= myReview.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
-                                            }
-                                        </div>
-                                        @if (!string.IsNullOrEmpty(myReview.Komentar))
-                                        {
-                                            <span style="font-size:13px;color:#64748b;">— @myReview.Komentar</span>
-                                        }
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="psec-label">Beri Feedback untuk Peminta</div>
-                                    <form asp-controller="Reputation" asp-action="Submit" method="post" style="margin-top:10px;">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="itemRequestId" value="@req?.Id" />
-                                        <input type="hidden" name="rating" id="ratingValue" value="0" />
-                                        <div style="display:flex;gap:4px;margin-bottom:12px;">
-                                            @for (int star = 1; star <= 5; star++)
-                                            {
-                                                <button type="button" class="pstar-btn" data-value="@star">★</button>
-                                            }
-                                        </div>
-                                        <div class="pform-group">
-                                            <textarea class="pform-input" name="komentar" rows="3"
-                                                      placeholder="Ceritakan pengalaman berdonasi..." style="resize:vertical;"></textarea>
-                                        </div>
-                                        <button type="submit" class="pbtn pbtn-primary pbtn-block">Kirim Feedback</button>
-                                    </form>
-                                }
-                            </div>
-                        }
                     }
                 </div>
 
@@ -267,22 +219,4 @@
 </div>
 
 <script>
-    (function() {
-        document.querySelectorAll('.pstar-btn').forEach(function(btn) {
-            btn.addEventListener('mouseover', function() {
-                var val = parseInt(this.dataset.value);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
-            });
-            btn.addEventListener('mouseout', function() {
-                var sel = parseInt(document.getElementById('ratingValue')?.value || 0);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
-            });
-            btn.addEventListener('click', function() {
-                var val = parseInt(this.dataset.value);
-                var rv = document.getElementById('ratingValue');
-                if (rv) rv.value = val;
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
-            });
-        });
-    })();
 </script>
