@@ -93,7 +93,7 @@
                     <i class="ti ti-dots-vertical" aria-hidden="true"></i>
                 </button>
                 <div class="card-menu-dropdown" id="@cardId">
-                    <button class="card-menu-item" onclick="reportItem(@req.Id)">
+                    <button class="card-menu-item" onclick="reportRequest(@req.Id)">
                         <i class="ti ti-flag" aria-hidden="true"></i> Lapor
                     </button>
                     <button class="card-menu-item" onclick="copyLink('/Request/Detail/@req.Id')">
@@ -131,9 +131,5 @@
             document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
         }
 
-        function reportItem(id) {
-            alert('Laporan untuk request #' + id + ' telah dikirim.');
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
-        }
     </script>
 }

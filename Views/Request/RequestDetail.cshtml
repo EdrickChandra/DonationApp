@@ -304,7 +304,7 @@
         }
 
         function copyDetailLink() { navigator.clipboard.writeText(window.location.href); }
-        function reportDetail() { alert('Laporan telah dikirim.'); }
+        function reportDetail() { openReportModal(null, @Model.Id); }
 
         document.getElementById('offer-file-input')?.addEventListener('change', function() {
             Array.from(this.files).forEach(function(file) { if (offerImageStore.length < 3) offerImageStore.push(file); });
