@@ -74,6 +74,53 @@ public class ProfileController : AppBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
+    [AllowAnonymous]
+    public async Task<IActionResult> View(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null || user.IsBanned) return NotFound();
+
+        var totalDonasi = await _db.Items.CountAsync(i => i.UserId == id);
+        var totalRequest = await _db.ItemRequests.CountAsync(r => r.UserId == id);
+        var avgRating = await _db.Feedbacks.Where(f => f.ReviewedUserId == id).AverageAsync(f => (double?)f.Rating);
+        var totalReviews = await _db.Feedbacks.CountAsync(f => f.ReviewedUserId == id);
+
+        var reviews = await _db.Feedbacks
+            .Include(f => f.Reviewer)
+            .Include(f => f.ClaimRequest)
+                .ThenInclude(c => c!.Item)
+            .Include(f => f.ItemRequest)
+            .Where(f => f.ReviewedUserId == id)
+            .OrderByDescending(f => f.CreatedAt)
+            .Take(20)
+            .ToListAsync();
+
+        var activeDonations = await _db.Items
+            .Include(i => i.Images)
+            .Where(i => i.UserId == id && i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(i => i.CreatedAt)
+            .Take(6)
+            .ToListAsync();
+
+        var activeRequests = await _db.ItemRequests
+            .Include(r => r.Images)
+            .Where(r => r.UserId == id && r.Status == ItemRequestStatus.Open && r.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(6)
+            .ToListAsync();
+
+        ViewBag.ProfileUser = user;
+        ViewBag.TotalDonasi = totalDonasi;
+        ViewBag.TotalRequest = totalRequest;
+        ViewBag.AvgRating = Math.Round(avgRating ?? 0, 1);
+        ViewBag.TotalReviews = totalReviews;
+        ViewBag.Reviews = reviews;
+        ViewBag.ActiveDonations = activeDonations;
+        ViewBag.ActiveRequests = activeRequests;
+
+        return View("~/Views/Profile/PublicProfile.cshtml");
+    }
+
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(string NamaDepan, string NamaBelakang, string PhoneNumber, string Alamat, string Kota, string Provinsi, string KodePos)

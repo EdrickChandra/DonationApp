@@ -172,9 +172,9 @@
                                         <div>
                                             <div class="penerima-row" onclick="togglePenerima('penerima-detail-@r.Id')"
                                                  style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#e2e8f0;border-radius:8px;cursor:pointer;border:1px solid #c4c9d4;transition:background 0.15s;">
-                                                <div class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;">@rAvatar</div>
+                                                <a href="/Profile/View/@r.UserId" class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;text-decoration:none;color:#fff;" onclick="event.stopPropagation();">@rAvatar</a>
                                                 <div style="flex:1;">
-                                                    <div style="font-size:13px;font-weight:500;color:#0f172a;">@rName</div>
+                                                    <a href="/Profile/View/@r.UserId" style="font-size:13px;font-weight:500;color:#0f172a;text-decoration:none;" onclick="event.stopPropagation();">@rName</a>
                                                     <div style="font-size:11px;color:#64748b;">@r.Jumlah pcs · @r.User?.Alamat</div>
                                                 </div>
                                                 <span class="pbadge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
@@ -248,9 +248,9 @@
                                 var rAvatar = r.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                                 var rName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
                                 <div class="preq-row">
-                                    <div class="preq-avatar">@rAvatar</div>
+                                    <a href="/Profile/View/@r.UserId" class="preq-avatar" style="text-decoration:none;color:#fff;">@rAvatar</a>
                                     <div style="flex:1;">
-                                        <span class="preq-name">@rName</span>
+                                        <a href="/Profile/View/@r.UserId" class="preq-name" style="text-decoration:none;">@rName</a>
                                         <div style="font-size:11px;color:#64748b;">Minta @r.Jumlah pcs</div>
                                     </div>
                                     <div class="preq-actions">

@@ -174,11 +174,13 @@
                                         <div>
                                             <div class="penerima-row" onclick="togglePenerima('offer-detail-@o.Id')"
                                                  style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#e2e8f0;border-radius:8px;cursor:pointer;border:1px solid #c4c9d4;transition:background 0.15s;">
-                                                <div class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;">@oAvatar</div>
-                                                <div style="flex:1;">
-                                                    <div style="font-size:13px;font-weight:500;color:#0f172a;">@oName</div>
-                                                    <div style="font-size:11px;color:#64748b;">@o.NamaBarang · @o.Jumlah pcs</div>
-                                                </div>
+                                                <a href="/Profile/View/@o.UserId" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0;" onclick="event.stopPropagation();">
+                                                    <div class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;">@oAvatar</div>
+                                                    <div style="flex:1;">
+                                                        <div style="font-size:13px;font-weight:500;color:#0f172a;">@oName</div>
+                                                        <div style="font-size:11px;color:#64748b;">@o.NamaBarang · @o.Jumlah pcs</div>
+                                                    </div>
+                                                </a>
                                                 <span class="pbadge @oStatusClass" style="font-size:10px;">@oStatusLabel</span>
                                                 <i class="ti ti-chevron-down" id="chevron-@o.Id" style="font-size:14px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
                                             </div>
@@ -235,11 +237,13 @@
                                 var oAvatar = o.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                                 var oName = o.User != null ? o.User.NamaDepan + " " + o.User.NamaBelakang : "Unknown";
                                 <div class="preq-row">
-                                    <div class="preq-avatar">@oAvatar</div>
-                                    <div style="flex:1;">
-                                        <span class="preq-name">@oName</span>
-                                        <div style="font-size:11px;color:#64748b;">@o.NamaBarang · @o.Jumlah pcs</div>
-                                    </div>
+                                    <a href="/Profile/View/@o.UserId" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0;" onclick="event.stopPropagation();">
+                                        <div class="preq-avatar">@oAvatar</div>
+                                        <div style="flex:1;">
+                                            <span class="preq-name">@oName</span>
+                                            <div style="font-size:11px;color:#64748b;">@o.NamaBarang · @o.Jumlah pcs</div>
+                                        </div>
+                                    </a>
                                     <div class="preq-actions">
                                         <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;">
                                             @Html.AntiForgeryToken()

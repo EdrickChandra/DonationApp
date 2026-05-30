@@ -71,10 +71,10 @@
                     </div>
                 </div>
 
-                <div class="duser-row">
+                <a href="/Profile/View/@Model.UserId" class="duser-row" style="text-decoration:none;color:inherit;">
                     <div class="detail-poster-av">@avatarLetter</div>
                     <div style="flex:1;min-width:0;">
-                        <div class="detail-poster-name">@posterName</div>
+                        <div class="detail-poster-name" style="transition:color 0.15s;">@posterName</div>
                         <div style="display:flex;align-items:center;gap:5px;margin-top:1px;">
                             @if (totalReviews > 0)
                             {
@@ -94,7 +94,7 @@
                         <i class="ti ti-map-pin" style="font-size:12px;" aria-hidden="true"></i>
                         @Model.Lokasi@(!string.IsNullOrWhiteSpace(Model.Provinsi) ? ", " + Model.Provinsi : "")
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="dcard">

@@ -83,10 +83,10 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <div class="card-poster">
+                        <a href="/Profile/View/@req.UserId" class="card-poster" style="text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
                             <div class="card-poster-av">@avatarLetter</div>
                             <span class="card-poster-name">@posterName</span>
-                        </div>
+                        </a>
                     </div>
                 </a>
                 <button class="card-menu-btn" onclick="toggleCardMenu('@cardId', event)" aria-label="Opsi">
