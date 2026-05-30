@@ -181,6 +181,7 @@ public class RequestController : AppBaseController
         ModelState.Remove("User");
         ModelState.Remove("Images");
         ModelState.Remove("Offers");
+        ModelState.Remove("Feedbacks");
 
         if (!ModelState.IsValid)
         {
@@ -231,6 +232,7 @@ public class RequestController : AppBaseController
         ModelState.Remove("User");
         ModelState.Remove("Images");
         ModelState.Remove("Offers");
+        ModelState.Remove("Feedbacks");
 
         if (!ModelState.IsValid)
         {
