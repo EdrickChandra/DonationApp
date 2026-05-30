@@ -131,6 +131,8 @@ main:has(.pnav) {
     padding: 10px 18px;
     font-size: 13px;
     color: #334155;
+    background: none;
+    border: none;
     border-bottom: 2px solid transparent;
     cursor: pointer;
     text-decoration: none;

@@ -4,6 +4,7 @@
 @{
     var userAlamat = ViewBag.UserAlamat as string ?? "";
     var userProvinsi = ViewBag.UserProvinsi as string ?? "";
+    var userKota = ViewBag.UserKota as string ?? "";
     var editRequest = ViewBag.EditRequest as ItemRequest;
     var isEdit = editRequest != null;
     var pageTitle = isEdit ? "Edit Request" : "Buat Request";
@@ -159,7 +160,7 @@
 <script>
     var isEdit = @(isEdit ? "true" : "false");
     var existingProvinsi = '@(editRequest?.Provinsi ?? userProvinsi)';
-    var existingLokasi = '@(editRequest?.Lokasi ?? "")';
+    var existingLokasi = '@(editRequest?.Lokasi ?? userKota)';
     var existingDetails = @Html.Raw(existingDetails != null ? JsonSerializer.Serialize(existingDetails) : "{}");
 
     var categoryFields = {

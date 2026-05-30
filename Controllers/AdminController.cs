@@ -72,7 +72,7 @@ public class AdminController : AppBaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> TakeAction(int reportId, string action, string? note)
+    public async Task<IActionResult> TakeAction(int reportId, string actionType, string? note)
     {
         var adminId = _userManager.GetUserId(User)!;
 
@@ -84,18 +84,25 @@ public class AdminController : AppBaseController
 
         if (report == null) return NotFound();
 
+        if (actionType == "Reviewing" && report.Status != ReportStatus.Open)
+            return RedirectToAction("ReportDetail", new { id = reportId });
+
+        if ((actionType == "Dismiss" || actionType == "BanUser" || actionType == "WarnUser" || actionType == "RemoveItems")
+            && (report.Status == ReportStatus.Resolved || report.Status == ReportStatus.Dismissed))
+            return RedirectToAction("ReportDetail", new { id = reportId });
+
         var adminAction = new AdminAction
         {
             AdminId = adminId,
             ReportId = reportId,
-            Action = action,
+            Action = actionType,
             Note = note?.Trim(),
             CreatedAt = DateTime.UtcNow
         };
 
         _db.AdminActions.Add(adminAction);
 
-        switch (action)
+        switch (actionType)
         {
             case "BanUser":
                 if (report.TargetUser != null)

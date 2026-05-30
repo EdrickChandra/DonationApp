@@ -82,11 +82,13 @@
                         <div class="psec">
                             <div class="psec-label">Donor</div>
                             <div style="display:flex;align-items:center;gap:10px;">
-                                <div class="preview-avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
-                                <div>
-                                    <div style="font-size:13px;font-weight:500;color:#0f172a;">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
-                                    <div style="font-size:11px;color:#64748b;">@selected.Item?.User?.Alamat</div>
-                                </div>
+                                <a href="/Profile/View/@selected.Item?.UserId" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0;" onclick="event.stopPropagation();">
+                                    <div class="preview-avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
+                                    <div>
+                                        <div style="font-size:13px;font-weight:500;color:#0f172a;">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
+                                        <div style="font-size:11px;color:#64748b;">@selected.Item?.User?.Alamat</div>
+                                    </div>
+                                </a>
                                 <form asp-controller="Donasi" asp-action="Chat" method="post" style="margin-left:auto;">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="itemId" value="@selected.Item?.Id" />
@@ -145,7 +147,7 @@
                         @if (selected.Status == TransactionStatus.Delivered && !alreadyReviewed)
                         {
                             <div class="psec">
-                                <div class="psec-label">Beri Feedback untuk Donor</div>
+                                <div class="psec-label">Feedback untuk Donasi</div>
                                 <form asp-controller="Reputation" asp-action="Submit" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="claimRequestId" value="@selected.Id" />
