@@ -84,6 +84,13 @@ public class AdminController : AppBaseController
 
         if (report == null) return NotFound();
 
+        if (action == "Reviewing" && report.Status != ReportStatus.Open)
+            return RedirectToAction("ReportDetail", new { id = reportId });
+
+        if ((action == "Dismiss" || action == "BanUser" || action == "WarnUser" || action == "RemoveItems")
+            && (report.Status == ReportStatus.Resolved || report.Status == ReportStatus.Dismissed))
+            return RedirectToAction("ReportDetail", new { id = reportId });
+
         var adminAction = new AdminAction
         {
             AdminId = adminId,
