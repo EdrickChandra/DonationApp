@@ -147,7 +147,7 @@
                         @if (selected.Status == TransactionStatus.Delivered && !alreadyReviewed)
                         {
                             <div class="psec">
-                                <div class="psec-label">Beri Feedback untuk Donor</div>
+                                <div class="psec-label">Feedback untuk Donasi</div>
                                 <form asp-controller="Reputation" asp-action="Submit" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="claimRequestId" value="@selected.Id" />

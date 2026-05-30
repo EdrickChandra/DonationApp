@@ -275,32 +275,64 @@
                             {
                                 <p style="font-size:13px;color:#64748b;text-align:center;padding:12px 0;">Belum ada penawaran.</p>
                             }
+                            <div style="display:flex;flex-direction:column;gap:6px;">
                             @foreach (var o in pendingOffers)
                             {
                                 var oAvatar = o.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                                 var oName = o.User != null ? o.User.NamaDepan + " " + o.User.NamaBelakang : "Unknown";
-                                <div class="preq-row">
-                                    <a href="/Profile/View/@o.UserId" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0;" onclick="event.stopPropagation();">
-                                        <div class="preq-avatar">@oAvatar</div>
-                                        <div style="flex:1;">
-                                            <span class="preq-name">@oName</span>
+                                var firstOfferImg = o.Images.FirstOrDefault();
+                                <div>
+                                    <div class="penerima-row" onclick="togglePenawaran('pending-detail-@o.Id')"
+                                         style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#e2e8f0;border-radius:8px;cursor:pointer;border:1px solid #c4c9d4;transition:background 0.15s;">
+                                        <a href="/Profile/View/@o.UserId" class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;text-decoration:none;color:#fff;" onclick="event.stopPropagation();">@oAvatar</a>
+                                        <div style="flex:1;min-width:0;">
+                                            <a href="/Profile/View/@o.UserId" style="font-size:13px;font-weight:500;color:#0f172a;text-decoration:none;" onclick="event.stopPropagation();">@oName</a>
                                             <div style="font-size:11px;color:#64748b;">@o.NamaBarang · @o.Jumlah pcs</div>
                                         </div>
-                                    </a>
-                                    <div class="preq-actions">
-                                        <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;" onsubmit="return confirm('Terima penawaran dari @oName?')">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="offerId" value="@o.Id" />
-                                            <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
-                                        </form>
-                                        <form asp-controller="Request" asp-action="RejectOffer" method="post" style="display:inline;" onsubmit="return confirm('Tolak penawaran dari @oName?')">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="offerId" value="@o.Id" />
-                                            <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>
-                                        </form>
+                                        <span class="pbadge pbadge-muted" style="font-size:10px;">Menunggu</span>
+                                        <i class="ti ti-chevron-down" id="chevron-pending-@o.Id" style="font-size:14px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
+                                    </div>
+                                    <div id="pending-detail-@o.Id" style="display:none;padding:12px;background:#f8fafc;border:1px solid #c4c9d4;border-top:none;border-radius:0 0 8px 8px;margin-bottom:2px;">
+                                        <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;">
+                                            @if (firstOfferImg != null)
+                                            {
+                                                <img src="@firstOfferImg.FilePath" style="width:64px;height:64px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                            }
+                                            <div style="flex:1;">
+                                                <div style="font-size:14px;font-weight:600;color:#0f172a;margin-bottom:4px;">@o.NamaBarang</div>
+                                                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                                                    <span class="pbadge pbadge-muted">@o.Kondisi</span>
+                                                    <span class="pbadge pbadge-muted">@o.Jumlah pcs</span>
+                                                    @if (!string.IsNullOrEmpty(o.Lokasi))
+                                                    {
+                                                        <span class="pbadge pbadge-muted">
+                                                            <i class="ti ti-map-pin" style="font-size:10px;" aria-hidden="true"></i>
+                                                            @o.Lokasi@(!string.IsNullOrEmpty(o.Provinsi) ? ", " + o.Provinsi : "")
+                                                        </span>
+                                                    }
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(o.Deskripsi))
+                                                {
+                                                    <div style="font-size:13px;color:#64748b;line-height:1.5;">@o.Deskripsi</div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div style="display:flex;gap:8px;justify-content:flex-end;">
+                                            <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;" onsubmit="return confirm('Terima penawaran dari @oName?')">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="offerId" value="@o.Id" />
+                                                <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:5px 12px;">Terima</button>
+                                            </form>
+                                            <form asp-controller="Request" asp-action="RejectOffer" method="post" style="display:inline;" onsubmit="return confirm('Tolak penawaran dari @oName?')">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="offerId" value="@o.Id" />
+                                                <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:5px 12px;">Tolak</button>
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             }
+                            </div>
                         </div>
                     }
                 </div>
@@ -324,6 +356,16 @@
         var isOpen = el.style.display !== 'none';
         var offerId = detailId.replace('offer-detail-', '');
         var chevron = document.getElementById('chevron-' + offerId);
+        el.style.display = isOpen ? 'none' : 'block';
+        if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+    }
+
+    function togglePenawaran(detailId) {
+        var el = document.getElementById(detailId);
+        if (!el) return;
+        var isOpen = el.style.display !== 'none';
+        var offerId = detailId.replace('pending-detail-', '');
+        var chevron = document.getElementById('chevron-pending-' + offerId);
         el.style.display = isOpen ? 'none' : 'block';
         if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
     }
