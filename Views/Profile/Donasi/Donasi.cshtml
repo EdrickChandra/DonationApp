@@ -228,11 +228,10 @@
                                                 }
                                                 else if (r.Status == TransactionStatus.Delivered)
                                                 {
+                                                    var donorReviewed = r.Feedbacks.Any(f => f.ReviewerId == selected.UserId);
                                                     <p style="font-size:12px;color:#16a34a;text-align:center;margin-bottom:10px;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
-                                                    @{
-                                                        var donorReviewed = r.Feedbacks.Any(f => f.ReviewerId == selected.UserId);
-                                                    }
-                                                    @if (donorReviewed)
+                                                    if (donorReviewed)
+
                                                     {
                                                         var donorReview = r.Feedbacks.First(f => f.ReviewerId == selected.UserId);
                                                         <div style="padding:10px;background:#f1f5f9;border-radius:8px;">
