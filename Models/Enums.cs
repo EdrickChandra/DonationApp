@@ -11,11 +11,8 @@ public enum ItemCategory
     Pakaian,
     Elektronik,
     Buku,
-    PerabotRumah,
-    MainanHobi,
-    AlatTulis,
-    AlatMusik,
-    PeralatanDapur
+    MainanHobi = 4,
+    AlatMusik = 6
 }
 
 public enum ItemStatus
