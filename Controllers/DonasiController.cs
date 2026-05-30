@@ -596,7 +596,7 @@ public class DonasiController : AppBaseController
             posterName = m.ItemRequest.User != null
                 ? m.ItemRequest.User.NamaDepan + " " + m.ItemRequest.User.NamaBelakang
                 : "Unknown",
-            posterAvatar = m.ItemRequest.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
+            posterAvatar = m.ItemRequest.User?.NamaDepan is { Length: > 0 } name ? name[..1].ToUpper() : "?",
             createdAgo = (DateTime.UtcNow - m.ItemRequest.CreatedAt).Days,
             firstImage = m.ItemRequest.Images.FirstOrDefault()?.FilePath,
             type = "request"
@@ -669,7 +669,7 @@ public class DonasiController : AppBaseController
             posterName = m.ItemRequest.User != null
                 ? m.ItemRequest.User.NamaDepan + " " + m.ItemRequest.User.NamaBelakang
                 : "Unknown",
-            posterAvatar = m.ItemRequest.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?",
+            posterAvatar = m.ItemRequest.User?.NamaDepan is { Length: > 0 } name ? name[..1].ToUpper() : "?",
             createdAgo = (DateTime.UtcNow - m.ItemRequest.CreatedAt).Days,
             firstImage = m.ItemRequest.Images.FirstOrDefault()?.FilePath,
             type = "request"

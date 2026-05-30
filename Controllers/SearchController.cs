@@ -48,8 +48,8 @@ public class SearchController : AppBaseController
             requestsQuery = requestsQuery.Where(r => r.Kategori == kategori.Value);
         }
 
-        var donationsTask = donationsQuery.OrderByDescending(i => i.CreatedAt).ToListAsync();
-        var requestsTask = requestsQuery.OrderByDescending(r => r.CreatedAt).ToListAsync();
+        var donationsTask = donationsQuery.OrderByDescending(i => i.CreatedAt).Take(50).ToListAsync();
+        var requestsTask = requestsQuery.OrderByDescending(r => r.CreatedAt).Take(50).ToListAsync();
 
         await Task.WhenAll(donationsTask, requestsTask);
 

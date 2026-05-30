@@ -142,9 +142,9 @@ public class ProfileController : AppBaseController
     public async Task<IActionResult> MarkAllRead()
     {
         var userId = _userManager.GetUserId(User)!;
-        var unread = await _db.Notifications.Where(n => n.UserId == userId && !n.IsRead).ToListAsync();
-        foreach (var n in unread) n.IsRead = true;
-        await _db.SaveChangesAsync();
+        await _db.Notifications
+            .Where(n => n.UserId == userId && !n.IsRead)
+            .ExecuteUpdateAsync(s => s.SetProperty(n => n.IsRead, true));
         return RedirectToAction("Notifikasi", new { tab = "read" });
     }
 }

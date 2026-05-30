@@ -99,14 +99,9 @@ public class PesanController : AppBaseController
             })
             .ToListAsync();
 
-        var unread = await _db.ChatMessages
+        await _db.ChatMessages
             .Where(m => m.ConversationId == conversationId && m.SenderId != userId && !m.IsRead)
-            .ToListAsync();
-
-        foreach (var msg in unread)
-            msg.IsRead = true;
-
-        await _db.SaveChangesAsync();
+            .ExecuteUpdateAsync(s => s.SetProperty(m => m.IsRead, true));
 
         return Json(messages);
     }

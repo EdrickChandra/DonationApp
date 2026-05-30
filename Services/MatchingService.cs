@@ -40,6 +40,7 @@ public class MatchingService
             .Include(r => r.Images)
             .Include(r => r.User)
             .Where(r => r.Status == ItemRequestStatus.Open && r.ExpiresAt > DateTime.UtcNow)
+            .Where(r => r.Kategori == item.Kategori)
             .ToListAsync();
 
         var results = new List<ItemRequestMatchResult>();
@@ -67,6 +68,8 @@ public class MatchingService
             .Include(i => i.Images)
             .Include(i => i.User)
             .Where(i => i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
+
+        query = query.Where(i => i.Kategori == itemRequest.Kategori);
 
         if (itemRequest.KondisiMinimum == ItemCondition.Baru)
             query = query.Where(i => i.Kondisi == ItemCondition.Baru);
@@ -155,15 +158,17 @@ public class MatchingService
         return (score, reasons);
     }
 
+    private static readonly HashSet<string> StopWords = new() { "dan", "atau", "yang", "di", "ke", "dari", "untuk", "dengan", "ini", "itu", "ada", "bisa", "mau", "saya", "anda", "a", "the", "of", "in", "for" };
+
     private int ComputeKeywordScore(string sourceText, string targetText)
     {
         if (string.IsNullOrWhiteSpace(sourceText) || string.IsNullOrWhiteSpace(targetText))
             return 0;
 
-        var stopWords = new HashSet<string> { "dan", "atau", "yang", "di", "ke", "dari", "untuk", "dengan", "ini", "itu", "ada", "bisa", "mau", "saya", "anda", "a", "the", "of", "in", "for" };
-
-        var sourceTokens = Tokenize(sourceText).Except(stopWords).ToHashSet();
-        var targetTokens = Tokenize(targetText).Except(stopWords).ToHashSet();
+        var sourceTokens = Tokenize(sourceText);
+        sourceTokens.ExceptWith(StopWords);
+        var targetTokens = Tokenize(targetText);
+        targetTokens.ExceptWith(StopWords);
 
         if (sourceTokens.Count == 0 || targetTokens.Count == 0) return 0;
 

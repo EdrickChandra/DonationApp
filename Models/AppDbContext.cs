@@ -60,5 +60,26 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(r => r.TargetRequestId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.Entity<Item>()
+            .HasIndex(i => new { i.Status, i.ExpiresAt });
+
+        builder.Entity<Item>()
+            .HasIndex(i => new { i.Kategori, i.CreatedAt });
+
+        builder.Entity<ItemRequest>()
+            .HasIndex(r => new { r.Status, r.ExpiresAt });
+
+        builder.Entity<ItemRequest>()
+            .HasIndex(r => new { r.Kategori, r.CreatedAt });
+
+        builder.Entity<Notification>()
+            .HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+
+        builder.Entity<ClaimRequest>()
+            .HasIndex(c => new { c.UserId, c.Status });
+
+        builder.Entity<ChatMessage>()
+            .HasIndex(m => new { m.ConversationId, m.SentAt });
     }
 }

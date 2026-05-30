@@ -40,9 +40,6 @@ public class PointsService
             CreatedAt = DateTime.UtcNow
         });
 
-        user.TotalPoin += PointsPerDonation;
-        await _userManager.UpdateAsync(user);
-
         _db.Notifications.Add(new Notification
         {
             UserId = userId,
@@ -52,6 +49,7 @@ public class PointsService
             CreatedAt = DateTime.UtcNow
         });
 
+        user.TotalPoin += PointsPerDonation;
         await _db.SaveChangesAsync();
     }
 
