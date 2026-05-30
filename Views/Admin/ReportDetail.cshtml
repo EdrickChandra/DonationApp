@@ -190,7 +190,7 @@
                         <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this)">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="reportId" value="@Model.Id" />
-                            <button type="submit" name="action" value="Reviewing" class="admin-action-btn" style="background:#fef9c3;color:#854d0e;border-color:#fde68a;">
+                            <button type="submit" name="actionType" value="Reviewing" class="admin-action-btn" style="background:#fef9c3;color:#854d0e;border-color:#fde68a;">
                                 <i class="ti ti-eye" aria-hidden="true"></i> Tandai Sedang Direview
                             </button>
                         </form>
@@ -210,7 +210,7 @@
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="reportId" value="@Model.Id" />
                                 <input type="hidden" name="note" class="admin-note-input" />
-                                <button type="submit" name="action" value="WarnUser" class="admin-action-btn" style="background:#fff7ed;color:#9a3412;border-color:#fed7aa;">
+                                <button type="submit" name="actionType" value="WarnUser" class="admin-action-btn" style="background:#fff7ed;color:#9a3412;border-color:#fed7aa;">
                                     <i class="ti ti-alert-triangle" aria-hidden="true"></i> Beri Peringatan
                                 </button>
                             </form>
@@ -218,7 +218,7 @@
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="reportId" value="@Model.Id" />
                                 <input type="hidden" name="note" class="admin-note-input" />
-                                <button type="submit" name="action" value="BanUser"
+                                <button type="submit" name="actionType" value="BanUser"
                                         class="admin-action-btn" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;"
                                         onclick="return confirm('Ban pengguna ini? Tindakan ini tidak dapat dibatalkan dengan mudah.')">
                                     <i class="ti ti-ban" aria-hidden="true"></i> Ban Pengguna
@@ -240,7 +240,7 @@
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="reportId" value="@Model.Id" />
                             <input type="hidden" name="note" class="admin-note-input" />
-                            <button type="submit" name="action" value="RemoveItems" class="admin-action-btn" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;"
+                            <button type="submit" name="actionType" value="RemoveItems" class="admin-action-btn" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;"
                                     onclick="return confirm('Hapus item yang dilaporkan? Item akan ditutup dan pemilik akan diberitahu.')">
                                 <i class="ti ti-trash" aria-hidden="true"></i>
                                 Hapus @(Model.TargetDonation != null ? "Donasi" : "Request")
@@ -253,7 +253,7 @@
                     <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this)">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="reportId" value="@Model.Id" />
-                        <button type="submit" name="action" value="Dismiss" class="admin-action-btn" style="background:#f1f5f9;color:#64748b;border-color:#e2e8f0;">
+                        <button type="submit" name="actionType" value="Dismiss" class="admin-action-btn" style="background:#f1f5f9;color:#64748b;border-color:#e2e8f0;">
                             <i class="ti ti-x" aria-hidden="true"></i> Dismiss Laporan
                         </button>
                     </form>
