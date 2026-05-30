@@ -37,6 +37,8 @@ public class RequestController : AppBaseController
                 .ThenInclude(o => o.User)
             .Include(r => r.Offers)
                 .ThenInclude(o => o.Images)
+            .Include(r => r.Offers)
+                .ThenInclude(o => o.Feedbacks)
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
