@@ -307,6 +307,18 @@ public class DonasiController : AppBaseController
         if (fromItem == null)
             return Json(new { success = false, error = "Item tidak ditemukan." });
 
+        if (fromItem.Status != ItemStatus.Available)
+            return Json(new { success = false, error = "Item sudah tidak tersedia." });
+
+        if (fromItem.Jumlah <= 0)
+            return Json(new { success = false, error = "Stok item habis." });
+
+        var hasActiveClaimRequests = fromItem.ClaimRequests.Any(r =>
+            r.Status == TransactionStatus.Accepted ||
+            r.Status == TransactionStatus.Shipped);
+        if (hasActiveClaimRequests)
+            return Json(new { success = false, error = "Item sedang dalam proses pengiriman." });
+
         var alreadyOffered = await _db.RequestOffers
             .AnyAsync(o => o.ItemRequestId == itemRequestId && o.UserId == userId);
 
