@@ -47,3 +47,16 @@ function populateKota(provinsi, kotaSelectEl, selectedKota) {
         kotaSelectEl.appendChild(opt);
     });
 }
+
+function populateProvinsi(selectEl, selectedProv) {
+    var placeholder = selectEl.querySelector('option[value=""]');
+    selectEl.innerHTML = '';
+    if (placeholder) selectEl.appendChild(placeholder);
+    Object.keys(kotaByProvinsi).forEach(function (prov) {
+        var opt = document.createElement('option');
+        opt.value = prov;
+        opt.textContent = prov;
+        if (selectedProv && prov === selectedProv) opt.selected = true;
+        selectEl.appendChild(opt);
+    });
+}

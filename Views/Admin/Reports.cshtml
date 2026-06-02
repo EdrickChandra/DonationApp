@@ -13,7 +13,7 @@
             <p style="font-size:13px;color:#64748b;margin:0;">Kelola laporan pengguna</p>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:12px;color:#64748b;">@Model.Count() laporan</span>
+            <span class="text-sm-muted">@Model.Count() laporan</span>
         </div>
     </div>
 
@@ -36,8 +36,8 @@
     @if (!Model.Any())
     {
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:48px;text-align:center;">
-            <i class="ti ti-flag-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
-            <p style="font-size:13px;color:#64748b;">Tidak ada laporan.</p>
+            <i class="ti ti-flag-off" class="empty-icon" aria-hidden="true"></i>
+            <p class="text-muted">Tidak ada laporan.</p>
         </div>
     }
     else
@@ -87,20 +87,20 @@
                         <tr>
                             <td style="color:#94a3b8;font-size:12px;">#@r.Id</td>
                             <td>
-                                <div style="font-size:13px;font-weight:500;color:#0f172a;">@(r.Reporter?.NamaDepan + " " + r.Reporter?.NamaBelakang)</div>
+                                <div class="text-strong">@(r.Reporter?.NamaDepan + " " + r.Reporter?.NamaBelakang)</div>
                             </td>
                             <td>
                                 <div style="font-size:13px;color:#334155;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@targetName</div>
                             </td>
                             <td>
-                                <span style="font-size:12px;color:#64748b;">@r.Alasan</span>
+                                <span class="text-sm-muted">@r.Alasan</span>
                             </td>
                             <td>
                                 <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:@statusBg;color:@statusColor;font-family:'Plus Jakarta Sans',sans-serif;">
                                     @statusLabel
                                 </span>
                             </td>
-                            <td style="font-size:12px;color:#64748b;">@r.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td class="text-sm-muted">@r.CreatedAt.ToString("dd MMM yyyy")</td>
                             <td>
                                 <a href="/Admin/ReportDetail/@r.Id" style="font-size:12px;color:#2563eb;font-weight:600;text-decoration:none;">Lihat →</a>
                             </td>

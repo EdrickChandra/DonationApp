@@ -20,11 +20,8 @@
                     ItemCategory.Pakaian => "ti-shirt",
                     ItemCategory.Elektronik => "ti-device-laptop",
                     ItemCategory.Buku => "ti-book",
-                    ItemCategory.PerabotRumah => "ti-sofa",
                     ItemCategory.MainanHobi => "ti-fidget-spinner",
-                    ItemCategory.AlatTulis => "ti-pencil",
                     ItemCategory.AlatMusik => "ti-guitar-pick",
-                    ItemCategory.PeralatanDapur => "ti-tools-kitchen-2",
                     _ => "ti-tag"
                 };
                 <a class="pill @(selected == cat ? "active" : "")"
@@ -80,13 +77,13 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <div class="card-poster">
-                            <div class="card-poster-av">@posterInitial</div>
+                        <a href="/Profile/View/@item.UserId" class="card-poster" style="text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
+                            <div class="avatar avatar-xs">@posterInitial</div>
                             <span class="card-poster-name">@posterName</span>
-                        </div>
+                        </a>
                     </div>
                 </a>
-                <button class="card-menu-btn" onclick="toggleCardMenu('@cardId', event)" aria-label="Opsi">
+                <button class="btn-card-menu" onclick="toggleCardMenu('@cardId', event)" aria-label="Opsi">
                     <i class="ti ti-dots-vertical" aria-hidden="true"></i>
                 </button>
                 <div class="card-menu-dropdown" id="@cardId">
@@ -115,6 +112,5 @@
         }
         document.addEventListener('click', () => document.querySelectorAll('.card-menu-dropdown').forEach(el => el.classList.remove('open')));
         function copyLink(path) { navigator.clipboard.writeText(window.location.origin + path); }
-        function reportItem(id) { alert('Laporan untuk item #' + id + ' telah dikirim.'); }
     </script>
 }

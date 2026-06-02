@@ -41,7 +41,7 @@
         }
         @if (TempData["RedeemError"] != null)
         {
-            <div class="pform-error-banner" style="display:flex;align-items:center;gap:8px;">
+            <div class="form-error-banner" style="display:flex;align-items:center;gap:8px;">
                 <i class="ti ti-alert-circle" aria-hidden="true"></i>
                 @TempData["RedeemError"]
             </div>
@@ -62,9 +62,9 @@
         <div id="redeem-tab-katalog">
             @if (!items.Any())
             {
-                <div class="preview-card" style="padding:48px;text-align:center;">
-                    <i class="ti ti-gift-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
-                    <p style="font-size:13px;color:#64748b;">Belum ada item yang tersedia untuk ditukar.</p>
+                <div class="preview-card empty-state">
+                    <i class="ti ti-gift-off" class="empty-icon" aria-hidden="true"></i>
+                    <p class="text-muted">Belum ada item yang tersedia untuk ditukar.</p>
                 </div>
             }
             else
@@ -100,7 +100,7 @@
                                     </div>
                                     @if (item.Stock > 0)
                                     {
-                                        <span style="font-size:11px;color:#94a3b8;">Stok: @item.Stock</span>
+                                        <span class="text-xs-dim">Stok: @item.Stock</span>
                                     }
                                 </div>
                                 @if (canRedeem)
@@ -109,18 +109,18 @@
                                           onsubmit="return confirm('Tukar @item.Name seharga @item.PointCost poin?')">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="redeemItemId" value="@item.Id" />
-                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="margin-top:10px;font-size:12px;">
+                                        <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;font-size:12px;">
                                             <i class="ti ti-exchange" aria-hidden="true"></i> Tukar Sekarang
                                         </button>
                                     </form>
                                 }
                                 else if (item.Stock <= 0)
                                 {
-                                    <button class="pbtn pbtn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>Stok Habis</button>
+                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>Stok Habis</button>
                                 }
                                 else
                                 {
-                                    <button class="pbtn pbtn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>
+                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>
                                         Kurang @(item.PointCost - userPoints) poin lagi
                                     </button>
                                 }
@@ -134,7 +134,7 @@
         <div id="redeem-tab-riwayat" style="display:none;">
             @if (!history.Any())
             {
-                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
+                <div class="preview-card empty-state">
                     Belum ada riwayat penukaran.
                 </div>
             }
@@ -152,23 +152,23 @@
                         };
                         var statusClass = r.Status switch
                         {
-                            RedeemStatus.Pending => "pbadge-pending",
-                            RedeemStatus.Fulfilled => "pbadge-available",
-                            RedeemStatus.Cancelled => "pbadge-rejected",
-                            _ => "pbadge-muted"
+                            RedeemStatus.Pending => "badge-pending",
+                            RedeemStatus.Fulfilled => "badge-available",
+                            RedeemStatus.Cancelled => "badge-rejected",
+                            _ => "badge-muted"
                         };
                         <div class="preview-item">
                             <div style="width:36px;height:36px;border-radius:8px;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="ti ti-gift" style="color:#854d0e;font-size:18px;" aria-hidden="true"></i>
                             </div>
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div class="preview-name">@(r.RedeemItem?.Name ?? "Item")</div>
                                 <div style="font-size:11px;color:#64748b;margin-top:2px;">
                                     <i class="ti ti-coin" style="font-size:11px;" aria-hidden="true"></i>
                                     @r.PointsSpent poin · @r.CreatedAt.ToString("dd MMM yyyy")
                                 </div>
                             </div>
-                            <span class="pbadge @statusClass">@statusLabel</span>
+                            <span class="badge @statusClass">@statusLabel</span>
                         </div>
                     }
                 </div>
@@ -178,7 +178,7 @@
         <div id="redeem-tab-poin" style="display:none;">
             @if (!pointHistory.Any())
             {
-                <div class="preview-card" style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
+                <div class="preview-card empty-state">
                     Belum ada riwayat poin.
                 </div>
             }
@@ -199,7 +199,7 @@
                             <div style="width:36px;height:36px;border-radius:8px;background:@(isPositive ? "#dcfce7" : "#fee2e2");display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="ti @(isPositive ? "ti-arrow-up" : "ti-arrow-down")" style="color:@(isPositive ? "#166534" : "#dc2626");font-size:16px;" aria-hidden="true"></i>
                             </div>
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div class="preview-name">@typeLabel</div>
                                 <div style="font-size:11px;color:#64748b;margin-top:2px;">@p.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div>
                             </div>

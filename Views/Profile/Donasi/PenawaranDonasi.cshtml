@@ -18,10 +18,10 @@
 
         @if (myOffers == null || !myOffers.Any())
         {
-            <div style="padding:48px;text-align:center;">
-                <i class="ti ti-package-off" style="font-size:40px;color:#94a3b8;display:block;margin-bottom:12px;" aria-hidden="true"></i>
+            <div class="empty-state">
+                <i class="ti ti-package-off" class="empty-icon" aria-hidden="true"></i>
                 <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Belum ada penawaran yang dibuat.</p>
-                <a asp-controller="Request" asp-action="Index" class="pbtn pbtn-primary">Lihat Request Barang</a>
+                <a asp-controller="Request" asp-action="Index" class="btn btn-primary">Lihat Request Barang</a>
             </div>
         }
         else
@@ -39,15 +39,15 @@
                         switch (offer.Status)
                         {
                             case TransactionStatus.Accepted:
-                                statusLabel = "Diterima"; statusClass = "pbadge-claimed"; break;
+                                statusLabel = "Diterima"; statusClass = "badge-claimed"; break;
                             case TransactionStatus.Shipped:
-                                statusLabel = "Dikirim"; statusClass = "pbadge-pending"; break;
+                                statusLabel = "Dikirim"; statusClass = "badge-pending"; break;
                             case TransactionStatus.Delivered:
-                                statusLabel = "Selesai"; statusClass = "pbadge-available"; break;
+                                statusLabel = "Selesai"; statusClass = "badge-available"; break;
                             case TransactionStatus.Rejected:
-                                statusLabel = "Ditolak"; statusClass = "pbadge-rejected"; break;
+                                statusLabel = "Ditolak"; statusClass = "badge-rejected"; break;
                             default:
-                                statusLabel = "Menunggu"; statusClass = "pbadge-muted"; break;
+                                statusLabel = "Menunggu"; statusClass = "badge-muted"; break;
                         }
 
                         <a class="plist-item @(selected?.Id == offer.Id ? "active" : "")"
@@ -60,11 +60,11 @@
                             {
                                 <div class="plist-thumb"><i class="ti ti-list-search" aria-hidden="true"></i></div>
                             }
-                            <div style="flex:1;min-width:0;">
+                            <div class="flex-min">
                                 <div class="plist-name">@(req?.Title ?? "Request dihapus")</div>
                                 <div class="plist-sub">@offer.NamaBarang · @offer.Jumlah pcs</div>
                             </div>
-                            <span class="pbadge @statusClass">@statusLabel</span>
+                            <span class="badge @statusClass">@statusLabel</span>
                         </a>
                     }
                 </div>
@@ -77,7 +77,7 @@
                     else
                     {
                         var req = selected.ItemRequest;
-                        var alreadyReviewed = selected.ItemRequest?.Feedbacks.Any() ?? false;
+                        var alreadyReviewed = req?.Feedbacks.Any() ?? false;
                         var firstReqImg = req?.Images.FirstOrDefault();
                         var reqOwnerInitial = req?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                         var reqOwnerName = req?.User != null ? req.User.NamaDepan + " " + req.User.NamaBelakang : "Unknown";
@@ -86,23 +86,23 @@
                         switch (selected.Status)
                         {
                             case TransactionStatus.Accepted:
-                                statusLabel = "Diterima"; statusClass = "pbadge-claimed";
+                                statusLabel = "Diterima"; statusClass = "badge-claimed";
                                 statusDesc = "Penawaran Anda diterima — siap untuk dikirim.";
                                 dotColor = "#2563eb"; break;
                             case TransactionStatus.Shipped:
-                                statusLabel = "Dikirim"; statusClass = "pbadge-pending";
+                                statusLabel = "Dikirim"; statusClass = "badge-pending";
                                 statusDesc = "Barang sudah ditandai dikirim. Menunggu konfirmasi penerimaan.";
                                 dotColor = "#f59e0b"; break;
                             case TransactionStatus.Delivered:
-                                statusLabel = "Selesai"; statusClass = "pbadge-available";
+                                statusLabel = "Selesai"; statusClass = "badge-available";
                                 statusDesc = "Barang telah diterima. Transaksi selesai.";
                                 dotColor = "#22c55e"; break;
                             case TransactionStatus.Rejected:
-                                statusLabel = "Ditolak"; statusClass = "pbadge-rejected";
+                                statusLabel = "Ditolak"; statusClass = "badge-rejected";
                                 statusDesc = "Penawaran Anda tidak dipilih kali ini.";
                                 dotColor = "#ef4444"; break;
                             default:
-                                statusLabel = "Menunggu"; statusClass = "pbadge-muted";
+                                statusLabel = "Menunggu"; statusClass = "badge-muted";
                                 statusDesc = "Menunggu konfirmasi dari peminta.";
                                 dotColor = "#f59e0b"; break;
                         }
@@ -110,22 +110,22 @@
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (firstReqImg != null)
                             {
-                                <img src="@firstReqImg.FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                <img src="@firstReqImg.FilePath" class="img-60" />
                             }
                             else
                             {
                                 <div class="plist-thumb" style="width:60px;height:60px;flex-shrink:0;"><i class="ti ti-list-search" aria-hidden="true" style="font-size:22px;"></i></div>
                             }
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div style="font-size:11px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Request dari</div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@(req?.Title ?? "Request dihapus")</div>
-                                <div style="display:flex;align-items:center;gap:6px;">
+                                <a href="/Profile/View/@req?.UserId" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
                                     <div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;">@reqOwnerInitial</div>
-                                    <span style="font-size:12px;color:#64748b;">@reqOwnerName</span>
-                                </div>
+                                    <span class="text-sm-muted">@reqOwnerName</span>
+                                </a>
                             </div>
                             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
-                                <span class="pbadge @statusClass">@statusLabel</span>
+                                <span class="badge @statusClass">@statusLabel</span>
                                 @if (req != null)
                                 {
                                     <a asp-controller="Request" asp-action="Detail" asp-route-id="@req.Id" style="font-size:11px;color:#2563eb;text-decoration:none;">Lihat request →</a>
@@ -138,16 +138,16 @@
                             <div style="display:flex;gap:12px;align-items:flex-start;">
                                 @if (selected.Images.Any())
                                 {
-                                    <img src="@selected.Images.First().FilePath" style="width:64px;height:64px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                    <img src="@selected.Images.First().FilePath" class="img-64" />
                                 }
-                                <div style="flex:1;">
+                                <div class="flex-1">
                                     <div style="font-size:14px;font-weight:600;color:#0f172a;margin-bottom:4px;">@selected.NamaBarang</div>
                                     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-                                        <span class="pbadge pbadge-muted">@selected.Kondisi</span>
-                                        <span class="pbadge pbadge-muted">@selected.Jumlah pcs</span>
+                                        <span class="badge badge-muted">@selected.Kondisi</span>
+                                        <span class="badge badge-muted">@selected.Jumlah pcs</span>
                                         @if (!string.IsNullOrEmpty(selected.Lokasi))
                                         {
-                                            <span class="pbadge pbadge-muted">
+                                            <span class="badge badge-muted">
                                                 <i class="ti ti-map-pin" style="font-size:10px;" aria-hidden="true"></i>
                                                 @selected.Lokasi@(!string.IsNullOrEmpty(selected.Provinsi) ? ", " + selected.Provinsi : "")
                                             </span>
@@ -177,30 +177,31 @@
                                         <div class="pstep-dot @(selected.Status == TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                         <div class="pstep-label">Diterima</div>
                                     </div>
-                                    <div class="pstep-line @(alreadyReviewed ? "done" : "")"></div>
-                                    <div class="pstep @(alreadyReviewed ? "done" : "")">
-                                        <div class="pstep-dot @(alreadyReviewed ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
-                                        <div class="pstep-label">Feedback</div>
-                                    </div>
                                 </div>
 
                                 @if (selected.Status == TransactionStatus.Accepted)
                                 {
-                                    <p style="font-size:12px;color:#64748b;text-align:center;">Menunggu peminta menandai barang dikirim...</p>
+                                    <form asp-controller="Request" asp-action="MarkOfferShipped" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="offerId" value="@selected.Id" />
+                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="font-size:12px;">
+                                            <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
+                                        </button>
+                                    </form>
                                 }
                                 else if (selected.Status == TransactionStatus.Shipped)
                                 {
                                     <form asp-controller="Request" asp-action="MarkOfferDelivered" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="offerId" value="@selected.Id" />
-                                        <button type="submit" class="pbtn pbtn-success pbtn-block" style="font-size:12px;">
+                                        <button type="submit" class="btn btn-success btn-block">
                                             <i class="ti ti-package" aria-hidden="true"></i> Konfirmasi Barang Diterima
                                         </button>
                                     </form>
                                 }
                                 else if (selected.Status == TransactionStatus.Delivered)
                                 {
-                                    <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah dikonfirmasi diterima</p>
+                                    <p class="text-success-center"><i class="ti ti-check" aria-hidden="true"></i> Barang telah dikonfirmasi diterima</p>
                                 }
                             </div>
                         }
@@ -232,7 +233,7 @@
                                         </div>
                                         @if (!string.IsNullOrEmpty(myReview.Komentar))
                                         {
-                                            <span style="font-size:13px;color:#64748b;">— @myReview.Komentar</span>
+                                            <span class="text-muted">— @myReview.Komentar</span>
                                         }
                                     </div>
                                 }
@@ -246,14 +247,14 @@
                                         <div style="display:flex;gap:4px;margin-bottom:12px;">
                                             @for (int star = 1; star <= 5; star++)
                                             {
-                                                <button type="button" class="pstar-btn" data-value="@star">★</button>
+                                                <button type="button" class="btn-star" data-value="@star">★</button>
                                             }
                                         </div>
-                                        <div class="pform-group">
-                                            <textarea class="pform-input" name="komentar" rows="3"
+                                        <div class="form-group">
+                                            <textarea class="form-input" name="komentar" rows="3"
                                                       placeholder="Ceritakan pengalaman berdonasi..." style="resize:vertical;"></textarea>
                                         </div>
-                                        <button type="submit" class="pbtn pbtn-primary pbtn-block">Kirim Feedback</button>
+                                        <button type="submit" class="btn btn-primary btn-block">Kirim Feedback</button>
                                     </form>
                                 }
                             </div>
@@ -268,20 +269,20 @@
 
 <script>
     (function() {
-        document.querySelectorAll('.pstar-btn').forEach(function(btn) {
+        document.querySelectorAll('.btn-star').forEach(function(btn) {
             btn.addEventListener('mouseover', function() {
                 var val = parseInt(this.dataset.value);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+                document.querySelectorAll('.btn-star').forEach(function(s, i) { s.classList.toggle('active', i < val); });
             });
             btn.addEventListener('mouseout', function() {
                 var sel = parseInt(document.getElementById('ratingValue')?.value || 0);
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
+                document.querySelectorAll('.btn-star').forEach(function(s, i) { s.classList.toggle('active', i < sel); });
             });
             btn.addEventListener('click', function() {
                 var val = parseInt(this.dataset.value);
                 var rv = document.getElementById('ratingValue');
                 if (rv) rv.value = val;
-                document.querySelectorAll('.pstar-btn').forEach(function(s, i) { s.classList.toggle('active', i < val); });
+                document.querySelectorAll('.btn-star').forEach(function(s, i) { s.classList.toggle('active', i < val); });
             });
         });
     })();

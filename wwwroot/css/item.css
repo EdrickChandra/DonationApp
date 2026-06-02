@@ -32,7 +32,7 @@
     border: none;
     text-decoration: none;
     transition: all 0.15s;
-    color: #334155;
+    color: var(--text-mid);
     background: rgba(0,0,0,0.08);
     white-space: nowrap;
 }
@@ -43,12 +43,12 @@
 
     .pill:hover {
         background: rgba(0,0,0,0.14);
-        color: #0f172a;
+        color: var(--text-dark);
     }
 
     .pill.active {
         background: rgba(255,255,255,0.75);
-        color: #0f1f3d;
+        color: var(--navy);
         font-weight: 700;
     }
 
@@ -59,7 +59,7 @@
 .feed-tabs {
     display: flex;
     gap: 0;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--gray-200);
     margin-bottom: 24px;
 }
 
@@ -68,7 +68,7 @@
     font-size: 14px;
     font-weight: 600;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #334155;
+    color: var(--text-mid);
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
     text-decoration: none;
@@ -80,8 +80,8 @@
     }
 
     .feed-tab.active {
-        color: #0f1f3d;
-        border-bottom-color: #0f1f3d;
+        color: var(--navy);
+        border-bottom-color: var(--navy);
     }
 
 .feed-header {
@@ -94,13 +94,13 @@
 .feed-title {
     font-size: 20px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .feed-count {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--gray-400);
 }
 
 .card-grid {
@@ -127,7 +127,7 @@
 
 .card-img {
     height: 150px;
-    background: #e2e8f0;
+    background: var(--gray-200);
     position: relative;
     overflow: hidden;
 }
@@ -144,9 +144,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f1f5f9;
+    background: var(--gray-100);
     font-size: 36px;
-    color: #94a3b8;
+    color: var(--gray-400);
 }
 
 .card-timer-badge {
@@ -172,7 +172,7 @@
     position: absolute;
     top: 8px;
     left: 8px;
-    background: #0ea5e9;
+    background: var(--sky);
     color: white;
     font-size: 10px;
     font-weight: 700;
@@ -187,7 +187,7 @@
 .card-name {
     font-size: 13px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin-bottom: 5px;
     white-space: nowrap;
@@ -203,17 +203,17 @@
 
 .card-cat {
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--gray-400);
 }
 
 .card-dot {
     font-size: 10px;
-    color: #cbd5e1;
+    color: var(--gray-300);
 }
 
 .card-loc {
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--gray-400);
     display: flex;
     align-items: center;
     gap: 2px;
@@ -225,7 +225,7 @@
 
 .card-offers {
     font-size: 11px;
-    color: #0ea5e9;
+    color: var(--sky);
     font-weight: 600;
 }
 
@@ -234,7 +234,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--gray-100);
 }
 
 .card-poster {
@@ -243,38 +243,22 @@
     gap: 6px;
 }
 
-.card-poster-av {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #3b82f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 9px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-}
 
 .card-poster-name {
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--gray-400);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 90px;
 }
 
-.card-cta {
-    display: none;
-}
 
 .card-kondisi-baru {
     position: absolute;
     bottom: 8px;
     left: 8px;
-    background: #16a34a;
+    background: var(--green-dark);
     color: white;
     font-size: 10px;
     font-weight: 700;
@@ -286,7 +270,7 @@
     position: absolute;
     bottom: 8px;
     left: 8px;
-    background: #64748b;
+    background: var(--text-light);
     color: white;
     font-size: 10px;
     font-weight: 700;
@@ -294,40 +278,13 @@
     border-radius: 99px;
 }
 
-.card-menu-btn {
-    position: absolute;
-    top: 6px;
-    left: 8px;
-    background: white;
-    border: none;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-    z-index: 5;
-    transition: background 0.15s;
-}
-
-    .card-menu-btn:hover {
-        background: #f1f5f9;
-    }
-
-    .card-menu-btn i {
-        font-size: 14px;
-        color: #374151;
-    }
-
 .card-menu-dropdown {
     display: none;
     position: absolute;
     top: 38px;
     left: 8px;
     background: white;
-    border: 0.5px solid #e2e8f0;
+    border: 0.5px solid var(--gray-200);
     border-radius: 8px;
     padding: 4px 0;
     min-width: 130px;
@@ -346,7 +303,7 @@
     width: 100%;
     padding: 7px 14px;
     font-size: 12px;
-    color: #374151;
+    color: var(--gray-700);
     background: none;
     border: none;
     cursor: pointer;
@@ -356,7 +313,7 @@
 }
 
     .card-menu-item:hover {
-        background: #f8fafc;
+        background: var(--gray-50);
     }
 
     .card-menu-item i {
@@ -365,7 +322,7 @@
 
 .card-grid-empty {
     font-size: 13px;
-    color: #94a3b8;
+    color: var(--gray-400);
     padding: 48px 0;
     grid-column: 1 / -1;
     text-align: center;
@@ -390,7 +347,7 @@
 }
 
 .dpage-img-wrap {
-    background: #e2e8f0;
+    background: var(--gray-200);
     border-radius: 14px;
     height: 380px;
     position: relative;
@@ -414,13 +371,13 @@
     background: white;
     border-radius: 12px;
     padding: 16px 18px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--gray-200);
 }
 
 .dpage-title {
     font-size: 22px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0;
     line-height: 1.2;
@@ -431,7 +388,7 @@
     align-items: center;
     gap: 10px;
     padding-top: 12px;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--gray-100);
     margin-top: 12px;
 }
 
@@ -455,37 +412,15 @@
     padding: 24px 32px;
 }
 
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 500;
-    text-decoration: none;
-    margin-bottom: 20px;
-    transition: color 0.15s;
-}
-
-    .back-btn:hover {
-        color: #0f172a;
-    }
-
-    .back-btn i {
-        font-size: 16px;
-    }
-
 .detail-grid {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
     gap: 32px;
 }
 
-.detail-media {
-}
 
 .detail-img-wrap {
-    background: #e2e8f0;
+    background: var(--gray-200);
     border-radius: 14px;
     height: 320px;
     position: relative;
@@ -503,43 +438,13 @@
     width: 100%;
     height: 320px;
     border-radius: 14px;
-    background: #f1f5f9;
+    background: var(--gray-100);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 64px;
-    color: #94a3b8;
+    color: var(--gray-400);
 }
-
-.detail-slide-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0,0,0,0.45);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    cursor: pointer;
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s;
-}
-
-    .detail-slide-btn:hover {
-        background: rgba(0,0,0,0.65);
-    }
-
-    .detail-slide-btn.left {
-        left: 10px;
-    }
-
-    .detail-slide-btn.right {
-        right: 10px;
-    }
 
 .detail-counter {
     position: absolute;
@@ -570,7 +475,7 @@
 }
 
     .detail-thumb.active {
-        border-color: #2563eb;
+        border-color: var(--blue);
     }
 
     .detail-thumb img {
@@ -590,50 +495,11 @@
     margin-bottom: 12px;
 }
 
-.detail-badge-blue {
-    background: #dbeafe;
-    color: #1e40af;
-    border-radius: 99px;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.detail-badge-green {
-    background: #dcfce7;
-    color: #166534;
-    border-radius: 99px;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.detail-badge-sky {
-    background: #e0f2fe;
-    color: #0369a1;
-    border-radius: 99px;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-.detail-badge-red {
-    background: #fee2e2;
-    color: #991b1b;
-    border-radius: 99px;
-    padding: 4px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
 
 .detail-name {
     font-size: 26px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0 0 14px;
     line-height: 1.2;
@@ -662,7 +528,7 @@
     justify-content: space-between;
     padding-top: 14px;
     margin-top: 8px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--gray-200);
 }
 
 .detail-poster {
@@ -672,29 +538,16 @@
     margin-bottom: 20px;
 }
 
-.detail-poster-av {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #3b82f6;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
-}
 
 .detail-poster-name {
     font-size: 13px;
     font-weight: 600;
-    color: #334155;
+    color: var(--text-mid);
 }
 
 .detail-poster-loc {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--gray-400);
     display: flex;
     align-items: center;
     gap: 3px;
@@ -707,7 +560,7 @@
 
 .detail-divider {
     height: 1px;
-    background: #f1f5f9;
+    background: var(--gray-100);
     margin-bottom: 16px;
 }
 
@@ -718,7 +571,7 @@
 .detail-row-label {
     font-size: 10px;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--gray-400);
     text-transform: uppercase;
     letter-spacing: 0.07em;
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -727,7 +580,7 @@
 
 .detail-row-value {
     font-size: 14px;
-    color: #1e293b;
+    color: var(--gray-800);
     line-height: 1.6;
 }
 
@@ -736,11 +589,11 @@
     align-items: center;
     gap: 6px;
     font-weight: 700;
-    color: #0f172a;
+    color: var(--text-dark);
 }
 
     .detail-timer i {
-        color: #f59e0b;
+        color: var(--amber);
         font-size: 16px;
     }
 
@@ -752,63 +605,6 @@
     gap: 8px;
 }
 
-.detail-btn {
-    width: 100%;
-    padding: 14px;
-    background: #2563eb;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    text-decoration: none;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: background 0.15s;
-}
-
-    .detail-btn:hover {
-        background: #1d4ed8;
-    }
-
-.detail-btn-disabled {
-    background: #e2e8f0;
-    color: #94a3b8;
-    cursor: not-allowed;
-}
-
-    .detail-btn-disabled:hover {
-        background: #e2e8f0;
-    }
-
-.detail-btn-ghost {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    color: #64748b;
-    border: 1.5px solid #cbd5e1;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.15s;
-}
-
-    .detail-btn-ghost:hover {
-        border-color: #94a3b8;
-        color: #334155;
-    }
-
 .offers-section {
     margin-top: 40px;
     max-width: 860px;
@@ -817,14 +613,14 @@
 .offers-title {
     font-size: 16px;
     font-weight: 800;
-    color: #0f172a;
+    color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin-bottom: 14px;
 }
 
 .offer-card {
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--gray-200);
     border-radius: 10px;
     padding: 16px;
     margin-bottom: 10px;
@@ -840,20 +636,20 @@
 .offer-card-name {
     font-size: 13px;
     font-weight: 600;
-    color: #0f172a;
+    color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
     margin: 0;
 }
 
 .offer-card-time {
     font-size: 11px;
-    color: #94a3b8;
+    color: var(--gray-400);
     margin: 0;
 }
 
 .offer-card-desc {
     font-size: 13px;
-    color: #64748b;
+    color: var(--text-light);
     margin: 0 0 10px;
     line-height: 1.6;
 }
@@ -869,41 +665,8 @@
     height: 72px;
     border-radius: 8px;
     object-fit: cover;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--gray-200);
 }
-
-.offer-btn-accept {
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    border: none;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: background 0.15s;
-}
-
-    .offer-btn-accept:hover {
-        background: #1d4ed8;
-    }
-
-.offer-btn-reject {
-    padding: 6px 14px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    border: none;
-    background: #fee2e2;
-    color: #991b1b;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-
-    .offer-btn-reject:hover {
-        background: #fecaca;
-    }
 
 .modal-overlay {
     display: none;

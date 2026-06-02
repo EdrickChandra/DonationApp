@@ -32,14 +32,14 @@
         }
         @if (TempData["DonasiError"] != null)
         {
-            <div style="margin:12px 16px 0;" class="pform-error-banner">@TempData["DonasiError"]</div>
+            <div style="margin:12px 16px 0;" class="form-error-banner">@TempData["DonasiError"]</div>
         }
 
         @if (visibleDonations == null || !visibleDonations.Any())
         {
-            <div style="padding:48px;text-align:center;font-size:13px;color:#64748b;">
+            <div class="empty-state">
                 Belum ada donasi.
-                <a asp-controller="Donasi" asp-action="Create" class="pbtn pbtn-primary" style="display:inline-flex;margin-top:12px;">Buat Donasi Pertama</a>
+                <a asp-controller="Donasi" asp-action="Create" class="btn btn-primary" style="display:inline-flex;margin-top:12px;">Buat Donasi Pertama</a>
             </div>
         }
         else
@@ -58,13 +58,13 @@
                         string statusClass;
 
                         if (activeRequests.Any(r => r.Status == TransactionStatus.Shipped))
-                        { statusLabel = "Dikirim"; statusClass = "pbadge-pending"; }
+                        { statusLabel = "Dikirim"; statusClass = "badge-pending"; }
                         else if (activeRequests.Any(r => r.Status == TransactionStatus.Accepted))
-                        { statusLabel = "Diterima"; statusClass = "pbadge-claimed"; }
+                        { statusLabel = "Diterima"; statusClass = "badge-claimed"; }
                         else if (activeRequests.Any(r => r.Status == TransactionStatus.Delivered))
-                        { statusLabel = "Selesai"; statusClass = "pbadge-available"; }
+                        { statusLabel = "Selesai"; statusClass = "badge-available"; }
                         else
-                        { statusLabel = d.Status == ItemStatus.Available ? "Tersedia" : "Diambil"; statusClass = d.Status == ItemStatus.Available ? "pbadge-available" : "pbadge-claimed"; }
+                        { statusLabel = d.Status == ItemStatus.Available ? "Tersedia" : "Diambil"; statusClass = d.Status == ItemStatus.Available ? "badge-available" : "badge-claimed"; }
 
                         var daysLeft = (d.ExpiresAt - DateTime.UtcNow).Days;
 
@@ -78,7 +78,7 @@
                             {
                                 <div class="plist-thumb"><i class="ti ti-gift" aria-hidden="true"></i></div>
                             }
-                            <div style="flex:1;min-width:0;">
+                            <div class="flex-min">
                                 <div class="plist-name">@d.NamaBarang</div>
                                 <div class="plist-sub">
                                     @CategoryHelper.DisplayName(d.Kategori)
@@ -92,7 +92,7 @@
                                     }
                                 </div>
                             </div>
-                            <span class="pbadge @statusClass">@statusLabel</span>
+                            <span class="badge @statusClass">@statusLabel</span>
                         </a>
                     }
                 </div>
@@ -115,30 +115,30 @@
                         <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (selected.Images.Any())
                             {
-                                <img src="@selected.Images.First().FilePath" style="width:60px;height:60px;border-radius:8px;object-fit:cover;flex-shrink:0;" />
+                                <img src="@selected.Images.First().FilePath" class="img-60" />
                             }
-                            <div style="flex:1;">
+                            <div class="flex-1">
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.NamaBarang</div>
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                                    <span class="pbadge pbadge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
-                                    <span class="pbadge pbadge-muted">@selected.Kondisi</span>
-                                    <span class="pbadge pbadge-muted">Sisa @selected.Jumlah pcs</span>
-                                    <span class="pbadge pbadge-muted">@selected.Lokasi</span>
+                                    <span class="badge badge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
+                                    <span class="badge badge-muted">@selected.Kondisi</span>
+                                    <span class="badge badge-muted">Sisa @selected.Jumlah pcs</span>
+                                    <span class="badge badge-muted">@selected.Lokasi</span>
                                 </div>
                             </div>
                             <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
-                                <button onclick="runMatch(@selected.Id, this)" class="pbtn" style="font-size:12px;padding:5px 12px;background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-color:#2563eb;">
+                                <button onclick="runMatch(@selected.Id, this)" class="btn btn-secondary btn-sm" style="background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-color:#2563eb;">
                                     <i class="ti ti-search" aria-hidden="true"></i> Cari Kecocokan
                                 </button>
                                 @if (!hasAnyActive)
                                 {
-                                    <a href="/Donasi/Edit/@selected.Id" class="pbtn" style="font-size:12px;padding:5px 12px;">
+                                    <a href="/Donasi/Edit/@selected.Id" class="btn btn-secondary btn-sm">
                                         <i class="ti ti-edit" aria-hidden="true"></i> Edit
                                     </a>
                                     <form asp-controller="Donasi" asp-action="Delete" method="post" onsubmit="return confirm('Hapus donasi ini?')">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="id" value="@selected.Id" />
-                                        <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:5px 12px;">
+                                        <button type="submit" class="btn btn-danger btn-sm">
                                             <i class="ti ti-trash" aria-hidden="true"></i> Hapus
                                         </button>
                                     </form>
@@ -164,20 +164,20 @@
                                         };
                                         var rStatusClass = r.Status switch
                                         {
-                                            TransactionStatus.Accepted  => "pbadge-claimed",
-                                            TransactionStatus.Shipped   => "pbadge-pending",
-                                            TransactionStatus.Delivered => "pbadge-available",
-                                            _ => "pbadge-muted"
+                                            TransactionStatus.Accepted  => "badge-claimed",
+                                            TransactionStatus.Shipped   => "badge-pending",
+                                            TransactionStatus.Delivered => "badge-available",
+                                            _ => "badge-muted"
                                         };
                                         <div>
                                             <div class="penerima-row" onclick="togglePenerima('penerima-detail-@r.Id')"
                                                  style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#e2e8f0;border-radius:8px;cursor:pointer;border:1px solid #c4c9d4;transition:background 0.15s;">
-                                                <div class="preview-avatar" style="width:28px;height:28px;font-size:12px;flex-shrink:0;">@rAvatar</div>
-                                                <div style="flex:1;">
-                                                    <div style="font-size:13px;font-weight:500;color:#0f172a;">@rName</div>
-                                                    <div style="font-size:11px;color:#64748b;">@r.Jumlah pcs · @r.User?.Alamat</div>
+                                                <a href="/Profile/View/@r.UserId" class="avatar avatar-sm" style="text-decoration:none;color:#fff;" onclick="event.stopPropagation();">@rAvatar</a>
+                                                <div class="flex-1">
+                                                    <a href="/Profile/View/@r.UserId" class="text-strong" style="text-decoration:none;" onclick="event.stopPropagation();">@rName</a>
+                                                    <div class="text-xs-muted">@r.Jumlah pcs · @r.User?.Alamat</div>
                                                 </div>
-                                                <span class="pbadge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
+                                                <span class="badge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
                                                 <i class="ti ti-chevron-down" id="chevron-@r.Id" style="font-size:14px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
                                             </div>
                                             <div id="penerima-detail-@r.Id" style="display:none;padding:12px;background:#f8fafc;border:1px solid #c4c9d4;border-top:none;border-radius:0 0 8px 8px;margin-bottom:2px;">
@@ -186,7 +186,7 @@
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="itemId" value="@selected.Id" />
                                                         <input type="hidden" name="otherUserId" value="@r.UserId" />
-                                                        <button type="submit" class="pbtn pbtn-primary" style="font-size:12px;padding:5px 12px;">
+                                                        <button type="submit" class="btn btn-primary btn-sm">
                                                             <i class="ti ti-message-2" aria-hidden="true"></i> Chat
                                                         </button>
                                                     </form>
@@ -206,18 +206,13 @@
                                                         <div class="pstep-dot @(r.Status >= TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
                                                         <div class="pstep-label">Diterima</div>
                                                     </div>
-                                                    <div class="pstep-line @(r.Status == TransactionStatus.Delivered && r.Feedbacks.Any() ? "done" : "")"></div>
-                                                    <div class="pstep @(r.Feedbacks.Any() ? "done" : "")">
-                                                        <div class="pstep-dot @(r.Feedbacks.Any() ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
-                                                        <div class="pstep-label">Feedback</div>
-                                                    </div>
                                                 </div>
                                                 @if (r.Status == TransactionStatus.Accepted)
                                                 {
                                                     <form asp-controller="Donasi" asp-action="MarkShipped" method="post">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="claimRequestId" value="@r.Id" />
-                                                        <button type="submit" class="pbtn pbtn-primary pbtn-block" style="font-size:12px;">
+                                                        <button type="submit" class="btn btn-primary btn-block">
                                                             <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
                                                         </button>
                                                     </form>
@@ -228,11 +223,21 @@
                                                 }
                                                 else if (r.Status == TransactionStatus.Delivered)
                                                 {
-                                                    <p style="font-size:12px;color:#16a34a;text-align:center;"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                                    <p class="text-success-center"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
                                                 }
                                             </div>
                                         </div>
                                     }
+                                </div>
+                            </div>
+                        }
+
+                        @if (selected.Jumlah <= 0 && !hasAnyActive)
+                        {
+                            <div class="psec">
+                                <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+                                    <span class="badge badge-muted">Stok Habis</span>
+                                    <span style="font-size:12px;color:#64748b;">Tidak dapat menerima permintaan baru.</span>
                                 </div>
                             </div>
                         }
@@ -248,27 +253,35 @@
                                 var rAvatar = r.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                                 var rName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
                                 <div class="preq-row">
-                                    <div class="preq-avatar">@rAvatar</div>
-                                    <div style="flex:1;">
-                                        <span class="preq-name">@rName</span>
-                                        <div style="font-size:11px;color:#64748b;">Minta @r.Jumlah pcs</div>
+                                    <a href="/Profile/View/@r.UserId" class="avatar avatar-sm" style="text-decoration:none;color:#fff;">@rAvatar</a>
+                                    <div class="flex-1">
+                                        <a href="/Profile/View/@r.UserId" class="preq-name" style="text-decoration:none;">@rName</a>
+                                        <div class="text-xs-muted">Minta @r.Jumlah pcs</div>
                                     </div>
                                     <div class="preq-actions">
-                                        <form asp-controller="Donasi" asp-action="Accept" method="post" style="display:inline;">
+                                        @if (selected.Jumlah > 0)
+                                        {
+                                            <form asp-controller="Donasi" asp-action="Accept" method="post" style="display:inline;" onsubmit="return confirm('Terima permintaan dari @rName?')">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="requestId" value="@r.Id" />
+                                                <button type="submit" class="btn btn-success btn-sm">Terima</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary btn-sm" style="opacity:0.5;" disabled>Stok Habis</button>
+                                        }
+                                        <form asp-controller="Donasi" asp-action="Reject" method="post" style="display:inline;" onsubmit="return confirm('Tolak permintaan dari @rName?')">
+
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="requestId" value="@r.Id" />
-                                            <button type="submit" class="pbtn pbtn-success" style="font-size:12px;padding:4px 10px;">Terima</button>
-                                        </form>
-                                        <form asp-controller="Donasi" asp-action="Reject" method="post" style="display:inline;">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="requestId" value="@r.Id" />
-                                            <button type="submit" class="pbtn pbtn-danger" style="font-size:12px;padding:4px 10px;">Tolak</button>
+                                            <button type="submit" class="btn btn-danger btn-sm">Tolak</button>
                                         </form>
                                         <form asp-controller="Donasi" asp-action="Chat" method="post" style="display:inline;">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="itemId" value="@selected.Id" />
                                             <input type="hidden" name="otherUserId" value="@r.UserId" />
-                                            <button type="submit" class="pbtn pbtn-primary" style="font-size:12px;padding:4px 10px;">Chat</button>
+                                            <button type="submit" class="btn btn-primary btn-sm">Chat</button>
                                         </form>
                                     </div>
                                 </div>

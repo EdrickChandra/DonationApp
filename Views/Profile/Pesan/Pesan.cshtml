@@ -40,7 +40,7 @@
                         {
                             <div class="pchat-thumb-placeholder"></div>
                         }
-                        <div style="flex:1;min-width:0;">
+                        <div class="flex-min">
                             <div class="pchat-name">@conv.Item?.NamaBarang</div>
                             <div class="pchat-preview">@lastPreview</div>
                         </div>
@@ -78,11 +78,11 @@
                 </div>
                 <div class="pchat-input-row">
                     <input type="file" id="chatImageInput" accept=".jpg,.jpeg,.png,.gif" style="display:none;" onchange="previewChatImage(this)" />
-                    <button type="button" class="pchat-img-btn" onclick="document.getElementById('chatImageInput').click()" title="Kirim Foto">
+                    <button type="button" class="btn-chat-img" onclick="document.getElementById('chatImageInput').click()" title="Kirim Foto">
                         <i class="ti ti-photo" aria-hidden="true"></i>
                     </button>
                     <textarea class="pchat-textarea" id="chatInput" placeholder="Tulis pesan..." rows="1"></textarea>
-                    <button class="pchat-send-btn" id="chatSendBtn" onclick="sendMessage()">Kirim</button>
+                    <button class="btn btn-primary" id="chatSendBtn" onclick="sendMessage()">Kirim</button>
                 </div>
             </div>
         </div>

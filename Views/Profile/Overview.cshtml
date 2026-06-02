@@ -50,8 +50,8 @@
                     var daysAgo = (DateTime.UtcNow - r.CreatedAt).Days;
                     var itemName = r.ClaimRequest?.Item?.NamaBarang ?? r.ItemRequest?.Title ?? "";
                     <div class="preview-item">
-                        <div class="preview-avatar">@rAvatar</div>
-                        <div style="flex:1;">
+                        <div class="avatar">@rAvatar</div>
+                        <div class="flex-1">
                             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
                                 <span class="preview-name">@rName</span>
                                 <span class="pstars" style="font-size:12px;">

@@ -37,14 +37,14 @@
 
         <div class="ppage-header">
             <h1 class="ppage-title">@pageTitle</h1>
-            <a asp-controller="Donasi" asp-action="Index" class="pbtn" style="font-size:12px;">
+            <a asp-controller="Donasi" asp-action="Index" class="btn btn-secondary btn-sm">
                 <i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali
             </a>
         </div>
 
         @if (TempData["DonasiError"] != null)
         {
-            <div class="pform-error-banner">@TempData["DonasiError"]</div>
+            <div class="form-error-banner">@TempData["DonasiError"]</div>
         }
         @if (TempData["DonasiSuccess"] != null)
         {
@@ -65,76 +65,72 @@
                 }
                 <input type="hidden" id="DetailTambahanJson" name="DetailTambahanJson" />
 
-                <div class="pform-group">
-                    <label class="pform-label">Nama Barang</label>
-                    <input class="pform-input" name="NamaBarang" value="@editItem?.NamaBarang" placeholder="Masukkan nama barang..." required />
-                    <span class="pform-error" data-for="NamaBarang">Nama barang wajib diisi.</span>
+                <div class="form-group">
+                    <label class="form-label">Nama Barang</label>
+                    <input class="form-input" name="NamaBarang" value="@editItem?.NamaBarang" placeholder="Masukkan nama barang..." required />
+                    <span class="form-error" data-for="NamaBarang">Nama barang wajib diisi.</span>
                 </div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Kategori</label>
-                    <select class="pform-input" name="Kategori" id="donasi-kategori" onchange="showDonasFields(this.value)" required>
+                <div class="form-group">
+                    <label class="form-label">Kategori</label>
+                    <select class="form-input" name="Kategori" id="donasi-kategori" onchange="showDonasFields(this.value)" required>
                         <option value="">Pilih Kategori</option>
                         @foreach (var cat in CategoryHelper.AllCategories())
                         {
                             <option value="@((int)cat)" selected="@(editItem != null && editItem.Kategori == cat)">@CategoryHelper.DisplayName(cat)</option>
                         }
                     </select>
-                    <span class="pform-error" data-for="Kategori">Kategori wajib dipilih.</span>
+                    <span class="form-error" data-for="Kategori">Kategori wajib dipilih.</span>
                 </div>
 
                 <div id="donasi-detail-fields"></div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Kondisi Barang</label>
+                <div class="form-group">
+                    <label class="form-label">Kondisi Barang</label>
                     <input type="hidden" id="kondisiInput" name="Kondisi" value="@((int)(editItem?.Kondisi ?? ItemCondition.Baru))" />
                     <div class="pcond-group">
-                        <button type="button" class="pcond-btn @(editItem == null || editItem.Kondisi == ItemCondition.Baru ? "selected" : "")" data-value="@((int)ItemCondition.Baru)">Baru</button>
-                        <button type="button" class="pcond-btn @(editItem?.Kondisi == ItemCondition.Bekas ? "selected" : "")" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                        <button type="button" class="btn-condition @(editItem == null || editItem.Kondisi == ItemCondition.Baru ? "selected" : "")" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                        <button type="button" class="btn-condition @(editItem?.Kondisi == ItemCondition.Bekas ? "selected" : "")" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
                     </div>
                 </div>
 
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <div class="pform-group">
-                        <label class="pform-label">Provinsi</label>
-                        <select class="pform-input" name="Provinsi" id="donasi-provinsi" onchange="updateDonasiKota(this.value)" required>
+                <div class="input-row">
+                    <div class="form-group">
+                        <label class="form-label">Provinsi</label>
+                        <select class="form-input" name="Provinsi" id="donasi-provinsi" onchange="updateDonasiKota(this.value)" required>
                             <option value="">Pilih Provinsi</option>
-                            @foreach (var prov in new[] { "Aceh","Bali","Banten","Bengkulu","DI Yogyakarta","DKI Jakarta","Gorontalo","Jambi","Jawa Barat","Jawa Tengah","Jawa Timur","Kalimantan Barat","Kalimantan Selatan","Kalimantan Tengah","Kalimantan Timur","Kalimantan Utara","Kepulauan Bangka Belitung","Kepulauan Riau","Lampung","Maluku","Maluku Utara","Nusa Tenggara Barat","Nusa Tenggara Timur","Papua","Papua Barat","Riau","Sulawesi Barat","Sulawesi Selatan","Sulawesi Tengah","Sulawesi Tenggara","Sulawesi Utara","Sumatera Barat","Sumatera Selatan","Sumatera Utara" })
-                            {
-                                <option selected="@(defaultProvinsi == prov)">@prov</option>
-                            }
                         </select>
-                        <span class="pform-error" data-for="Provinsi">Provinsi wajib dipilih.</span>
+                        <span class="form-error" data-for="Provinsi">Provinsi wajib dipilih.</span>
                     </div>
-                    <div class="pform-group">
-                        <label class="pform-label">Kota</label>
-                        <select class="pform-input" name="Lokasi" id="donasi-kota" required>
+                    <div class="form-group">
+                        <label class="form-label">Kota</label>
+                        <select class="form-input" name="Lokasi" id="donasi-kota" required>
                             <option value="">Pilih Provinsi dulu</option>
                         </select>
-                        <span class="pform-error" data-for="Lokasi">Kota wajib dipilih.</span>
+                        <span class="form-error" data-for="Lokasi">Kota wajib dipilih.</span>
                     </div>
                 </div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Jumlah Barang</label>
-                    <input class="pform-input" name="Jumlah" type="number" min="1" max="99" value="@(editItem?.Jumlah ?? 1)" style="width:120px;" />
+                <div class="form-group">
+                    <label class="form-label">Jumlah Barang</label>
+                    <input class="form-input" name="Jumlah" type="number" min="1" max="99" value="@(editItem?.Jumlah ?? 1)" style="width:120px;" />
                 </div>
 
-                <div class="pform-group">
-                    <label class="pform-label">Deskripsi</label>
-                    <textarea class="pform-input" name="Deskripsi" rows="4" placeholder="Ceritakan kondisi barang secara detail..." required style="resize:vertical;">@editItem?.Deskripsi</textarea>
-                    <span class="pform-error" data-for="Deskripsi">Deskripsi wajib diisi.</span>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea class="form-input" name="Deskripsi" rows="4" placeholder="Ceritakan kondisi barang secara detail..." required style="resize:vertical;">@editItem?.Deskripsi</textarea>
+                    <span class="form-error" data-for="Deskripsi">Deskripsi wajib diisi.</span>
                 </div>
 
                 @if (isEdit && editItem!.Images.Any())
                 {
-                    <div class="pform-group">
-                        <label class="pform-label">Foto Saat Ini</label>
+                    <div class="form-group">
+                        <label class="form-label">Foto Saat Ini</label>
                         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
                             @foreach (var img in editItem.Images)
                             {
                                 <div style="position:relative;width:88px;height:88px;">
-                                    <img src="@img.FilePath" style="width:88px;height:88px;border-radius:8px;object-fit:cover;" />
+                                    <img src="@img.FilePath" class="img-88" />
                                     <form asp-controller="Donasi" asp-action="DeleteImage" method="post" style="display:inline;">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="imageId" value="@img.Id" />
@@ -147,20 +143,20 @@
                     </div>
                 }
 
-                <div class="pform-group">
-                    <label class="pform-label">
+                <div class="form-group">
+                    <label class="form-label">
                         @(isEdit ? "Tambah Foto Baru" : "Foto Barang")
-                        <span class="pform-hint">(maks. 5, 5MB, JPG/PNG)</span>
+                        <span class="form-hint">(maks. 5, 5MB, JPG/PNG)</span>
                     </label>
                     <input type="file" id="donasi-file-input" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
                     @if (!isEdit)
                     {
-                        <span class="pform-error" id="donasi-image-error">Minimal 1 foto harus diunggah.</span>
+                        <span class="form-error" id="donasi-image-error">Minimal 1 foto harus diunggah.</span>
                     }
                     <div id="donasi-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
                 </div>
 
-                <button type="submit" class="pbtn pbtn-primary pbtn-block" onclick="return validateDonasi()">
+                <button type="submit" class="btn btn-primary btn-block" onclick="return validateDonasi()">
                     @(isEdit ? "Simpan Perubahan" : "Posting Donasi")
                 </button>
             </form>
@@ -180,11 +176,9 @@
 
     // Auto-fill provinsi and kota on load
     (function() {
-        if (defaultProvinsi) {
-            var provSel = document.getElementById('donasi-provinsi');
-            if (provSel) provSel.value = defaultProvinsi;
-            updateDonasiKota(defaultProvinsi);
-        }
+        var provSel = document.getElementById('donasi-provinsi');
+        if (provSel) populateProvinsi(provSel, defaultProvinsi);
+        if (defaultProvinsi) updateDonasiKota(defaultProvinsi);
     })();
 
     var categoryFields = {
@@ -217,15 +211,15 @@
         if (!fields) return;
         fields.forEach(function(f) {
             var div = document.createElement('div');
-            div.className = 'pform-group';
+            div.className = 'form-group';
             var label = document.createElement('label');
-            label.className = 'pform-label';
+            label.className = 'form-label';
             label.textContent = f.label;
             div.appendChild(label);
             var input;
             if (f.type === 'select') {
                 input = document.createElement('select');
-                input.className = 'pform-input';
+                input.className = 'form-input';
                 input.dataset.key = f.key;
                 input.id = 'donasi-field-' + f.key;
                 var empty = document.createElement('option');
@@ -239,7 +233,7 @@
                 });
             } else {
                 input = document.createElement('input');
-                input.className = 'pform-input';
+                input.className = 'form-input';
                 input.type = 'text';
                 input.placeholder = f.placeholder || '';
                 input.dataset.key = f.key;
@@ -254,9 +248,9 @@
     var katEl = document.getElementById('donasi-kategori');
     if (katEl && katEl.value) showDonasFields(katEl.value);
 
-    document.querySelectorAll('.pcond-btn').forEach(function(btn) {
+    document.querySelectorAll('.btn-condition').forEach(function(btn) {
         btn.addEventListener('click', function() {
-            document.querySelectorAll('.pcond-btn').forEach(function(b) { b.classList.remove('selected'); });
+            document.querySelectorAll('.btn-condition').forEach(function(b) { b.classList.remove('selected'); });
             this.classList.add('selected');
             document.getElementById('kondisiInput').value = this.dataset.value;
         });
