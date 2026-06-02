@@ -102,7 +102,7 @@
                                     <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                     <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                                 </div>
-                                <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
+                                <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@(r.Status == TransactionStatus.Accepted ? "Diterima" : r.Status == TransactionStatus.Rejected ? "Ditolak" : r.Status == TransactionStatus.Shipped ? "Dikirim" : r.Status == TransactionStatus.Delivered ? "Selesai" : "Menunggu")</span>
                             </div>
                         }
                     }
@@ -277,7 +277,7 @@
                                 <p class="profile-item-name">@r.Item?.NamaBarang</p>
                                 <p class="profile-item-sub">Diminta @((DateTime.UtcNow - r.CreatedAt).Days) hari lalu</p>
                             </div>
-                            <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@r.Status</span>
+                            <span class="profile-badge @(r.Status == TransactionStatus.Accepted ? "profile-badge-claimed" : r.Status == TransactionStatus.Rejected ? "profile-badge-rejected" : "profile-badge-pending")">@(r.Status == TransactionStatus.Accepted ? "Diterima" : r.Status == TransactionStatus.Rejected ? "Ditolak" : r.Status == TransactionStatus.Shipped ? "Dikirim" : r.Status == TransactionStatus.Delivered ? "Selesai" : "Menunggu")</span>
                         </div>
                     }
                 }

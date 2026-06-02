@@ -102,10 +102,10 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <div class="card-poster">
+                                <a href="/Profile/View/@item.UserId" class="card-poster" style="text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
                                     <div class="card-poster-av">@posterInitial</div>
                                     <span class="card-poster-name">@posterName</span>
-                                </div>
+                                </a>
                             </div>
                         </a>
                         <button class="card-menu-btn" onclick="toggleCardMenu('@cardId', event)" aria-label="Opsi">
@@ -171,17 +171,17 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <div class="card-poster">
+                                <a href="/Profile/View/@req.UserId" class="card-poster" style="text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
                                     <div class="card-poster-av">@avatarLetter</div>
                                     <span class="card-poster-name">@posterName</span>
-                                </div>
+                                </a>
                             </div>
                         </a>
                         <button class="card-menu-btn" onclick="toggleCardMenu('@cardId', event)" aria-label="Opsi">
                             <i class="ti ti-dots-vertical" aria-hidden="true"></i>
                         </button>
                         <div class="card-menu-dropdown" id="@cardId">
-                            <button class="card-menu-item" onclick="reportItem(@req.Id)">
+                            <button class="card-menu-item" onclick="reportRequest(@req.Id)">
                                 <i class="ti ti-flag" aria-hidden="true"></i> Lapor
                             </button>
                             <button class="card-menu-item" onclick="copyLink('/Request/Detail/@req.Id')">
@@ -217,9 +217,5 @@
             document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
         }
 
-        function reportItem(id) {
-            alert('Laporan telah dikirim.');
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
-        }
     </script>
 }

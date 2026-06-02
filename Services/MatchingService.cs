@@ -99,7 +99,7 @@ public class MatchingService
         if (item.Kategori != req.Kategori)
             return (0, reasons);
 
-        score += 40;
+        score += 20;
         reasons.Add("Kategori cocok");
 
         var keywordScore = ComputeKeywordScore(
@@ -131,7 +131,7 @@ public class MatchingService
         if (req.Kategori != item.Kategori)
             return (0, reasons);
 
-        score += 40;
+        score += 20;
         reasons.Add("Kategori cocok");
 
         var keywordScore = ComputeKeywordScore(
@@ -170,7 +170,7 @@ public class MatchingService
         var overlap = sourceTokens.Intersect(targetTokens).Count();
         var ratio = (double)overlap / Math.Min(sourceTokens.Count, targetTokens.Count);
 
-        return (int)Math.Round(ratio * 30);
+        return (int)Math.Round(ratio * 40);
     }
 
     private HashSet<string> Tokenize(string text)
@@ -186,13 +186,13 @@ public class MatchingService
         if (!string.IsNullOrWhiteSpace(lokasi1) && !string.IsNullOrWhiteSpace(lokasi2))
         {
             if (string.Equals(lokasi1.Trim(), lokasi2.Trim(), StringComparison.OrdinalIgnoreCase))
-                return (20, "Kota sama");
+                return (15, "Kota sama");
         }
 
         if (!string.IsNullOrWhiteSpace(provinsi1) && !string.IsNullOrWhiteSpace(provinsi2))
         {
             if (string.Equals(provinsi1.Trim(), provinsi2.Trim(), StringComparison.OrdinalIgnoreCase))
-                return (10, "Provinsi sama");
+                return (8, "Provinsi sama");
         }
 
         return (0, null);
@@ -236,7 +236,7 @@ public class MatchingService
 
             if (matchedFields.Count == 0) return (0, null);
 
-            var points = Math.Min(matchedFields.Count * 10, 20);
+            var points = Math.Min(matchedFields.Count * 10, 25);
             return (points, $"Detail cocok: {string.Join(", ", matchedFields)}");
         }
         catch

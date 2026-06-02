@@ -77,10 +77,10 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <div class="card-poster">
+                        <a href="/Profile/View/@item.UserId" class="card-poster" style="text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
                             <div class="card-poster-av">@posterInitial</div>
                             <span class="card-poster-name">@posterName</span>
-                        </div>
+                        </a>
                     </div>
                 </a>
                 <button class="card-menu-btn" onclick="toggleCardMenu('@cardId', event)" aria-label="Opsi">
@@ -112,6 +112,5 @@
         }
         document.addEventListener('click', () => document.querySelectorAll('.card-menu-dropdown').forEach(el => el.classList.remove('open')));
         function copyLink(path) { navigator.clipboard.writeText(window.location.origin + path); }
-        function reportItem(id) { alert('Laporan untuk item #' + id + ' telah dikirim.'); }
     </script>
 }
