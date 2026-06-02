@@ -53,11 +53,11 @@
 
     <div class="feed-tabs">
         <a class="feed-tab @(activeTab == "donasi" ? "active" : "")"
-           href="/Search?q=@Uri.EscapeDataString(query)&tab=donasi&kategori=@((int)selected)">
+           href="/Search?q=@Uri.EscapeDataString(query)&tab=donasi@(selected.HasValue ? $"&kategori={(int)selected.Value}" : "")">
             Donasi (@donations.Count)
         </a>
         <a class="feed-tab @(activeTab == "request" ? "active" : "")"
-           href="/Search?q=@Uri.EscapeDataString(query)&tab=request&kategori=@((int)selected)">
+           href="/Search?q=@Uri.EscapeDataString(query)&tab=request@(selected.HasValue ? $"&kategori={(int)selected.Value}" : "")">
             Request (@requests.Count)
         </a>
     </div>

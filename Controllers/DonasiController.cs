@@ -224,6 +224,7 @@ public class DonasiController : AppBaseController
 
         var item = await _db.Items
             .Include(i => i.Images)
+            .Include(i => i.User)
             .Include(i => i.ClaimRequests)
             .FirstOrDefaultAsync(i => i.Id == id);
 

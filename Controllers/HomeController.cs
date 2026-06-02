@@ -17,6 +17,7 @@ public class HomeController : AppBaseController
     {
         var query = _db.Items
             .Include(i => i.Images)
+            .Include(i => i.User)
             .Where(i => i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
 
         if (kategori.HasValue)

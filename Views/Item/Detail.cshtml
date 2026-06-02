@@ -9,8 +9,8 @@
     var hasRequested = (bool)ViewBag.HasRequested;
     var posterInitial = Model.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
     var posterName = Model.User != null ? Model.User.NamaDepan + " " + Model.User.NamaBelakang : "Unknown";
-    var avgRating = ViewBag.AverageRating as double? ?? 0;
-    var totalReviews = ViewBag.TotalReviews as int? ?? 0;
+    var avgRating = ViewBag.AverageRating != null ? (double)ViewBag.AverageRating : 0.0;
+    var totalReviews = ViewBag.TotalReviews != null ? (int)ViewBag.TotalReviews : 0;
 
     Dictionary<string, string>? detailTambahan = null;
     if (!string.IsNullOrWhiteSpace(Model.DetailTambahan))
