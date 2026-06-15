@@ -28,13 +28,13 @@
                 <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
                     @if (!string.IsNullOrEmpty(user?.Kota) || !string.IsNullOrEmpty(user?.Provinsi))
                     {
-                        <span style="font-size:12px;color:#64748b;display:flex;align-items:center;gap:3px;">
-                            <i class="ti ti-map-pin" style="font-size:13px;" aria-hidden="true"></i>
+                        <span style="font-size:14px;color:#64748b;display:flex;align-items:center;gap:3px;">
+                            <i class="ti ti-map-pin" style="font-size:15px;" aria-hidden="true"></i>
                             @user?.Kota@(!string.IsNullOrEmpty(user?.Provinsi) ? ", " + user?.Provinsi : "")
                         </span>
                     }
-                    <span style="font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:3px;">
-                        <i class="ti ti-calendar" style="font-size:13px;" aria-hidden="true"></i>
+                    <span style="font-size:14px;color:#94a3b8;display:flex;align-items:center;gap:3px;">
+                        <i class="ti ti-calendar" style="font-size:15px;" aria-hidden="true"></i>
                         Bergabung @memberSince
                     </span>
                 </div>
@@ -44,18 +44,18 @@
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;">
             <div style="text-align:center;padding:12px;background:#f8fafc;border-radius:10px;">
                 <div style="font-size:22px;font-weight:700;color:#0f172a;">@totalDonasi</div>
-                <div style="font-size:11px;color:#64748b;font-weight:500;">Donasi</div>
+                <div style="font-size:13px;color:#64748b;font-weight:500;">Donasi</div>
             </div>
             <div style="text-align:center;padding:12px;background:#f8fafc;border-radius:10px;">
                 <div style="font-size:22px;font-weight:700;color:#0f172a;">@totalRequest</div>
-                <div style="font-size:11px;color:#64748b;font-weight:500;">Request</div>
+                <div style="font-size:13px;color:#64748b;font-weight:500;">Request</div>
             </div>
             <div style="text-align:center;padding:12px;background:#f8fafc;border-radius:10px;">
                 <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
                     <span style="font-size:22px;font-weight:700;color:#0f172a;">@avgRating.ToString("0.0")</span>
                     <span style="color:#EF9F27;font-size:16px;">★</span>
                 </div>
-                <div style="font-size:11px;color:#64748b;font-weight:500;">@totalReviews ulasan</div>
+                <div style="font-size:13px;color:#64748b;font-weight:500;">@totalReviews ulasan</div>
             </div>
         </div>
     </div>
@@ -63,7 +63,7 @@
     @if (activeDonations.Any())
     {
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px;">
-            <h2 style="font-size:14px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
+            <h2 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
                 <i class="ti ti-gift" style="color:#3b82f6;" aria-hidden="true"></i> Donasi Aktif
             </h2>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">
@@ -79,8 +79,8 @@
                             <div style="width:100%;height:120px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="ti ti-gift" style="font-size:28px;" aria-hidden="true"></i></div>
                         }
                         <div style="padding:10px;">
-                            <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@d.NamaBarang</div>
-                            <div style="font-size:11px;color:#64748b;">@CategoryHelper.DisplayName(d.Kategori)</div>
+                            <div style="font-size:15px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@d.NamaBarang</div>
+                            <div style="font-size:13px;color:#64748b;">@CategoryHelper.DisplayName(d.Kategori)</div>
                         </div>
                     </a>
                 }
@@ -91,7 +91,7 @@
     @if (activeRequests.Any())
     {
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px;">
-            <h2 style="font-size:14px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
+            <h2 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
                 <i class="ti ti-list-search" style="color:#3b82f6;" aria-hidden="true"></i> Request Aktif
             </h2>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">
@@ -107,8 +107,8 @@
                             <div style="width:100%;height:120px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="ti ti-list-search" style="font-size:28px;" aria-hidden="true"></i></div>
                         }
                         <div style="padding:10px;">
-                            <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@r.Title</div>
-                            <div style="font-size:11px;color:#64748b;">@CategoryHelper.DisplayName(r.Kategori)</div>
+                            <div style="font-size:15px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@r.Title</div>
+                            <div style="font-size:13px;color:#64748b;">@CategoryHelper.DisplayName(r.Kategori)</div>
                         </div>
                     </a>
                 }
@@ -117,12 +117,12 @@
     }
 
     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
-        <h2 style="font-size:14px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
+        <h2 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
             <i class="ti ti-star" style="color:#EF9F27;" aria-hidden="true"></i> Ulasan (@totalReviews)
         </h2>
         @if (!reviews.Any())
         {
-            <p style="font-size:13px;color:#94a3b8;text-align:center;padding:20px 0;">Belum ada ulasan.</p>
+            <p style="font-size:15px;color:#94a3b8;text-align:center;padding:20px 0;">Belum ada ulasan.</p>
         }
         else
         {
@@ -137,25 +137,31 @@
 
                     <div style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
                         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                            <a href="/Profile/View/@f.ReviewerId" style="width:28px;height:28px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;text-decoration:none;">@rInitial</a>
+                            <a href="/Profile/View/@f.ReviewerId" style="width:28px;height:28px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;text-decoration:none;">@rInitial</a>
                             <div style="flex:1;">
-                                <a href="/Profile/View/@f.ReviewerId" style="font-size:13px;font-weight:600;color:#0f172a;text-decoration:none;">@rName</a>
+                                <a href="/Profile/View/@f.ReviewerId" style="font-size:15px;font-weight:600;color:#0f172a;text-decoration:none;">@rName</a>
                                 @if (!string.IsNullOrEmpty(contextLabel))
                                 {
-                                    <div style="font-size:11px;color:#94a3b8;">@contextLabel</div>
+                                    <div style="font-size:13px;color:#94a3b8;">@contextLabel</div>
                                 }
                             </div>
-                            <span style="font-size:11px;color:#94a3b8;">@f.CreatedAt.ToString("dd MMM yyyy")</span>
+                            <span style="font-size:13px;color:#94a3b8;">@f.CreatedAt.ToString("dd MMM yyyy")</span>
                         </div>
                         <div style="display:flex;gap:2px;margin-bottom:6px;">
                             @for (int s = 1; s <= 5; s++)
                             {
-                                <span style="font-size:14px;color:@(s <= f.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
+                                <span style="font-size:16px;color:@(s <= f.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
                             }
                         </div>
                         @if (!string.IsNullOrEmpty(f.Komentar))
                         {
-                            <p style="font-size:13px;color:#334155;line-height:1.5;margin:0;">@f.Komentar</p>
+                            <p style="font-size:15px;color:#334155;line-height:1.5;margin:0;">@f.Komentar</p>
+                        }
+                        @if (!string.IsNullOrEmpty(f.FotoPath))
+                        {
+                            <div style="margin-top:8px;">
+                                <img src="@f.FotoPath" style="max-width:200px;max-height:200px;border-radius:8px;object-fit:cover;cursor:pointer;" onclick="window.open(this.src)" />
+                            </div>
                         }
                     </div>
                 }

@@ -13,7 +13,7 @@
                 <p id="matchModalTitle" style="font-size:16px;font-weight:700;color:#fff;margin:0 0 3px;font-family:'Plus Jakarta Sans',sans-serif;">
                     <i class="ti ti-search" aria-hidden="true" style="margin-right:6px;"></i>Kecocokan ditemukan!
                 </p>
-                <p id="matchModalSubtitle" style="font-size:12px;color:#bfdbfe;margin:0;"></p>
+                <p id="matchModalSubtitle" style="font-size:14px;color:#bfdbfe;margin:0;"></p>
             </div>
             <button onclick="closeMatchModal()" style="background:rgba(255,255,255,0.2);border:none;cursor:pointer;color:#fff;font-size:16px;line-height:1;padding:4px 8px;border-radius:6px;">
                 <i class="ti ti-x" aria-hidden="true"></i>
@@ -30,30 +30,30 @@
                 </div>
                 <div style="padding:14px 16px 4px;">
                     <p id="matchCardTitle" style="font-size:15px;font-weight:600;color:#0f172a;margin:0 0 4px;font-family:'Plus Jakarta Sans',sans-serif;"></p>
-                    <p id="matchCardLocation" style="font-size:12px;color:#64748b;margin:0 0 8px;display:flex;align-items:center;gap:4px;"></p>
-                    <p id="matchCardDesc" style="font-size:13px;color:#64748b;margin:0 0 10px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"></p>
+                    <p id="matchCardLocation" style="font-size:14px;color:#64748b;margin:0 0 8px;display:flex;align-items:center;gap:4px;"></p>
+                    <p id="matchCardDesc" style="font-size:15px;color:#64748b;margin:0 0 10px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"></p>
                     <div id="matchCardReasons" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
                     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                        <div id="matchCardAvatar" style="width:22px;height:22px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#1e40af;flex-shrink:0;"></div>
+                        <div id="matchCardAvatar" style="width:22px;height:22px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1e40af;flex-shrink:0;"></div>
                         <span id="matchCardPoster" class="text-sm-muted"></span>
                     </div>
                 </div>
                 <div style="padding:0 16px 14px;display:flex;gap:8px;">
-                    <button onclick="prevMatch()" id="matchPrevBtn" class="btn btn-secondary" style="flex:1;font-size:12px;padding:7px 0;">← Prev</button>
-                    <button onclick="quickAction()" id="matchActionBtn" class="btn btn-primary" style="flex:2;font-size:12px;padding:7px 0;border:none;cursor:pointer;"></button>
-                    <button onclick="nextMatch()" id="matchNextBtn" class="btn btn-secondary" style="flex:1;font-size:12px;padding:7px 0;">Next →</button>
+                    <button onclick="prevMatch()" id="matchPrevBtn" class="btn btn-secondary" style="flex:1;font-size:14px;padding:7px 0;">← Prev</button>
+                    <button onclick="quickAction()" id="matchActionBtn" class="btn btn-primary" style="flex:2;font-size:14px;padding:7px 0;border:none;cursor:pointer;"></button>
+                    <button onclick="nextMatch()" id="matchNextBtn" class="btn btn-secondary" style="flex:1;font-size:14px;padding:7px 0;">Next →</button>
                 </div>
-                <div id="matchActionFeedback" style="display:none;padding:0 16px 10px;font-size:12px;text-align:center;"></div>
+                <div id="matchActionFeedback" style="display:none;padding:0 16px 10px;font-size:14px;text-align:center;"></div>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
                 <div style="display:flex;gap:6px;" id="matchDots"></div>
-                <a id="matchDetailLink" href="#" style="font-size:12px;color:#2563eb;text-decoration:none;">Lihat detail →</a>
+                <a id="matchDetailLink" href="#" style="font-size:14px;color:#2563eb;text-decoration:none;">Lihat detail →</a>
             </div>
-            <p id="matchCounter" style="text-align:center;font-size:12px;color:#64748b;margin:6px 0 0;"></p>
+            <p id="matchCounter" style="text-align:center;font-size:14px;color:#64748b;margin:6px 0 0;"></p>
         </div>
 
         <div style="padding:0 20px 16px;">
-            <button onclick="closeMatchModal()" class="btn btn-secondary btn-block" style="font-size:13px;padding:8px 0;">Tutup</button>
+            <button onclick="closeMatchModal()" class="btn btn-secondary btn-block" style="font-size:15px;padding:8px 0;">Tutup</button>
         </div>
     </div>
 </div>
@@ -66,11 +66,11 @@
         </div>
         <div style="padding:24px 20px;text-align:center;">
             <i class="ti ti-mood-sad" aria-hidden="true" class="empty-icon"></i>
-            <p style="font-size:14px;font-weight:600;color:#0f172a;margin:0 0 6px;">Tidak ada kecocokan</p>
-            <p style="font-size:13px;color:#64748b;margin:0;">Belum ada yang cocok saat ini. Coba lagi nanti.</p>
+            <p style="font-size:16px;font-weight:600;color:#0f172a;margin:0 0 6px;">Tidak ada kecocokan</p>
+            <p style="font-size:15px;color:#64748b;margin:0;">Belum ada yang cocok saat ini. Coba lagi nanti.</p>
         </div>
         <div style="padding:0 20px 16px;">
-            <button onclick="closeNoResultModal()" class="btn btn-secondary btn-block" style="font-size:13px;padding:8px 0;">Tutup</button>
+            <button onclick="closeNoResultModal()" class="btn btn-secondary btn-block" style="font-size:15px;padding:8px 0;">Tutup</button>
         </div>
     </div>
 </div>
@@ -127,16 +127,16 @@
 
         var scoreColor = m.score >= 80 ? '#1e40af' : m.score >= 60 ? '#166534' : '#64748b';
         document.getElementById('matchCardBadges').innerHTML =
-            '<span style="background:#dbeafe;color:#1e40af;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;font-family:Plus Jakarta Sans,sans-serif;">' + m.kategori + '</span>' +
-            '<span style="background:#fff;color:' + scoreColor + ';font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;border:1px solid #e2e8f0;">' + m.score + ' pts</span>';
+            '<span style="background:#dbeafe;color:#1e40af;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;font-family:Plus Jakarta Sans,sans-serif;">' + m.kategori + '</span>' +
+            '<span style="background:#fff;color:' + scoreColor + ';font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;border:1px solid #e2e8f0;">' + m.score + ' pts</span>';
 
         document.getElementById('matchCardTitle').textContent = m.title;
         document.getElementById('matchCardLocation').innerHTML =
-            '<i class="ti ti-map-pin" style="font-size:11px;" aria-hidden="true"></i>' +
+            '<i class="ti ti-map-pin" style="font-size:13px;" aria-hidden="true"></i>' +
             (m.lokasi || '') + (m.provinsi ? ' · ' + m.provinsi : '');
         document.getElementById('matchCardDesc').textContent = m.deskripsi;
         document.getElementById('matchCardReasons').innerHTML = (m.reasons || []).map(function(r) {
-            return '<span style="font-size:11px;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;padding:2px 8px;border-radius:99px;">' + r + '</span>';
+            return '<span style="font-size:13px;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;padding:2px 8px;border-radius:99px;">' + r + '</span>';
         }).join('');
         document.getElementById('matchCardAvatar').textContent = m.posterAvatar;
         document.getElementById('matchCardPoster').textContent = m.posterName + ' · ' + m.createdAgo + ' hari lalu';

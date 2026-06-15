@@ -109,6 +109,13 @@ public class DonasiController : AppBaseController
             return RedirectToAction("Create");
         }
 
+        var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
+        if (Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+        {
+            TempData["DonasiError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
+            return RedirectToAction("Create");
+        }
+
         if (!ModelState.IsValid)
         {
             TempData["DonasiError"] = "Pastikan semua field wajib sudah diisi.";
@@ -164,7 +171,15 @@ public class DonasiController : AppBaseController
         existing.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
         if (Images != null && Images.Count > 0)
+        {
+            var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
+            if (Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+            {
+                TempData["DonasiError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
+                return RedirectToAction("Edit", new { id });
+            }
             await SaveImagesAsync(Images, userId, existing.Id, maxCount: 5, currentCount: existing.Images.Count);
+        }
 
         await _db.SaveChangesAsync();
         TempData["DonasiSuccess"] = "Donasi berhasil diperbarui.";
@@ -224,6 +239,7 @@ public class DonasiController : AppBaseController
 
         var item = await _db.Items
             .Include(i => i.Images)
+            .Include(i => i.User)
             .Include(i => i.ClaimRequests)
             .FirstOrDefaultAsync(i => i.Id == id);
 
@@ -232,17 +248,11 @@ public class DonasiController : AppBaseController
         ViewBag.IsOwner = userId == item.UserId;
         ViewBag.HasRequested = userId != null && item.ClaimRequests.Any(r => r.UserId == userId);
 
-        var avgRatingTask = _db.Feedbacks
-            .Where(f => f.ReviewedUserId == item.UserId)
-            .AverageAsync(f => (double?)f.Rating);
-
-        var totalReviewsTask = _db.Feedbacks
+        var totalReviews = await _db.Feedbacks
             .CountAsync(f => f.ReviewedUserId == item.UserId);
 
-        await Task.WhenAll(avgRatingTask, totalReviewsTask);
-
-        ViewBag.AverageRating = Math.Round(avgRatingTask.Result ?? 0, 1);
-        ViewBag.TotalReviews = totalReviewsTask.Result;
+        ViewBag.AverageRating = (double)(item.User?.AvgRating ?? 0);
+        ViewBag.TotalReviews = totalReviews;
 
         return View("~/Views/Item/Detail.cshtml", item);
     }
@@ -494,7 +504,7 @@ public class DonasiController : AppBaseController
         });
 
         await _db.SaveChangesAsync();
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { selectedId = request.ItemId });
     }
 
     [HttpPost]
@@ -523,7 +533,42 @@ public class DonasiController : AppBaseController
         });
 
         await _db.SaveChangesAsync();
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { selectedId = request.ItemId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChooseDeliveryMethod(int claimRequestId, MetodePengiriman metode)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var request = await _db.ClaimRequests
+            .Include(r => r.Item)
+            .FirstOrDefaultAsync(r => r.Id == claimRequestId && r.UserId == userId);
+
+        if (request == null || request.Item == null)
+            return RedirectToAction("Permintaan", "Request");
+        if (request.Status != TransactionStatus.Accepted)
+            return RedirectToAction("Permintaan", "Request");
+        if (metode == MetodePengiriman.BelumDipilih)
+            return RedirectToAction("Permintaan", "Request");
+
+        request.MetodePengiriman = metode;
+        request.UpdatedAt = DateTime.UtcNow;
+
+        var metodeLabel = metode == MetodePengiriman.Pickup ? "Pickup" : "Kurir";
+        _db.Notifications.Add(new Notification
+        {
+            UserId = request.Item.UserId,
+            Message = $"Penerima memilih metode pengiriman \"{metodeLabel}\" untuk \"{request.Item.NamaBarang}\".",
+            Type = NotificationType.ItemShipped,
+            RefId = claimRequestId.ToString(),
+            Link = "/Donasi/Index?selectedId=" + request.Item.Id,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+        return RedirectToAction("Permintaan", "Request", new { selectedId = request.Id });
     }
 
     [HttpPost]
@@ -540,14 +585,20 @@ public class DonasiController : AppBaseController
             return RedirectToAction("Index");
         if (request.Status != TransactionStatus.Accepted)
             return RedirectToAction("Index");
+        if (request.MetodePengiriman == MetodePengiriman.BelumDipilih)
+            return RedirectToAction("Index");
 
         request.Status = TransactionStatus.Shipped;
         request.UpdatedAt = DateTime.UtcNow;
 
+        var shippedMsg = request.MetodePengiriman == MetodePengiriman.Pickup
+            ? $"Barang \"{request.Item.NamaBarang}\" ({request.Jumlah} pcs) telah di-pickup. Silakan konfirmasi penerimaan."
+            : $"Barang \"{request.Item.NamaBarang}\" ({request.Jumlah} pcs) telah dikirim. Silakan konfirmasi penerimaan.";
+
         _db.Notifications.Add(new Notification
         {
             UserId = request.UserId,
-            Message = $"Barang \"{request.Item.NamaBarang}\" ({request.Jumlah} pcs) telah dikirim. Silakan konfirmasi penerimaan.",
+            Message = shippedMsg,
             Type = NotificationType.ItemShipped,
             RefId = claimRequestId.ToString(),
             Link = "/Request/Permintaan",
@@ -555,7 +606,7 @@ public class DonasiController : AppBaseController
         });
 
         await _db.SaveChangesAsync();
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { selectedId = request.ItemId });
     }
 
     [HttpPost]
@@ -588,7 +639,7 @@ public class DonasiController : AppBaseController
 
         await _db.SaveChangesAsync();
         await _pointsService.AwardPointsAsync(request.Item.UserId, claimRequestId, null);
-        return RedirectToAction("Permintaan", "Request");
+        return RedirectToAction("Permintaan", "Request", new { selectedId = request.Id });
     }
 
     [HttpGet]
@@ -716,8 +767,9 @@ public class DonasiController : AppBaseController
                 .ThenInclude(r => r!.Images)
             .Include(o => o.ItemRequest)
                 .ThenInclude(r => r!.User)
+            .Include(o => o.ItemRequest)
+                .ThenInclude(r => r!.Feedbacks)
             .Include(o => o.Images)
-            .Include(o => o.Feedbacks)
             .Where(o => o.UserId == userId)
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();

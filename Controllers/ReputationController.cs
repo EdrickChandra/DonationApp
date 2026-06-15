@@ -11,21 +11,28 @@ namespace DonationApp.Controllers;
 public class ReputationController : AppBaseController
 {
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IWebHostEnvironment _env;
 
-    public ReputationController(AppDbContext context, UserManager<ApplicationUser> userManager)
+    public ReputationController(AppDbContext context, UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
         : base(context, userManager)
     {
         _userManager = userManager;
+        _env = env;
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Submit(int? claimRequestId, int? itemRequestId, int? requestOfferId, int rating, string? komentar)
+    public async Task<IActionResult> Submit(int? claimRequestId, int? itemRequestId, int? requestOfferId, int rating, string? komentar, IFormFile? foto)
     {
         var userId = _userManager.GetUserId(User)!;
 
         if (rating < 1 || rating > 5)
-            return RedirectToAction("Permintaan", "Request");
+        {
+            TempData["RequestError"] = "Silakan pilih rating terlebih dahulu.";
+            if (claimRequestId.HasValue)
+                return RedirectToAction("Permintaan", "Request");
+            return RedirectToAction("MyRequests", "Request");
+        }
 
         if (claimRequestId == null && itemRequestId == null && requestOfferId == null)
             return RedirectToAction("Permintaan", "Request");
@@ -46,18 +53,10 @@ public class ReputationController : AppBaseController
             if (claimRequest.Feedbacks.Any(f => f.ReviewerId == userId))
                 return RedirectToAction("Permintaan", "Request");
 
-            if (claimRequest.UserId == userId)
-            {
-                reviewedUserId = claimRequest.Item.UserId;
-            }
-            else if (claimRequest.Item.UserId == userId)
-            {
-                reviewedUserId = claimRequest.UserId;
-            }
-            else
-            {
+            if (claimRequest.UserId != userId)
                 return RedirectToAction("Permintaan", "Request");
-            }
+
+            reviewedUserId = claimRequest.Item.UserId;
         }
         else if (requestOfferId.HasValue)
         {
@@ -71,24 +70,15 @@ public class ReputationController : AppBaseController
                 return RedirectToAction("MyRequests", "Request");
 
             var existingFeedback = await _db.Feedbacks
-                .AnyAsync(f => f.ReviewerId == userId && f.ItemRequestId == offer.ItemRequestId
-                    && ((f.ReviewedUserId == offer.UserId) || (f.ReviewedUserId == offer.ItemRequest.UserId)));
+                .AnyAsync(f => f.ReviewerId == userId && f.ItemRequestId == offer.ItemRequestId);
 
             if (existingFeedback)
                 return RedirectToAction("MyRequests", "Request");
 
-            if (offer.ItemRequest.UserId == userId)
-            {
-                reviewedUserId = offer.UserId;
-            }
-            else if (offer.UserId == userId)
-            {
-                reviewedUserId = offer.ItemRequest.UserId;
-            }
-            else
-            {
+            if (offer.ItemRequest.UserId != userId)
                 return RedirectToAction("MyRequests", "Request");
-            }
+
+            reviewedUserId = offer.UserId;
 
             itemRequestId = offer.ItemRequestId;
         }
@@ -108,22 +98,25 @@ public class ReputationController : AppBaseController
             if (acceptedOffer == null)
                 return RedirectToAction("MyRequests", "Request");
 
-            if (itemRequest.UserId == userId)
-            {
-                if (itemRequest.Feedbacks.Any(f => f.ReviewerId == userId))
-                    return RedirectToAction("MyRequests", "Request");
-                reviewedUserId = acceptedOffer.UserId;
-            }
-            else if (acceptedOffer.UserId == userId)
-            {
-                if (itemRequest.Feedbacks.Any(f => f.ReviewerId == userId))
-                    return RedirectToAction("MyRequests", "Request");
-                reviewedUserId = itemRequest.UserId;
-            }
-            else
-            {
+            if (itemRequest.UserId != userId)
                 return RedirectToAction("MyRequests", "Request");
-            }
+
+            if (itemRequest.Feedbacks.Any(f => f.ReviewerId == userId))
+                return RedirectToAction("MyRequests", "Request");
+
+            reviewedUserId = acceptedOffer.UserId;
+        }
+
+        string? fotoPath = null;
+        if (foto != null && foto.Length > 0)
+        {
+            var fileName = Guid.NewGuid() + Path.GetExtension(foto.FileName);
+            var relativePath = $"/uploads/feedback/{userId}/{fileName}";
+            var fullPath = Path.Combine(_env.WebRootPath, "uploads", "feedback", userId, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+            using var stream = new FileStream(fullPath, FileMode.Create);
+            await foto.CopyToAsync(stream);
+            fotoPath = relativePath;
         }
 
         var feedback = new Feedback
@@ -134,6 +127,7 @@ public class ReputationController : AppBaseController
             ItemRequestId = itemRequestId,
             Rating = rating,
             Komentar = string.IsNullOrWhiteSpace(komentar) ? null : komentar.Trim(),
+            FotoPath = fotoPath,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -149,7 +143,7 @@ public class ReputationController : AppBaseController
         var reviewedUser = await _userManager.FindByIdAsync(reviewedUserId);
         if (reviewedUser != null)
         {
-            reviewedUser.TrustScore = (decimal)Math.Round(newAverage, 1);
+            reviewedUser.AvgRating = (decimal)Math.Round(newAverage, 1);
             await _userManager.UpdateAsync(reviewedUser);
         }
 
@@ -164,8 +158,15 @@ public class ReputationController : AppBaseController
 
         await _db.SaveChangesAsync();
 
+        TempData["RequestSuccess"] = "Feedback berhasil dikirim!";
         if (claimRequestId.HasValue)
-            return RedirectToAction("Permintaan", "Request");
+            return RedirectToAction("Permintaan", "Request", new { selectedId = claimRequestId.Value });
+        if (requestOfferId.HasValue)
+        {
+            var offr = await _db.RequestOffers.FindAsync(requestOfferId.Value);
+            if (offr != null)
+                return RedirectToAction("MyRequests", "Request", new { selectedId = offr.ItemRequestId });
+        }
         return RedirectToAction("MyRequests", "Request");
     }
 }

@@ -90,7 +90,7 @@ footer {
 }
 
 .footer-copyright {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--gray-400);
     text-align: center;
 }
@@ -122,9 +122,9 @@ nav {
     background: var(--gray-200);
     border: none;
     border-radius: 6px;
-    padding: 8px 14px;
+    padding: 12px 18px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--text-mid);
     outline: none;
 }
@@ -136,9 +136,9 @@ nav {
 .nav-user {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     color: var(--white);
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
@@ -149,8 +149,8 @@ nav {
 }
 
 .avatar {
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     background: var(--blue-light);
     display: flex;
@@ -158,13 +158,13 @@ nav {
     justify-content: center;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--white);
     flex-shrink: 0;
 }
 
-.avatar.avatar-xs { width: 20px; height: 20px; font-size: 9px; }
-.avatar.avatar-sm { width: 28px; height: 28px; font-size: 12px; font-weight: 600; background: var(--gray-100); color: var(--text-mid); }
+.avatar.avatar-xs { width: 26px; height: 26px; font-size: 12px; }
+.avatar.avatar-sm { width: 34px; height: 34px; font-size: 15px; font-weight: 600; background: var(--gray-100); color: var(--text-mid); }
 
 .nav-dropdown {
     position: relative;
@@ -191,7 +191,7 @@ nav {
     display: block;
     width: 100%;
     padding: 10px 16px;
-    font-size: 13px;
+    font-size: 16px;
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 500;
     color: var(--text-dark);
@@ -223,7 +223,7 @@ nav {
 
 .form-label {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-mid);
     margin-bottom: 6px;
@@ -235,9 +235,9 @@ nav {
     background: var(--gray-50);
     border: 1px solid var(--gray-200);
     border-radius: 6px;
-    padding: 9px 12px;
+    padding: 12px 16px;
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--text-dark);
     outline: none;
     transition: border-color 0.15s;
@@ -254,7 +254,7 @@ select.form-input {
 
 .form-error {
     display: none;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--red);
     margin-top: 4px;
 }
@@ -263,14 +263,14 @@ select.form-input {
     background: var(--red-bg);
     border: 1px solid var(--red-border);
     color: var(--red-text);
-    font-size: 13px;
+    font-size: 15px;
     padding: 10px 14px;
     border-radius: 8px;
     margin-bottom: 16px;
 }
 
 .validation-message {
-    font-size: 11px;
+    font-size: 14px;
     color: var(--red);
     margin-top: 4px;
     display: block;
@@ -281,7 +281,7 @@ select.form-input {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-light);
     font-weight: 500;
     text-decoration: none;
@@ -330,11 +330,11 @@ textarea.form-input {
 }
 
 .nav-page-link {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     color: var(--gray-400);
     text-decoration: none;
-    padding: 4px 10px;
+    padding: 8px 14px;
     border-radius: 6px;
     transition: color 0.15s;
 }
@@ -361,11 +361,11 @@ textarea.form-input {
     right: 0;
     background: var(--red);
     color: var(--white);
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
     border-radius: 999px;
-    min-width: 16px;
-    height: 16px;
+    min-width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -384,12 +384,12 @@ textarea.form-input {
 
 .badge {
     display: inline-block;
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     border-radius: 99px;
     font-family: 'Plus Jakarta Sans', sans-serif;
     flex-shrink: 0;
-    padding: 2px 8px;
+    padding: 4px 12px;
 }
 
 .badge-lg { padding: 4px 12px; font-weight: 700; }
@@ -417,10 +417,10 @@ textarea.form-input {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 12px 22px;
     border-radius: 8px;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
     border: 1.5px solid transparent;
@@ -512,13 +512,13 @@ textarea.form-input {
 
 /* ── Size modifiers ── */
 .btn-sm {
-    font-size: 12px;
-    padding: 5px 12px;
+    font-size: 14px;
+    padding: 7px 14px;
 }
 
 .btn-lg {
-    font-size: 15px;
-    padding: 14px 20px;
+    font-size: 17px;
+    padding: 16px 24px;
     border-radius: 10px;
 }
 
@@ -530,12 +530,12 @@ textarea.form-input {
 /* ── Condition toggle ── */
 .btn-condition {
     flex: 1;
-    padding: 8px;
+    padding: 10px;
     border-radius: 6px;
     border: 1.5px solid var(--gray-300);
     background: var(--gray-100);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-mid);
     cursor: pointer;
@@ -640,12 +640,12 @@ textarea.form-input {
    ═══════════════════════════════════════════ */
 
 /* Typography */
-.text-muted    { font-size: 13px; color: var(--text-light); }
-.text-sm-muted { font-size: 12px; color: var(--text-light); }
-.text-xs-muted { font-size: 11px; color: var(--text-light); }
-.text-xs-dim   { font-size: 11px; color: var(--gray-400); }
-.label-caps    { font-size: 11px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
-.text-strong   { font-size: 13px; font-weight: 500; color: var(--text-dark); }
+.text-muted    { font-size: 16px; color: var(--text-light); }
+.text-sm-muted { font-size: 15px; color: var(--text-light); }
+.text-xs-muted { font-size: 14px; color: var(--text-light); }
+.text-xs-dim   { font-size: 14px; color: var(--gray-400); }
+.label-caps    { font-size: 14px; color: var(--gray-400); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.text-strong   { font-size: 16px; font-weight: 500; color: var(--text-dark); }
 
 /* Layout */
 .flex-1   { flex: 1; }
@@ -658,12 +658,12 @@ textarea.form-input {
 .img-88 { width: 88px; height: 88px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
 
 /* Empty state */
-.empty-state { padding: 48px; text-align: center; font-size: 13px; color: var(--text-light); }
-.empty-text  { font-size: 13px; color: var(--text-light); text-align: center; padding: 24px 0; }
+.empty-state { padding: 48px; text-align: center; font-size: 16px; color: var(--text-light); }
+.empty-text  { font-size: 16px; color: var(--text-light); text-align: center; padding: 24px 0; }
 .empty-icon  { font-size: 40px; color: var(--gray-400); display: block; margin-bottom: 12px; }
 
 /* Status text */
-.text-success-center { font-size: 12px; color: var(--green-dark); text-align: center; }
+.text-success-center { font-size: 14px; color: var(--green-dark); text-align: center; }
 
 @media (max-width: 768px) {
     body {
@@ -702,6 +702,21 @@ textarea.form-input {
         display: none;
     }
 
+    .footer-copyright {
+        font-size: 11px;
+    }
+
+    .nav-bell-badge {
+        font-size: 10px;
+        min-width: 16px;
+        height: 16px;
+    }
+
+    .badge {
+        font-size: 11px;
+        padding: 2px 8px;
+    }
+
     .btn-nav,
     .btn-nav-outline {
         padding: 7px 12px;
@@ -723,6 +738,46 @@ textarea.form-input {
         padding: 12px 16px;
     }
 
+    .btn-condition {
+        font-size: 12px;
+        padding: 8px;
+    }
+
+    .form-label {
+        font-size: 12px;
+    }
+
+    .form-input {
+        font-size: 13px;
+        padding: 9px 12px;
+    }
+
+    .validation-message {
+        font-size: 11px;
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .avatar.avatar-xs { width: 20px; height: 20px; font-size: 9px; }
+    .avatar.avatar-sm { width: 28px; height: 28px; font-size: 12px; }
+
+    .text-muted    { font-size: 13px; }
+    .text-sm-muted { font-size: 12px; }
+    .text-xs-muted { font-size: 11px; }
+    .text-xs-dim   { font-size: 11px; }
+    .label-caps    { font-size: 11px; }
+    .text-strong   { font-size: 13px; }
+
+    .empty-state, .empty-text { font-size: 13px; }
+
+    .dropdown-item {
+        font-size: 13px;
+    }
+
     .dropdown-menu {
         right: 0;
         min-width: 180px;
@@ -736,5 +791,31 @@ textarea.form-input {
         grid-template-columns: 1fr;
     }
 
+
+    .form-error {
+        font-size: 12px;
+    }
+
+    .form-error-banner {
+        font-size: 13px;
+    }
+
+    .back-btn {
+        font-size: 13px;
+    }
+
+    .text-success-center {
+        font-size: 12px;
+    }
+
+    .search-bar {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .nav-page-link {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
 }
 

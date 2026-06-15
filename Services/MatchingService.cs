@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using DonationApp.Data;
 using DonationApp.Models;
@@ -47,7 +47,7 @@ public class MatchingService
         foreach (var req in candidates)
         {
             var (score, reasons) = ScoreItemAgainstRequest(item, req);
-            if (score >= 40)
+            if (score >= 25)
             {
                 results.Add(new ItemRequestMatchResult
                 {
@@ -77,7 +77,7 @@ public class MatchingService
         foreach (var item in candidates)
         {
             var (score, reasons) = ScoreRequestAgainstItem(itemRequest, item);
-            if (score >= 40)
+            if (score >= 25)
             {
                 results.Add(new ItemMatchResult
                 {
@@ -99,18 +99,9 @@ public class MatchingService
         if (item.Kategori != req.Kategori)
             return (0, reasons);
 
-        score += 20;
-        reasons.Add("Kategori cocok");
-
-        var keywordScore = ComputeKeywordScore(
-            item.NamaBarang + " " + item.Deskripsi,
-            req.Title + " " + req.Deskripsi);
-
-        if (keywordScore > 0)
-        {
-            score += keywordScore;
-            reasons.Add("Keyword cocok");
-        }
+        var kondisiScore = ScoreKondisi(item.Kondisi, req.KondisiMinimum);
+        score += kondisiScore.points;
+        if (kondisiScore.reason != null) reasons.Add(kondisiScore.reason);
 
         var locationResult = ScoreLocation(item.Lokasi, item.Provinsi, req.Lokasi, req.Provinsi);
         score += locationResult.points;
@@ -119,6 +110,12 @@ public class MatchingService
         var detailScore = ScoreDetails(item.DetailTambahan, req.DetailTambahan, item.Kategori);
         score += detailScore.points;
         if (detailScore.reason != null) reasons.Add(detailScore.reason);
+
+        var keywordScore = ScoreKeywords(
+            item.NamaBarang + " " + item.Deskripsi,
+            req.Title + " " + req.Deskripsi);
+        score += keywordScore.points;
+        if (keywordScore.reason != null) reasons.Add(keywordScore.reason);
 
         return (score, reasons);
     }
@@ -131,18 +128,9 @@ public class MatchingService
         if (req.Kategori != item.Kategori)
             return (0, reasons);
 
-        score += 20;
-        reasons.Add("Kategori cocok");
-
-        var keywordScore = ComputeKeywordScore(
-            req.Title + " " + req.Deskripsi,
-            item.NamaBarang + " " + item.Deskripsi);
-
-        if (keywordScore > 0)
-        {
-            score += keywordScore;
-            reasons.Add("Keyword cocok");
-        }
+        var kondisiScore = ScoreKondisi(item.Kondisi, req.KondisiMinimum);
+        score += kondisiScore.points;
+        if (kondisiScore.reason != null) reasons.Add(kondisiScore.reason);
 
         var locationResult = ScoreLocation(req.Lokasi, req.Provinsi, item.Lokasi, item.Provinsi);
         score += locationResult.points;
@@ -152,33 +140,24 @@ public class MatchingService
         score += detailScore.points;
         if (detailScore.reason != null) reasons.Add(detailScore.reason);
 
+        var keywordScore = ScoreKeywords(
+            req.Title + " " + req.Deskripsi,
+            item.NamaBarang + " " + item.Deskripsi);
+        score += keywordScore.points;
+        if (keywordScore.reason != null) reasons.Add(keywordScore.reason);
+
         return (score, reasons);
     }
 
-    private int ComputeKeywordScore(string sourceText, string targetText)
+    private (int points, string? reason) ScoreKondisi(ItemCondition itemKondisi, ItemCondition? requestedMinimum)
     {
-        if (string.IsNullOrWhiteSpace(sourceText) || string.IsNullOrWhiteSpace(targetText))
-            return 0;
+        if (requestedMinimum == null)
+            return (5, "Kondisi cocok");
 
-        var stopWords = new HashSet<string> { "dan", "atau", "yang", "di", "ke", "dari", "untuk", "dengan", "ini", "itu", "ada", "bisa", "mau", "saya", "anda", "a", "the", "of", "in", "for" };
+        if (itemKondisi >= requestedMinimum.Value)
+            return (5, "Kondisi cocok");
 
-        var sourceTokens = Tokenize(sourceText).Except(stopWords).ToHashSet();
-        var targetTokens = Tokenize(targetText).Except(stopWords).ToHashSet();
-
-        if (sourceTokens.Count == 0 || targetTokens.Count == 0) return 0;
-
-        var overlap = sourceTokens.Intersect(targetTokens).Count();
-        var ratio = (double)overlap / Math.Min(sourceTokens.Count, targetTokens.Count);
-
-        return (int)Math.Round(ratio * 40);
-    }
-
-    private HashSet<string> Tokenize(string text)
-    {
-        return text.ToLower()
-            .Split(new[] { ' ', ',', '.', '-', '/', '(', ')', '"', '\'' }, StringSplitOptions.RemoveEmptyEntries)
-            .Where(t => t.Length >= 3)
-            .ToHashSet();
+        return (0, null);
     }
 
     private (int points, string? reason) ScoreLocation(string lokasi1, string provinsi1, string lokasi2, string provinsi2)
@@ -186,13 +165,13 @@ public class MatchingService
         if (!string.IsNullOrWhiteSpace(lokasi1) && !string.IsNullOrWhiteSpace(lokasi2))
         {
             if (string.Equals(lokasi1.Trim(), lokasi2.Trim(), StringComparison.OrdinalIgnoreCase))
-                return (15, "Kota sama");
+                return (10, "Kota sama");
         }
 
         if (!string.IsNullOrWhiteSpace(provinsi1) && !string.IsNullOrWhiteSpace(provinsi2))
         {
             if (string.Equals(provinsi1.Trim(), provinsi2.Trim(), StringComparison.OrdinalIgnoreCase))
-                return (8, "Provinsi sama");
+                return (5, "Provinsi sama");
         }
 
         return (0, null);
@@ -214,8 +193,8 @@ public class MatchingService
             {
                 ItemCategory.Pakaian => new[] { "Ukuran", "JenisKelamin" },
                 ItemCategory.Elektronik => new[] { "Jenis", "Merk" },
-                ItemCategory.Buku => new[] { "Jenjang", "Subjek" },
-                ItemCategory.MainanHobi => new[] { "UsiaRekomendasi", "Jenis" },
+                ItemCategory.PerabotRumah => new[] { "JenisPerabot", "Bahan" },
+                ItemCategory.Mainan => new[] { "UsiaRekomendasi", "Jenis" },
                 ItemCategory.AlatMusik => new[] { "JenisInstrumen", "Merk" },
                 _ => Array.Empty<string>()
             };
@@ -236,12 +215,43 @@ public class MatchingService
 
             if (matchedFields.Count == 0) return (0, null);
 
-            var points = Math.Min(matchedFields.Count * 10, 25);
+            var points = matchedFields.Count * 15;
             return (points, $"Detail cocok: {string.Join(", ", matchedFields)}");
         }
         catch
         {
             return (0, null);
         }
+    }
+
+    private static readonly HashSet<string> StopWords = new()
+    {
+        "dan", "atau", "yang", "di", "ke", "dari", "untuk", "dengan",
+        "ini", "itu", "ada", "bisa", "mau", "saya", "anda",
+        "a", "the", "of", "in", "for"
+    };
+
+    private (int points, string? reason) ScoreKeywords(string sourceText, string targetText)
+    {
+        if (string.IsNullOrWhiteSpace(sourceText) || string.IsNullOrWhiteSpace(targetText))
+            return (0, null);
+
+        var sourceTokens = Tokenize(sourceText);
+        var targetTokens = Tokenize(targetText);
+
+        var matches = sourceTokens.Intersect(targetTokens).Count();
+        if (matches == 0) return (0, null);
+
+        var points = matches * 2;
+        return (points, $"{matches} keyword cocok");
+    }
+
+    private HashSet<string> Tokenize(string text)
+    {
+        return text.ToLower()
+            .Split(new[] { ' ', ',', '.', '-', '/', '(', ')', '"', '\'' }, StringSplitOptions.RemoveEmptyEntries)
+            .Where(t => t.Length >= 3)
+            .Where(t => !StopWords.Contains(t))
+            .ToHashSet();
     }
 }

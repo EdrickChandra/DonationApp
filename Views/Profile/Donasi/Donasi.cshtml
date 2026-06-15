@@ -26,7 +26,7 @@
 
         @if (TempData["DonasiSuccess"] != null)
         {
-            <div style="margin:12px 16px 0;background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);font-size:13px;">
+            <div style="margin:12px 16px 0;background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);font-size:15px;">
                 @TempData["DonasiSuccess"]
             </div>
         }
@@ -112,7 +112,7 @@
                         var pendingRequests = selected.ClaimRequests.Where(r => r.Status == TransactionStatus.Pending).ToList();
                         var hasAnyActive = activeRequests.Any();
 
-                        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+                        <div class="pdetail-header" style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
                             @if (selected.Images.Any())
                             {
                                 <img src="@selected.Images.First().FilePath" class="img-60" />
@@ -155,6 +155,8 @@
                                     {
                                         var rAvatar = r.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
                                         var rName = r.User != null ? r.User.NamaDepan + " " + r.User.NamaBelakang : "Unknown";
+                                        var rIsPickup = r.MetodePengiriman == MetodePengiriman.Pickup;
+                                        var rHasFeedback = r.Feedbacks.Any(f => f.ReviewerId == r.UserId);
                                         var rStatusLabel = r.Status switch
                                         {
                                             TransactionStatus.Accepted  => "Menunggu Kirim",
@@ -175,10 +177,10 @@
                                                 <a href="/Profile/View/@r.UserId" class="avatar avatar-sm" style="text-decoration:none;color:#fff;" onclick="event.stopPropagation();">@rAvatar</a>
                                                 <div class="flex-1">
                                                     <a href="/Profile/View/@r.UserId" class="text-strong" style="text-decoration:none;" onclick="event.stopPropagation();">@rName</a>
-                                                    <div class="text-xs-muted">@r.Jumlah pcs · @r.User?.Alamat</div>
+                                                    <div class="text-xs-muted">@r.Jumlah pcs · @r.User?.Kota - @r.User?.Provinsi</div>
                                                 </div>
-                                                <span class="badge @rStatusClass" style="font-size:10px;">@rStatusLabel</span>
-                                                <i class="ti ti-chevron-down" id="chevron-@r.Id" style="font-size:14px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
+                                                <span class="badge @rStatusClass" style="font-size:12px;">@rStatusLabel</span>
+                                                <i class="ti ti-chevron-down" id="chevron-@r.Id" style="font-size:16px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
                                             </div>
                                             <div id="penerima-detail-@r.Id" style="display:none;padding:12px;background:#f8fafc;border:1px solid #c4c9d4;border-top:none;border-radius:0 0 8px 8px;margin-bottom:2px;">
                                                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
@@ -198,32 +200,86 @@
                                                     </div>
                                                     <div class="pstep-line @(r.Status >= TransactionStatus.Shipped ? "done" : "")"></div>
                                                     <div class="pstep @(r.Status >= TransactionStatus.Shipped ? "done" : "")">
-                                                        <div class="pstep-dot @(r.Status >= TransactionStatus.Shipped ? "done" : "")"><i class="ti ti-truck" aria-hidden="true"></i></div>
-                                                        <div class="pstep-label">Dikirim</div>
+                                                        <div class="pstep-dot @(r.Status >= TransactionStatus.Shipped ? "done" : "")"><i class="ti @(rIsPickup ? "ti-walk" : "ti-truck")" aria-hidden="true"></i></div>
+                                                        <div class="pstep-label">@(rIsPickup ? "Pickup" : "Dikirim")</div>
                                                     </div>
                                                     <div class="pstep-line @(r.Status >= TransactionStatus.Delivered ? "done" : "")"></div>
                                                     <div class="pstep @(r.Status >= TransactionStatus.Delivered ? "done" : "")">
                                                         <div class="pstep-dot @(r.Status >= TransactionStatus.Delivered ? "done" : "")"><i class="ti ti-package" aria-hidden="true"></i></div>
-                                                        <div class="pstep-label">Diterima</div>
+                                                        <div class="pstep-label">@(rIsPickup ? "Selesai" : "Diterima")</div>
+                                                    </div>
+                                                    <div class="pstep-line @(rHasFeedback ? "done" : "")"></div>
+                                                    <div class="pstep @(rHasFeedback ? "done" : "")">
+                                                        <div class="pstep-dot @(rHasFeedback ? "done" : "")"><i class="ti ti-star" aria-hidden="true"></i></div>
+                                                        <div class="pstep-label">Feedback</div>
                                                     </div>
                                                 </div>
-                                                @if (r.Status == TransactionStatus.Accepted)
+                                                @if (r.Status == TransactionStatus.Accepted && r.MetodePengiriman == MetodePengiriman.BelumDipilih)
                                                 {
+                                                    <p style="font-size:14px;color:#64748b;text-align:center;">Menunggu penerima memilih metode pengiriman...</p>
+                                                }
+                                                else if (r.Status == TransactionStatus.Accepted)
+                                                {
+                                                    <div style="text-align:center;margin-bottom:8px;">
+                                                        <span style="font-size:14px;color:#3b82f6;font-weight:600;">
+                                                            <i class="ti @(rIsPickup ? "ti-walk" : "ti-truck")" aria-hidden="true"></i>
+                                                            @(rIsPickup ? "Pickup" : "Kurir")
+                                                        </span>
+                                                        @if (rIsPickup)
+                                                        {
+                                                            <p style="font-size:14px;color:#64748b;margin-top:4px;">Chat dengan penerima untuk mengatur penjemputan</p>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px 14px;margin-top:8px;text-align:left;">
+                                                                <div style="font-size:13px;color:#0369a1;font-weight:600;margin-bottom:4px;">
+                                                                    <i class="ti ti-map-pin" aria-hidden="true"></i> Alamat Penerima
+                                                                </div>
+                                                                <div style="font-size:15px;color:#0c4a6e;">@r.User?.Alamat</div>
+                                                                <div style="font-size:14px;color:#0369a1;">@r.User?.Kota - @r.User?.Provinsi</div>
+                                                            </div>
+                                                        }
+                                                    </div>
                                                     <form asp-controller="Donasi" asp-action="MarkShipped" method="post">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="claimRequestId" value="@r.Id" />
                                                         <button type="submit" class="btn btn-primary btn-block">
-                                                            <i class="ti ti-truck" aria-hidden="true"></i> Tandai Sudah Dikirim
+                                                            <i class="ti @(rIsPickup ? "ti-walk" : "ti-truck")" aria-hidden="true"></i>
+                                                            @(rIsPickup ? "Tandai Sudah Di-pickup" : "Tandai Sudah Dikirim")
                                                         </button>
                                                     </form>
                                                 }
                                                 else if (r.Status == TransactionStatus.Shipped)
                                                 {
-                                                    <p style="font-size:12px;color:#64748b;text-align:center;">Menunggu konfirmasi penerima...</p>
+                                                    <p style="font-size:14px;color:#64748b;text-align:center;">Menunggu konfirmasi penerima...</p>
                                                 }
                                                 else if (r.Status == TransactionStatus.Delivered)
                                                 {
                                                     <p class="text-success-center"><i class="ti ti-check" aria-hidden="true"></i> Barang telah diterima</p>
+                                                    var claimFeedback = r.Feedbacks
+                                                        .FirstOrDefault(f => f.ReviewerId == r.UserId);
+                                                    @if (claimFeedback != null)
+                                                    {
+                                                        <div style="padding:12px;background:#f1f5f9;border-radius:8px;margin-top:10px;">
+                                                            <div style="font-size:13px;color:#94a3b8;font-weight:600;margin-bottom:4px;">Feedback dari Penerima</div>
+                                                            <div style="display:flex;gap:2px;margin-bottom:4px;">
+                                                                @for (int s = 1; s <= 5; s++)
+                                                                {
+                                                                    <span style="font-size:16px;color:@(s <= claimFeedback.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
+                                                                }
+                                                            </div>
+                                                            @if (!string.IsNullOrEmpty(claimFeedback.Komentar))
+                                                            {
+                                                                <p style="font-size:14px;color:#64748b;margin:0;">@claimFeedback.Komentar</p>
+                                                            }
+                                                            @if (!string.IsNullOrEmpty(claimFeedback.FotoPath))
+                                                            {
+                                                                <div style="margin-top:6px;">
+                                                                    <img src="@claimFeedback.FotoPath" style="max-width:120px;max-height:120px;border-radius:6px;object-fit:cover;cursor:pointer;" onclick="window.open(this.src)" />
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    }
                                                 }
                                             </div>
                                         </div>
@@ -237,7 +293,7 @@
                             <div class="psec">
                                 <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
                                     <span class="badge badge-muted">Stok Habis</span>
-                                    <span style="font-size:12px;color:#64748b;">Tidak dapat menerima permintaan baru.</span>
+                                    <span style="font-size:14px;color:#64748b;">Tidak dapat menerima permintaan baru.</span>
                                 </div>
                             </div>
                         }
@@ -246,7 +302,7 @@
                             <div class="psec-label">Permintaan Masuk (@pendingRequests.Count)</div>
                             @if (!pendingRequests.Any())
                             {
-                                <p style="font-size:13px;color:#64748b;text-align:center;padding:12px 0;">Belum ada permintaan.</p>
+                                <p style="font-size:15px;color:#64748b;text-align:center;padding:12px 0;">Belum ada permintaan.</p>
                             }
                             @foreach (var r in pendingRequests)
                             {
@@ -311,6 +367,31 @@
         el.style.display = isOpen ? 'none' : 'block';
         if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
     }
+
+    (function() {
+        var forms = document.querySelectorAll('#donasi-detail form[method="post"]');
+        forms.forEach(function(form) {
+            form.addEventListener('submit', function() {
+                var panel = form.closest('[id^="penerima-detail-"]');
+                if (panel) {
+                    sessionStorage.setItem('expandPanel', panel.id);
+                }
+            });
+        });
+
+        var panelId = sessionStorage.getItem('expandPanel');
+        if (panelId) {
+            sessionStorage.removeItem('expandPanel');
+            var el = document.getElementById(panelId);
+            if (el) {
+                el.style.display = 'block';
+                var reqId = panelId.replace('penerima-detail-', '');
+                var chevron = document.getElementById('chevron-' + reqId);
+                if (chevron) chevron.style.transform = 'rotate(180deg)';
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    })();
 
     function runMatch(itemId, btn) {
         var orig = btn.innerHTML;

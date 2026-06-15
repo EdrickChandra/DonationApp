@@ -53,7 +53,7 @@
                     <div class="nav-user" onclick="toggleDropdown()" style="cursor:pointer;">
                         <div class="avatar">@(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "?")</div>
                         <span class="nav-username">@(User.Identity?.Name ?? "")</span>
-                        <span style="font-size:10px;">▼</span>
+                        <span style="font-size:12px;">▼</span>
                     </div>
 
                     <div class="dropdown-menu" id="dropdownMenu">
@@ -152,8 +152,8 @@
                     <input type="hidden" id="reportDonationId" name="donationId" />
                     <input type="hidden" id="reportRequestId" name="requestId" />
                     <div style="margin-bottom:14px;">
-                        <label style="display:block;font-size:13px;font-weight:500;color:#334155;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Alasan Laporan</label>
-                        <select id="reportAlasan" name="alasan" required style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;background:#fff;">
+                        <label style="display:block;font-size:15px;font-weight:500;color:#334155;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Alasan Laporan</label>
+                        <select id="reportAlasan" name="alasan" required style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;background:#fff;">
                             <option value="">Pilih alasan...</option>
                             <option value="0">Spam</option>
                             <option value="1">Item Palsu</option>
@@ -163,12 +163,12 @@
                         </select>
                     </div>
                     <div style="margin-bottom:16px;">
-                        <label style="display:block;font-size:13px;font-weight:500;color:#334155;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Deskripsi Tambahan <span style="color:#94a3b8;font-weight:400;">(opsional)</span></label>
-                        <textarea id="reportDeskripsi" name="deskripsi" rows="3" placeholder="Jelaskan masalah yang Anda temukan..." style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:13px;font-family:'Plus Jakarta Sans',sans-serif;resize:vertical;box-sizing:border-box;"></textarea>
+                        <label style="display:block;font-size:15px;font-weight:500;color:#334155;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Deskripsi Tambahan <span style="color:#94a3b8;font-weight:400;">(opsional)</span></label>
+                        <textarea id="reportDeskripsi" name="deskripsi" rows="3" placeholder="Jelaskan masalah yang Anda temukan..." style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;resize:vertical;box-sizing:border-box;"></textarea>
                     </div>
                     <div style="display:flex;gap:8px;justify-content:flex-end;">
-                        <button type="button" onclick="closeReportModal()" style="padding:8px 16px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:#334155;">Batal</button>
-                        <button type="submit" id="reportSubmitBtn" style="padding:8px 16px;border:none;border-radius:8px;background:#ef4444;color:#fff;font-size:13px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">Kirim Laporan</button>
+                        <button type="button" onclick="closeReportModal()" style="padding:8px 16px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-size:15px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;color:#334155;">Batal</button>
+                        <button type="submit" id="reportSubmitBtn" style="padding:8px 16px;border:none;border-radius:8px;background:#ef4444;color:#fff;font-size:15px;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;">Kirim Laporan</button>
                     </div>
                 </form>
             </div>

@@ -23,9 +23,9 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 14px;
+    padding: 9px 18px;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 17px;
     font-weight: 600;
     font-family: 'Plus Jakarta Sans', sans-serif;
     cursor: pointer;
@@ -38,7 +38,7 @@
 }
 
     .pill i {
-        font-size: 15px;
+        font-size: 18px;
     }
 
     .pill:hover {
@@ -64,8 +64,8 @@
 }
 
 .feed-tab {
-    padding: 10px 20px;
-    font-size: 14px;
+    padding: 12px 24px;
+    font-size: 15px;
     font-weight: 600;
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: var(--text-mid);
@@ -92,21 +92,21 @@
 }
 
 .feed-title {
-    font-size: 20px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .feed-count {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--gray-400);
 }
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 22px;
 }
 
 .item-card {
@@ -126,7 +126,7 @@
     }
 
 .card-img {
-    height: 150px;
+    height: 220px;
     background: var(--gray-200);
     position: relative;
     overflow: hidden;
@@ -155,9 +155,9 @@
     right: 8px;
     background: rgba(0,0,0,0.55);
     color: white;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 600;
-    padding: 3px 8px;
+    padding: 5px 12px;
     border-radius: 99px;
     display: flex;
     align-items: center;
@@ -165,7 +165,7 @@
 }
 
     .card-timer-badge i {
-        font-size: 11px;
+        font-size: 14px;
     }
 
 .card-request-badge {
@@ -174,22 +174,22 @@
     left: 8px;
     background: var(--sky);
     color: white;
-    font-size: 10px;
+    font-size: 14px;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 5px 12px;
     border-radius: 99px;
 }
 
 .card-body {
-    padding: 12px 14px 8px;
+    padding: 16px 18px 12px;
 }
 
 .card-name {
-    font-size: 13px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -198,11 +198,11 @@
 .card-meta {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
 }
 
 .card-cat {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--gray-400);
 }
 
@@ -212,25 +212,25 @@
 }
 
 .card-loc {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--gray-400);
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
 }
 
     .card-loc i {
-        font-size: 11px;
+        font-size: 15px;
     }
 
 .card-offers {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--sky);
     font-weight: 600;
 }
 
 .card-footer {
-    padding: 8px 14px 12px;
+    padding: 12px 18px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -245,12 +245,12 @@
 
 
 .card-poster-name {
-    font-size: 11px;
+    font-size: 15px;
     color: var(--gray-400);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 90px;
+    max-width: 150px;
 }
 
 
@@ -260,9 +260,9 @@
     left: 8px;
     background: var(--green-dark);
     color: white;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 99px;
 }
 
@@ -272,9 +272,9 @@
     left: 8px;
     background: var(--text-light);
     color: white;
-    font-size: 10px;
+    font-size: 13px;
     font-weight: 700;
-    padding: 3px 8px;
+    padding: 4px 10px;
     border-radius: 99px;
 }
 
@@ -302,7 +302,7 @@
     gap: 8px;
     width: 100%;
     padding: 7px 14px;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--gray-700);
     background: none;
     border: none;
@@ -321,7 +321,7 @@
     }
 
 .card-grid-empty {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--gray-400);
     padding: 48px 0;
     grid-column: 1 / -1;
@@ -375,7 +375,7 @@
 }
 
 .dpage-title {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -452,7 +452,7 @@
     right: 12px;
     background: rgba(0,0,0,0.5);
     color: white;
-    font-size: 11px;
+    font-size: 13px;
     padding: 3px 10px;
     border-radius: 99px;
 }
@@ -497,7 +497,7 @@
 
 
 .detail-name {
-    font-size: 26px;
+    font-size: 30px;
     font-weight: 800;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -540,13 +540,13 @@
 
 
 .detail-poster-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-mid);
 }
 
 .detail-poster-loc {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--gray-400);
     display: flex;
     align-items: center;
@@ -555,7 +555,7 @@
 }
 
     .detail-poster-loc i {
-        font-size: 12px;
+        font-size: 14px;
     }
 
 .detail-divider {
@@ -569,7 +569,7 @@
 }
 
 .detail-row-label {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     color: var(--gray-400);
     text-transform: uppercase;
@@ -579,7 +579,7 @@
 }
 
 .detail-row-value {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--gray-800);
     line-height: 1.6;
 }
@@ -611,7 +611,7 @@
 }
 
 .offers-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -634,7 +634,7 @@
 }
 
 .offer-card-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -642,13 +642,13 @@
 }
 
 .offer-card-time {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--gray-400);
     margin: 0;
 }
 
 .offer-card-desc {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-light);
     margin: 0 0 10px;
     line-height: 1.6;
@@ -755,6 +755,20 @@
         gap: 10px;
     }
 
+    .pill {
+        padding: 7px 14px;
+        font-size: 12px;
+    }
+
+    .pill i {
+        font-size: 15px;
+    }
+
+    .feed-tab {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
     .card-img {
         height: 120px;
     }
@@ -763,12 +777,38 @@
         font-size: 12px;
     }
 
+    .card-body {
+        padding: 12px 14px 8px;
+    }
+
+    .card-cat, .card-loc {
+        font-size: 11px;
+    }
+
+    .card-loc i {
+        font-size: 11px;
+    }
+
+    .card-offers {
+        font-size: 11px;
+    }
+
     .card-footer {
         padding: 6px 10px 10px;
     }
 
     .card-poster-name {
         display: none;
+    }
+
+    .card-timer-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .card-kondisi-baru, .card-kondisi-bekas {
+        font-size: 10px;
+        padding: 3px 8px;
     }
 
     .detail-page {
@@ -793,5 +833,113 @@
 
     .offers-section {
         margin-top: 24px;
+    }
+
+    .duser-row {
+        flex-wrap: wrap;
+    }
+
+    .duser-row > div:last-child {
+        white-space: normal !important;
+        width: 100%;
+        padding-top: 4px;
+    }
+
+    .dinfo-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dinfo-cell {
+        border-right: none !important;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 8px 0;
+    }
+
+        .dinfo-cell:last-child {
+            border-bottom: none;
+            padding-left: 0;
+        }
+
+    .daction-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .dcard {
+        padding: 14px 12px;
+    }
+
+    .detail-badges {
+        flex-wrap: wrap;
+    }
+
+    .dpage-title {
+        word-break: break-word;
+    }
+
+    .ddetail-tambahan-row {
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .card-body {
+        padding: 12px 14px 8px;
+    }
+
+    .card-menu-item {
+        font-size: 12px;
+    }
+
+    .card-grid-empty {
+        font-size: 13px;
+    }
+
+    .detail-row-label {
+        font-size: 10px;
+    }
+
+    .detail-row-value {
+        font-size: 14px;
+    }
+
+    .detail-poster-name {
+        font-size: 13px;
+    }
+
+    .detail-poster-loc {
+        font-size: 12px;
+    }
+
+    .detail-poster-loc i {
+        font-size: 12px;
+    }
+
+    .detail-counter {
+        font-size: 11px;
+    }
+
+    .offer-card-name {
+        font-size: 13px;
+    }
+
+    .offer-card-time {
+        font-size: 11px;
+    }
+
+    .offer-card-desc {
+        font-size: 13px;
+    }
+
+    .offers-title {
+        font-size: 16px;
+    }
+
+    .feed-count {
+        font-size: 14px;
+    }
+
+    .card-request-badge {
+        font-size: 12px;
+        padding: 4px 10px;
     }
 }

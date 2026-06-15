@@ -27,15 +27,23 @@ public class ProfileController : AppBaseController
     public async Task<IActionResult> Overview()
     {
         var userId = _userManager.GetUserId(User)!;
+        var user = await _userManager.FindByIdAsync(userId);
 
         var totalDonasiTask = _db.Items.CountAsync(i => i.UserId == userId);
         var activeDonasiTask = _db.Items.CountAsync(i => i.UserId == userId && i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow);
         var totalRequestTask = _db.ItemRequests.CountAsync(r => r.UserId == userId);
         var openRequestTask = _db.ItemRequests.CountAsync(r => r.UserId == userId && r.Status == ItemRequestStatus.Open);
-        var avgRatingTask = _db.Feedbacks.Where(f => f.ReviewedUserId == userId).AverageAsync(f => (double?)f.Rating);
         var totalReviewsTask = _db.Feedbacks.CountAsync(f => f.ReviewedUserId == userId);
+        var completedDonasiTask = _db.ClaimRequests
+            .CountAsync(r => r.Item!.UserId == userId && r.Status == TransactionStatus.Delivered);
+        var completedOfferTask = _db.RequestOffers
+            .CountAsync(o => o.UserId == userId && o.Status == TransactionStatus.Delivered);
+        var peoplehelpedTask = _db.ClaimRequests
+            .Where(r => r.Item!.UserId == userId && r.Status == TransactionStatus.Delivered)
+            .Select(r => r.UserId).Distinct().CountAsync();
 
-        await Task.WhenAll(totalDonasiTask, activeDonasiTask, totalRequestTask, openRequestTask, avgRatingTask, totalReviewsTask);
+        await Task.WhenAll(totalDonasiTask, activeDonasiTask, totalRequestTask, openRequestTask,
+            totalReviewsTask, completedDonasiTask, completedOfferTask, peoplehelpedTask);
 
         var recentReviews = await _db.Feedbacks
             .Include(f => f.Reviewer)
@@ -47,13 +55,32 @@ public class ProfileController : AppBaseController
             .Take(5)
             .ToListAsync();
 
+        var activeDonations = await _db.Items
+            .Include(i => i.Images)
+            .Where(i => i.UserId == userId && i.Status == ItemStatus.Available && i.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(i => i.CreatedAt)
+            .Take(4)
+            .ToListAsync();
+
+        var activeRequests = await _db.ItemRequests
+            .Include(r => r.Images)
+            .Where(r => r.UserId == userId && r.Status == ItemRequestStatus.Open && r.ExpiresAt > DateTime.UtcNow)
+            .OrderByDescending(r => r.CreatedAt)
+            .Take(4)
+            .ToListAsync();
+
         ViewBag.TotalDonasi = totalDonasiTask.Result;
         ViewBag.ActiveDonasi = activeDonasiTask.Result;
-        ViewBag.TotalRequest = totalRequestTask.Result; 
+        ViewBag.TotalRequest = totalRequestTask.Result;
         ViewBag.OpenRequest = openRequestTask.Result;
-        ViewBag.AvgRating = Math.Round(avgRatingTask.Result ?? 0, 1);
+        ViewBag.AvgRating = (double)(user?.AvgRating ?? 0);
         ViewBag.TotalReviews = totalReviewsTask.Result;
         ViewBag.RecentReviews = recentReviews;
+        ViewBag.CompletedDonasi = completedDonasiTask.Result + completedOfferTask.Result;
+        ViewBag.PeopleHelped = peoplehelpedTask.Result;
+        ViewBag.TotalPoin = user?.TotalPoin ?? 0;
+        ViewBag.ActiveDonations = activeDonations;
+        ViewBag.ActiveRequests = activeRequests;
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return PartialView("~/Views/Profile/Overview.cshtml");
@@ -82,7 +109,6 @@ public class ProfileController : AppBaseController
 
         var totalDonasi = await _db.Items.CountAsync(i => i.UserId == id);
         var totalRequest = await _db.ItemRequests.CountAsync(r => r.UserId == id);
-        var avgRating = await _db.Feedbacks.Where(f => f.ReviewedUserId == id).AverageAsync(f => (double?)f.Rating);
         var totalReviews = await _db.Feedbacks.CountAsync(f => f.ReviewedUserId == id);
 
         var reviews = await _db.Feedbacks
@@ -112,7 +138,7 @@ public class ProfileController : AppBaseController
         ViewBag.ProfileUser = user;
         ViewBag.TotalDonasi = totalDonasi;
         ViewBag.TotalRequest = totalRequest;
-        ViewBag.AvgRating = Math.Round(avgRating ?? 0, 1);
+        ViewBag.AvgRating = (double)user.AvgRating;
         ViewBag.TotalReviews = totalReviews;
         ViewBag.Reviews = reviews;
         ViewBag.ActiveDonations = activeDonations;

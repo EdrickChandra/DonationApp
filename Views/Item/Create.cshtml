@@ -25,8 +25,8 @@
                     <option value="">Pilih Kategori</option>
                     <option value="@((int)ItemCategory.Pakaian)">Pakaian</option>
                     <option value="@((int)ItemCategory.Elektronik)">Elektronik</option>
-                    <option value="@((int)ItemCategory.Buku)">Buku</option>
-                    <option value="@((int)ItemCategory.MainanHobi)">Mainan & Hobi</option>
+                    <option value="@((int)ItemCategory.PerabotRumah)">Perabot Rumah</option>
+                    <option value="@((int)ItemCategory.Mainan)">Mainan</option>
                     <option value="@((int)ItemCategory.AlatMusik)">Alat Musik</option>
                 </select>
                 <span class="validation-message" asp-validation-for="Kategori"></span>
@@ -59,7 +59,7 @@
                 <input type="file" id="imageInput" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
                 <div class="upload-zone" onclick="document.getElementById('imageInput').click()">
                     <span style="font-size:22px; color:#94a3b8;">+</span>
-                    <p style="font-size:12px; color:#64748b; margin:4px 0 0;">Klik untuk unggah foto</p>
+                    <p style="font-size:14px; color:#64748b; margin:4px 0 0;">Klik untuk unggah foto</p>
                 </div>
                 <span class="validation-message" id="imageError"></span>
                 <div id="previewContainer" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;"></div>

@@ -3,6 +3,7 @@ using System;
 using DonationApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DonationApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260602130000_AddFeedbackFoto")]
+    partial class AddFeedbackFoto
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -130,7 +133,7 @@ namespace DonationApp.Migrations
                     b.Property<int>("TotalPoin")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("AvgRating")
+                    b.Property<decimal>("TrustScore")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TwoFactorEnabled")
@@ -200,9 +203,6 @@ namespace DonationApp.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Jumlah")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MetodePengiriman")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Status")
@@ -439,9 +439,6 @@ namespace DonationApp.Migrations
                     b.Property<int?>("KondisiMinimum")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("MetodePengiriman")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Lokasi")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -581,6 +578,37 @@ namespace DonationApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("RedeemItems");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RedeemTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PointsSpent")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RedeemItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RedeemItemId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RedeemTransaction");
                 });
 
             modelBuilder.Entity("DonationApp.Models.Report", b =>
@@ -1047,6 +1075,25 @@ namespace DonationApp.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DonationApp.Models.RedeemTransaction", b =>
+                {
+                    b.HasOne("DonationApp.Models.RedeemItem", "RedeemItem")
+                        .WithMany("RedeemTransactions")
+                        .HasForeignKey("RedeemItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DonationApp.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RedeemItem");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DonationApp.Models.Report", b =>
                 {
                     b.HasOne("DonationApp.Models.ApplicationUser", "Reporter")
@@ -1185,6 +1232,11 @@ namespace DonationApp.Migrations
                     b.Navigation("Images");
 
                     b.Navigation("Offers");
+                });
+
+            modelBuilder.Entity("DonationApp.Models.RedeemItem", b =>
+                {
+                    b.Navigation("RedeemTransactions");
                 });
 
             modelBuilder.Entity("DonationApp.Models.Report", b =>

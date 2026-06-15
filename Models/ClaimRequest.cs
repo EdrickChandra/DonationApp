@@ -20,6 +20,7 @@ public class ClaimRequest
     public ApplicationUser? User { get; set; }
 
     public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
+    public MetodePengiriman MetodePengiriman { get; set; } = MetodePengiriman.BelumDipilih;
 
     [Range(1, 999)]
     public int Jumlah { get; set; } = 1;

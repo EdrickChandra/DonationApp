@@ -10,8 +10,8 @@ public enum ItemCategory
 {
     Pakaian,
     Elektronik,
-    Buku,
-    MainanHobi = 4,
+    PerabotRumah = 2,
+    Mainan = 4,
     AlatMusik = 6
 }
 
@@ -36,6 +36,13 @@ public enum TransactionStatus
     Rejected,
     Shipped,
     Delivered
+}
+
+public enum MetodePengiriman
+{
+    BelumDipilih,
+    Kurir,
+    Pickup
 }
 
 public enum ConversationType

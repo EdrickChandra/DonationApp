@@ -42,6 +42,5 @@ public class RequestOffer
     public DateTime? UpdatedAt { get; set; }
 
     public ICollection<ItemImage> Images { get; set; } = new List<ItemImage>();
-    public ICollection<Feedback> Feedbacks { get; set; } = new List<Feedback>();
     public ICollection<PointTransaction> PointTransactions { get; set; } = new List<PointTransaction>();
 }

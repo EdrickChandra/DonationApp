@@ -22,5 +22,4 @@ public class RedeemItem
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    public ICollection<RedeemTransaction> RedeemTransactions { get; set; } = new List<RedeemTransaction>();
 }

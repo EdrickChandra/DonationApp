@@ -9,14 +9,14 @@
 
 .auth-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 800;
     color: var(--text-dark);
     margin-bottom: 4px;
 }
 
 .auth-subtitle {
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-light);
     margin-bottom: 24px;
 }
@@ -43,5 +43,13 @@
         border-radius: 10px;
         padding: 24px 20px;
         max-width: 100%;
+    }
+
+    .auth-title {
+        font-size: 20px;
+    }
+
+    .auth-subtitle {
+        font-size: 13px;
     }
 }

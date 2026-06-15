@@ -129,8 +129,8 @@
                                 <option value="">Pilih Kategori</option>
                                 <option value="@((int)ItemCategory.Pakaian)">Pakaian</option>
                                 <option value="@((int)ItemCategory.Elektronik)">Elektronik</option>
-                                <option value="@((int)ItemCategory.Buku)">Buku</option>
-                                <option value="@((int)ItemCategory.MainanHobi)">Mainan & Hobi</option>
+                                <option value="@((int)ItemCategory.PerabotRumah)">Perabot Rumah</option>
+                                <option value="@((int)ItemCategory.Mainan)">Mainan</option>
                                 <option value="@((int)ItemCategory.AlatMusik)">Alat Musik</option>
                             </select>
                         </div>
@@ -158,7 +158,7 @@
                             <label class="form-label">Foto Barang <span style="font-weight:400;color:#94a3b8;">(maks. 5, 5MB, JPG/PNG)</span></label>
                             <input type="file" id="imageInput" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
                             <div class="upload-zone" onclick="document.getElementById('imageInput').click()">
-                                <p style="font-size:12px;color:#64748b;margin:0;">Klik untuk unggah foto</p>
+                                <p style="font-size:14px;color:#64748b;margin:0;">Klik untuk unggah foto</p>
                             </div>
                             <span class="validation-message" id="imageError"></span>
                             <div id="previewContainer" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
@@ -217,20 +217,20 @@
                                         <div class="permintaan-req-actions">
                                             @if (r.Status == TransactionStatus.Accepted)
                                             {
-                                                <span style="font-size:12px;color:#166534;font-weight:600;">Diterima</span>
+                                                <span style="font-size:14px;color:#166534;font-weight:600;">Diterima</span>
                                             }
                                             else if (r.Status == TransactionStatus.Rejected)
                                             {
-                                                <span style="font-size:12px;color:#991b1b;font-weight:600;">Ditolak</span>
+                                                <span style="font-size:14px;color:#991b1b;font-weight:600;">Ditolak</span>
                                             }
                                             else if (selectedItem.Status == ItemStatus.Available)
                                             {
-                                                <form asp-controller="Item" asp-action="Accept" method="post" style="display:inline;">
+                                                <form asp-controller="Item" asp-action="Accept" method="post" style="display:inline;" onsubmit="return confirm('Terima permintaan dari @requesterName?')">
                                                     @Html.AntiForgeryToken()
                                                     <input type="hidden" name="requestId" value="@r.Id" />
                                                     <button type="submit" class="permintaan-accept-btn">Terima</button>
                                                 </form>
-                                                <form asp-controller="Item" asp-action="Reject" method="post" style="display:inline; margin-left:6px;">
+                                                <form asp-controller="Item" asp-action="Reject" method="post" style="display:inline; margin-left:6px;" onsubmit="return confirm('Tolak permintaan dari @requesterName?')">
                                                     @Html.AntiForgeryToken()
                                                     <input type="hidden" name="requestId" value="@r.Id" />
                                                     <button type="submit" class="permintaan-reject-btn">Tolak</button>
@@ -292,7 +292,7 @@
                         <div class="chat-list-header">Percakapan</div>
                         @if (conversations == null || !conversations.Any())
                         {
-                            <p style="font-size:12px;color:#94a3b8;text-align:center;padding:20px 12px;">Belum ada percakapan.</p>
+                            <p style="font-size:14px;color:#94a3b8;text-align:center;padding:20px 12px;">Belum ada percakapan.</p>
                         }
                         else
                         {

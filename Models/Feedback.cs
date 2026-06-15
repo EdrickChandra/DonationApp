@@ -33,5 +33,7 @@ public class Feedback
 
     public string? Komentar { get; set; }
 
+    public string? FotoPath { get; set; }
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

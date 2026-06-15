@@ -33,12 +33,11 @@ public class RequestController : AppBaseController
 
         var myRequests = await _db.ItemRequests
             .Include(r => r.Images)
+            .Include(r => r.Feedbacks)
             .Include(r => r.Offers)
                 .ThenInclude(o => o.User)
             .Include(r => r.Offers)
                 .ThenInclude(o => o.Images)
-            .Include(r => r.Offers)
-                .ThenInclude(o => o.Feedbacks)
             .Where(r => r.UserId == userId)
             .OrderByDescending(r => r.CreatedAt)
             .ToListAsync();
@@ -103,6 +102,12 @@ public class RequestController : AppBaseController
         ViewBag.UserAlamat = user?.Alamat ?? "";
         ViewBag.UserProvinsi = user?.Provinsi ?? "";
         ViewBag.UserKota = user?.Kota ?? "";
+
+        var userId = _userManager.GetUserId(User)!;
+        var limit = await GetOrCreateRequestLimit(userId);
+        ViewBag.RequestsRemaining = RequestLimit.MaxRequestsPerWeek - (limit.IsLimitReached() ? RequestLimit.MaxRequestsPerWeek : limit.RequestCount);
+        ViewBag.LimitReached = limit.IsLimitReached();
+        ViewBag.PeriodEnd = limit.GetPeriodEnd();
 
         if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             return PartialView("~/Views/Profile/Request/BuatRequest.cshtml");
@@ -192,6 +197,21 @@ public class RequestController : AppBaseController
         }
 
         var userId = _userManager.GetUserId(User)!;
+
+        var limit = await GetOrCreateRequestLimit(userId);
+        if (limit.IsLimitReached())
+        {
+            TempData["RequestError"] = $"Anda telah mencapai batas maksimum {RequestLimit.MaxRequestsPerWeek} request per minggu. Silakan coba lagi setelah {limit.GetPeriodEnd():dd MMM yyyy HH:mm} UTC.";
+            return RedirectToAction("CreateView");
+        }
+
+        var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
+        if (Images != null && Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+        {
+            TempData["RequestError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
+            return RedirectToAction("CreateView");
+        }
+
         var user = await _userManager.FindByIdAsync(userId);
 
         itemRequest.UserId = userId;
@@ -207,6 +227,9 @@ public class RequestController : AppBaseController
         itemRequest.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
         _db.ItemRequests.Add(itemRequest);
+        await _db.SaveChangesAsync();
+
+        limit.Increment();
         await _db.SaveChangesAsync();
 
         if (Images != null && Images.Count > 0)
@@ -252,7 +275,15 @@ public class RequestController : AppBaseController
         existing.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
 
         if (Images != null && Images.Count > 0)
+        {
+            var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
+            if (Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+            {
+                TempData["RequestError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
+                return RedirectToAction("EditView", new { id });
+            }
             await SaveRequestImagesAsync(Images, userId, existing.Id, maxCount: 5, currentCount: existing.Images.Count);
+        }
 
         await _db.SaveChangesAsync();
         TempData["RequestSuccess"] = "Request berhasil diperbarui.";
@@ -326,6 +357,13 @@ public class RequestController : AppBaseController
         if (alreadyOffered || string.IsNullOrWhiteSpace(deskripsi))
             return RedirectToAction("Detail", new { id = itemRequestId });
 
+        var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
+        if (Images != null && Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+        {
+            TempData["RequestError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
+            return RedirectToAction("Detail", new { id = itemRequestId });
+        }
+
         var user = await _userManager.FindByIdAsync(userId);
         var lokasi = user?.Kota ?? string.Empty;
         var provinsi = user?.Provinsi ?? string.Empty;
@@ -398,7 +436,7 @@ public class RequestController : AppBaseController
         });
 
         await _db.SaveChangesAsync();
-        return RedirectToAction("MyRequests");
+        return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
     }
 
     [Authorize]
@@ -428,7 +466,7 @@ public class RequestController : AppBaseController
         });
 
         await _db.SaveChangesAsync();
-        return RedirectToAction("MyRequests");
+        return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
     }
 
     [Authorize]
@@ -532,6 +570,18 @@ public class RequestController : AppBaseController
             System.IO.File.Delete(fullPath);
     }
 
+    private async Task<RequestLimit> GetOrCreateRequestLimit(string userId)
+    {
+        var limit = await _db.RequestLimits.FirstOrDefaultAsync(l => l.UserId == userId);
+        if (limit == null)
+        {
+            limit = new RequestLimit { UserId = userId, RequestCount = 0, PeriodStart = DateTime.UtcNow };
+            _db.RequestLimits.Add(limit);
+            await _db.SaveChangesAsync();
+        }
+        return limit;
+    }
+
     private async Task RunMatchingAndStoreTempData(int requestId, string userId)
     {
         var savedRequest = await _db.ItemRequests
@@ -570,6 +620,41 @@ public class RequestController : AppBaseController
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ChooseOfferDeliveryMethod(int offerId, MetodePengiriman metode)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var offer = await _db.RequestOffers
+            .Include(o => o.ItemRequest)
+            .FirstOrDefaultAsync(o => o.Id == offerId && o.ItemRequest!.UserId == userId);
+
+        if (offer == null || offer.ItemRequest == null)
+            return RedirectToAction("MyRequests");
+        if (offer.Status != TransactionStatus.Accepted)
+            return RedirectToAction("MyRequests");
+        if (metode == MetodePengiriman.BelumDipilih)
+            return RedirectToAction("MyRequests");
+
+        offer.ItemRequest.MetodePengiriman = metode;
+
+        var metodeLabel = metode == MetodePengiriman.Pickup ? "Pickup" : "Kurir";
+        _db.Notifications.Add(new Notification
+        {
+            UserId = offer.UserId,
+            Message = $"Peminta memilih metode pengiriman \"{metodeLabel}\" untuk \"{offer.NamaBarang}\".",
+            Type = NotificationType.ItemShipped,
+            RefId = offerId.ToString(),
+            Link = "/Donasi/PenawaranDonasi?selectedId=" + offer.Id,
+            CreatedAt = DateTime.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+        return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
+    }
+
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> MarkOfferShipped(int offerId)
     {
         var userId = _userManager.GetUserId(User)!;
@@ -582,14 +667,19 @@ public class RequestController : AppBaseController
             return RedirectToAction("MyRequests");
         if (offer.Status != TransactionStatus.Accepted)
             return RedirectToAction("MyRequests");
+        if (offer.ItemRequest.MetodePengiriman == MetodePengiriman.BelumDipilih)
+            return RedirectToAction("MyRequests");
 
         offer.Status = TransactionStatus.Shipped;
-        offer.UpdatedAt = DateTime.UtcNow;
+
+        var shippedMsg = offer.ItemRequest.MetodePengiriman == MetodePengiriman.Pickup
+            ? $"Barang \"{offer.NamaBarang}\" ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah di-pickup. Silakan konfirmasi penerimaan."
+            : $"Barang \"{offer.NamaBarang}\" ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah dikirim. Silakan konfirmasi penerimaan.";
 
         _db.Notifications.Add(new Notification
         {
             UserId = offer.ItemRequest.UserId,
-            Message = $"Barang \"{offer.NamaBarang}\" ({offer.Jumlah} pcs) untuk request \"{offer.ItemRequest.Title}\" telah dikirim. Silakan konfirmasi penerimaan.",
+            Message = shippedMsg,
             Type = NotificationType.ItemShipped,
             RefId = offerId.ToString(),
             Link = "/Request/MyRequests",
@@ -617,7 +707,6 @@ public class RequestController : AppBaseController
             return RedirectToAction("MyRequests");
 
         offer.Status = TransactionStatus.Delivered;
-        offer.UpdatedAt = DateTime.UtcNow;
 
         _db.Notifications.Add(new Notification
         {
@@ -632,5 +721,45 @@ public class RequestController : AppBaseController
         await _db.SaveChangesAsync();
         await _pointsService.AwardPointsAsync(offer.UserId, null, offerId);
         return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Chat(int offerId)
+    {
+        var userId = _userManager.GetUserId(User)!;
+
+        var offer = await _db.RequestOffers
+            .Include(o => o.ItemRequest)
+            .FirstOrDefaultAsync(o => o.Id == offerId);
+
+        if (offer == null) return RedirectToAction("MyRequests");
+
+        var isRequester = offer.ItemRequest.UserId == userId;
+        var isDonor = offer.UserId == userId;
+        if (!isRequester && !isDonor) return RedirectToAction("MyRequests");
+
+        var requesterId = offer.ItemRequest.UserId;
+        var donorId = offer.UserId;
+
+        var existing = await _db.Conversations
+            .FirstOrDefaultAsync(c => c.RequestOfferId == offerId && c.RequesterId == requesterId && c.DonorId == donorId);
+
+        if (existing != null)
+            return RedirectToAction("Index", "Pesan", new { convId = existing.Id });
+
+        var conversation = new Conversation
+        {
+            Type = ConversationType.RequestOffer,
+            RequestOfferId = offerId,
+            RequesterId = requesterId,
+            DonorId = donorId,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _db.Conversations.Add(conversation);
+        await _db.SaveChangesAsync();
+
+        return RedirectToAction("Index", "Pesan", new { convId = conversation.Id });
     }
 }

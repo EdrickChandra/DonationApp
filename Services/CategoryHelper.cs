@@ -8,8 +8,8 @@ public static class CategoryHelper
     {
         ItemCategory.Pakaian    => "Pakaian",
         ItemCategory.Elektronik => "Perangkat Elektronik",
-        ItemCategory.Buku       => "Buku",
-        ItemCategory.MainanHobi => "Mainan & Hobi",
+        ItemCategory.PerabotRumah => "Perabot Rumah",
+        ItemCategory.Mainan       => "Mainan",
         ItemCategory.AlatMusik  => "Alat Musik",
         _                       => category.ToString()
     };
@@ -18,8 +18,8 @@ public static class CategoryHelper
     [
         ItemCategory.Pakaian,
         ItemCategory.Elektronik,
-        ItemCategory.Buku,
-        ItemCategory.MainanHobi,
+        ItemCategory.PerabotRumah,
+        ItemCategory.Mainan,
         ItemCategory.AlatMusik
     ];
 }

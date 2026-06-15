@@ -154,6 +154,54 @@ public class AdminController : AppBaseController
         return RedirectToAction("ReportDetail", new { id = reportId });
     }
 
+    public IActionResult ManageUsers()
+    {
+        return View("~/Views/Admin/ManageUsers.cshtml");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> SearchUsers(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query) || query.Trim().Length < 2)
+            return Json(new List<object>());
+
+        var q = query.Trim().ToLower();
+        var users = await _db.Users
+            .Where(u => u.NamaDepan!.ToLower().Contains(q)
+                     || u.NamaBelakang!.ToLower().Contains(q)
+                     || u.Email!.ToLower().Contains(q))
+            .Take(20)
+            .Select(u => new {
+                u.Id,
+                Nama = u.NamaDepan + " " + u.NamaBelakang,
+                u.Email,
+                u.IsAdmin,
+                u.IsBanned
+            })
+            .ToListAsync();
+
+        return Json(users);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ToggleAdmin(string userId)
+    {
+        var target = await _userManager.FindByIdAsync(userId);
+        if (target == null)
+            return Json(new { success = false, message = "User tidak ditemukan." });
+
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser!.Id == userId)
+            return Json(new { success = false, message = "Tidak bisa mengubah status admin sendiri." });
+
+        target.IsAdmin = !target.IsAdmin;
+        await _userManager.UpdateAsync(target);
+        await _db.SaveChangesAsync();
+
+        return Json(new { success = true, isAdmin = target.IsAdmin });
+    }
+
     private async Task SendNotificationAsync(string userId, string message)
     {
         _db.Notifications.Add(new Notification

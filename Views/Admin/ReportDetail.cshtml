@@ -7,13 +7,13 @@
 
 <div style="max-width:800px;margin:0 auto;padding:24px 0;">
 
-    <a href="/Admin/Reports" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#64748b;text-decoration:none;margin-bottom:20px;">
+    <a href="/Admin/Reports" style="display:inline-flex;align-items:center;gap:6px;font-size:15px;color:#64748b;text-decoration:none;margin-bottom:20px;">
         <i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali ke laporan
     </a>
 
     @if (TempData["AdminSuccess"] != null)
     {
-        <div style="background:#dcfce7;border:1px solid #86efac;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:8px;">
+        <div style="background:#dcfce7;border:1px solid #86efac;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:15px;display:flex;align-items:center;gap:8px;">
             <i class="ti ti-circle-check" aria-hidden="true"></i>
             @TempData["AdminSuccess"]
         </div>
@@ -51,7 +51,7 @@
                             _ => "#f1f5f9"
                         };
                     }
-                    <span style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;background:@statusBg;color:@statusColor;font-family:'Plus Jakarta Sans',sans-serif;">
+                    <span style="font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px;background:@statusBg;color:@statusColor;font-family:'Plus Jakarta Sans',sans-serif;">
                         @statusLabel
                     </span>
                 </div>
@@ -83,7 +83,7 @@
                 {
                     <div>
                         <div class="admin-field-label" style="margin-bottom:6px;">Deskripsi</div>
-                        <div style="font-size:13px;color:#334155;line-height:1.6;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
+                        <div style="font-size:15px;color:#334155;line-height:1.6;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
                             @Model.Deskripsi
                         </div>
                     </div>
@@ -99,14 +99,14 @@
                             @(Model.TargetUser.NamaDepan.Substring(0, 1).ToUpper())
                         </div>
                         <div>
-                            <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">
+                            <div style="font-size:16px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">
                                 @(Model.TargetUser.NamaDepan + " " + Model.TargetUser.NamaBelakang)
                             </div>
                             <div class="text-sm-muted">@Model.TargetUser.Email</div>
                         </div>
                         @if (Model.TargetUser.IsBanned)
                         {
-                            <span style="margin-left:auto;font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:#fee2e2;color:#991b1b;">Banned</span>
+                            <span style="margin-left:auto;font-size:13px;font-weight:700;padding:3px 10px;border-radius:99px;background:#fee2e2;color:#991b1b;">Banned</span>
                         }
                     </div>
                 </div>
@@ -123,11 +123,11 @@
                                  class="img-60" />
                         }
                         <div>
-                            <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetDonation.NamaBarang</div>
+                            <div style="font-size:16px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetDonation.NamaBarang</div>
                             <div class="text-sm-muted">@Model.TargetDonation.Kategori · @Model.TargetDonation.Lokasi</div>
                         </div>
                         <a href="/Donasi/Detail/@Model.TargetDonation.Id" target="_blank"
-                           style="margin-left:auto;font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">
+                           style="margin-left:auto;font-size:14px;color:#2563eb;text-decoration:none;font-weight:500;">
                             Lihat item →
                         </a>
                     </div>
@@ -145,11 +145,11 @@
                                  class="img-60" />
                         }
                         <div>
-                            <div style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetRequest.Title</div>
+                            <div style="font-size:16px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetRequest.Title</div>
                             <div class="text-sm-muted">@Model.TargetRequest.Kategori · @Model.TargetRequest.Lokasi</div>
                         </div>
                         <a href="/Request/Detail/@Model.TargetRequest.Id" target="_blank"
-                           style="margin-left:auto;font-size:12px;color:#2563eb;text-decoration:none;font-weight:500;">
+                           style="margin-left:auto;font-size:14px;color:#2563eb;text-decoration:none;font-weight:500;">
                             Lihat request →
                         </a>
                     </div>
@@ -165,13 +165,13 @@
                         {
                             <div style="padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-                                    <span style="font-size:12px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@a.Action</span>
+                                    <span style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@a.Action</span>
                                     <span class="text-xs-dim">@a.CreatedAt.ToString("dd MMM yyyy, HH:mm")</span>
                                 </div>
                                 <div class="text-sm-muted">oleh @(a.Admin?.NamaDepan + " " + a.Admin?.NamaBelakang)</div>
                                 @if (!string.IsNullOrEmpty(a.Note))
                                 {
-                                    <div style="font-size:12px;color:#334155;margin-top:4px;font-style:italic;">@a.Note</div>
+                                    <div style="font-size:14px;color:#334155;margin-top:4px;font-style:italic;">@a.Note</div>
                                 }
                             </div>
                         }
@@ -202,8 +202,8 @@
                     <div class="admin-card">
                         <div class="admin-section-label" style="margin-bottom:10px;">Aksi Pengguna</div>
                         <div style="margin-bottom:10px;">
-                            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Catatan (opsional)</label>
-                            <textarea id="userActionNote" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Catatan untuk aksi ini..."></textarea>
+                            <label style="font-size:14px;font-weight:600;color:#64748b;display:block;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Catatan (opsional)</label>
+                            <textarea id="userActionNote" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:15px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Catatan untuk aksi ini..."></textarea>
                         </div>
                         <div style="display:flex;flex-direction:column;gap:8px;">
                             <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this, 'userActionNote')">
@@ -233,8 +233,8 @@
                     <div class="admin-card">
                         <div class="admin-section-label" style="margin-bottom:10px;">Aksi Item</div>
                         <div style="margin-bottom:10px;">
-                            <label style="font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Catatan (opsional)</label>
-                            <textarea id="itemActionNote" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Catatan untuk aksi ini..."></textarea>
+                            <label style="font-size:14px;font-weight:600;color:#64748b;display:block;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Catatan (opsional)</label>
+                            <textarea id="itemActionNote" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:15px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Catatan untuk aksi ini..."></textarea>
                         </div>
                         <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this, 'itemActionNote')">
                             @Html.AntiForgeryToken()
@@ -263,7 +263,7 @@
             {
                 <div class="admin-card" style="text-align:center;padding:24px;">
                     <i class="ti ti-circle-check" style="font-size:32px;color:#22c55e;display:block;margin-bottom:8px;" aria-hidden="true"></i>
-                    <p style="font-size:13px;color:#64748b;margin:0;">Laporan ini sudah diselesaikan.</p>
+                    <p style="font-size:15px;color:#64748b;margin:0;">Laporan ini sudah diselesaikan.</p>
                 </div>
             }
         </div>

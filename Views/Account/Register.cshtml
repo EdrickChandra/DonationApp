@@ -11,7 +11,7 @@
         <div class="auth-subtitle">Sudah punya akun? <a asp-controller="Account" asp-action="Login">Masuk di sini</a></div>
 
         <form asp-action="Register" method="post">
-            <div class="validation-message" asp-validation-summary="All"></div>
+            <div class="validation-message" asp-validation-summary="ModelOnly"></div>
 
             <div class="input-row">
                 <div class="form-group">

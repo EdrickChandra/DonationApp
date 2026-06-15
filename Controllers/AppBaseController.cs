@@ -36,16 +36,12 @@ public class AppBaseController : Controller
                             (c.RequesterId == userId || c.DonorId == userId)))
                     .CountAsync();
 
-                var ratingTask = _db.Feedbacks
-                    .Where(f => f.ReviewedUserId == userId)
-                    .AverageAsync(f => (double?)f.Rating);
-
-                await Task.WhenAll(userTask, notifTask, msgTask, ratingTask);
+                await Task.WhenAll(userTask, notifTask, msgTask);
 
                 ViewBag.NavUser = userTask.Result;
                 ViewBag.UnreadCount = notifTask.Result;
                 ViewBag.UnreadMessageCount = msgTask.Result;
-                ViewBag.AverageRating = Math.Round(ratingTask.Result ?? 0, 1);
+                ViewBag.AverageRating = (double)(userTask.Result?.AvgRating ?? 0);
             }
         }
         else

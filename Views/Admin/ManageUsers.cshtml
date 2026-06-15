@@ -1,0 +1,202 @@
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="max-width:1000px;margin:0 auto;padding:24px 0;">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div>
+            <h1 style="font-size:22px;font-weight:800;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;margin:0 0 4px;">Kelola Pengguna</h1>
+            <p style="font-size:15px;color:#64748b;margin:0;">Cari dan kelola status admin pengguna</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <a href="/Admin/Reports" class="admin-filter-btn"><i class="ti ti-flag" aria-hidden="true"></i> Laporan</a>
+        </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:20px;">
+        <div style="position:relative;">
+            <i class="ti ti-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:16px;"></i>
+            <input type="text" id="searchInput" placeholder="Cari berdasarkan nama atau email..." autocomplete="off"
+                   style="width:100%;padding:12px 16px 12px 42px;border:1px solid #e2e8f0;border-radius:10px;font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border 0.15s;box-sizing:border-box;" />
+        </div>
+    </div>
+
+    <div id="results">
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:48px;text-align:center;">
+            <i class="ti ti-users-group" style="font-size:36px;color:#cbd5e1;display:block;margin-bottom:8px;"></i>
+            <p style="font-size:15px;color:#94a3b8;margin:0;">Ketik minimal 2 karakter untuk mencari pengguna</p>
+        </div>
+    </div>
+</div>
+
+<style>
+.admin-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    text-decoration: none;
+    transition: all 0.15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.admin-filter-btn:hover { background: #f8fafc; }
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+    text-align: left;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.admin-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: #f8fafc; }
+.admin-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 99px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.admin-badge.admin { background: #dbeafe; color: #1d4ed8; }
+.admin-badge.user { background: #f1f5f9; color: #64748b; }
+.admin-badge.banned { background: #fee2e2; color: #dc2626; }
+.toggle-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.toggle-btn.make-admin { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+.toggle-btn.make-admin:hover { background: #dbeafe; }
+.toggle-btn.remove-admin { background: #fff1f2; color: #dc2626; border-color: #fecdd3; }
+.toggle-btn.remove-admin:hover { background: #fee2e2; }
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f1f5f9;
+}
+</style>
+
+<script>
+(function() {
+    var input = document.getElementById('searchInput');
+    var results = document.getElementById('results');
+    var timeout = null;
+    var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    var token = tokenEl ? tokenEl.value : '';
+
+    input.addEventListener('input', function() {
+        clearTimeout(timeout);
+        var q = this.value.trim();
+        if (q.length < 2) {
+            results.innerHTML =
+                '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:48px;text-align:center;">' +
+                '<i class="ti ti-users-group" style="font-size:36px;color:#cbd5e1;display:block;margin-bottom:8px;"></i>' +
+                '<p style="font-size:15px;color:#94a3b8;margin:0;">Ketik minimal 2 karakter untuk mencari pengguna</p></div>';
+            return;
+        }
+        timeout = setTimeout(function() { fetchUsers(q); }, 300);
+    });
+
+    function fetchUsers(query) {
+        results.innerHTML = '<div style="text-align:center;padding:24px;color:#94a3b8;font-size:15px;">Mencari...</div>';
+        fetch('/Admin/SearchUsers?query=' + encodeURIComponent(query))
+            .then(function(r) { return r.json(); })
+            .then(function(users) {
+                if (!users.length) {
+                    results.innerHTML =
+                        '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:48px;text-align:center;">' +
+                        '<i class="ti ti-user-off" style="font-size:36px;color:#cbd5e1;display:block;margin-bottom:8px;"></i>' +
+                        '<p style="font-size:15px;color:#94a3b8;margin:0;">Tidak ada pengguna ditemukan</p></div>';
+                    return;
+                }
+                var html = '<div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">' +
+                    '<table class="admin-table"><thead><tr>' +
+                    '<th>Pengguna</th><th>Email</th><th>Status</th><th>Aksi</th>' +
+                    '</tr></thead><tbody>';
+                users.forEach(function(u) {
+                    var avatar = u.profilePictureUrl
+                        ? '<img src="' + u.profilePictureUrl + '" class="user-avatar" alt="">'
+                        : '<div class="user-avatar" style="display:flex;align-items:center;justify-content:center;background:#e2e8f0;color:#64748b;font-weight:700;font-size:16px;">' + ((u.nama || '?')[0]) + '</div>';
+                    var badges = '';
+                    if (u.isAdmin) badges += '<span class="admin-badge admin">Admin</span> ';
+                    if (u.isBanned) badges += '<span class="admin-badge banned">Banned</span> ';
+                    if (!u.isAdmin && !u.isBanned) badges = '<span class="admin-badge user">User</span>';
+                    var btnClass = u.isAdmin ? 'remove-admin' : 'make-admin';
+                    var btnText = u.isAdmin ? 'Hapus Admin' : 'Jadikan Admin';
+                    html += '<tr data-uid="' + u.id + '">' +
+                        '<td><div style="display:flex;align-items:center;gap:10px;">' + avatar + '<span style="font-size:15px;font-weight:600;color:#0f172a;">' + (u.nama || '-') + '</span></div></td>' +
+                        '<td><span style="font-size:15px;color:#64748b;">' + (u.email || '-') + '</span></td>' +
+                        '<td>' + badges + '</td>' +
+                        '<td><button class="toggle-btn ' + btnClass + '" onclick="toggleAdmin(\'' + u.id + '\', this)">' + btnText + '</button></td>' +
+                        '</tr>';
+                });
+                html += '</tbody></table></div>';
+                results.innerHTML = html;
+            })
+            .catch(function() {
+                results.innerHTML = '<div style="text-align:center;padding:24px;color:#ef4444;font-size:15px;">Gagal memuat data</div>';
+            });
+    }
+
+    window.toggleAdmin = function(userId, btn) {
+        btn.disabled = true;
+        btn.textContent = '...';
+        var formData = new FormData();
+        formData.append('userId', userId);
+        formData.append('__RequestVerificationToken', token);
+        fetch('/Admin/ToggleAdmin', { method: 'POST', body: formData })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (!data.success) {
+                    alert(data.message);
+                    btn.disabled = false;
+                    btn.textContent = btn.classList.contains('remove-admin') ? 'Hapus Admin' : 'Jadikan Admin';
+                    return;
+                }
+                var row = btn.closest('tr');
+                var statusCell = row.children[2];
+                if (data.isAdmin) {
+                    statusCell.innerHTML = '<span class="admin-badge admin">Admin</span>';
+                    btn.className = 'toggle-btn remove-admin';
+                    btn.textContent = 'Hapus Admin';
+                } else {
+                    statusCell.innerHTML = '<span class="admin-badge user">User</span>';
+                    btn.className = 'toggle-btn make-admin';
+                    btn.textContent = 'Jadikan Admin';
+                }
+                btn.disabled = false;
+            })
+            .catch(function() {
+                alert('Gagal mengubah status');
+                btn.disabled = false;
+            });
+    };
+
+    input.focus();
+})();
+</script>

@@ -34,7 +34,7 @@ main:has(.pnav) {
 
 
 .pnav-username {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 500;
     color: var(--white);
 }
@@ -54,7 +54,7 @@ main:has(.pnav) {
     gap: 6px;
     padding: 0 16px;
     height: 100%;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--gray-400);
     text-decoration: none;
     border-bottom: 2px solid transparent;
@@ -64,7 +64,7 @@ main:has(.pnav) {
     font-weight: 500;
 }
 
-    .pnav-link i { font-size: 16px; }
+    .pnav-link i { font-size: 18px; }
     .pnav-link:hover { color: var(--white); }
     .pnav-link.active {
         color: var(--white);
@@ -75,8 +75,8 @@ main:has(.pnav) {
 .pnav-badge {
     background: var(--red);
     color: var(--white);
-    font-size: 10px;
-    padding: 1px 5px;
+    font-size: 13px;
+    padding: 3px 8px;
     border-radius: 99px;
     font-weight: 600;
 }
@@ -100,7 +100,7 @@ main:has(.pnav) {
 }
 
 .ppage-title {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 600;
     color: var(--text-dark);
     margin: 0;
@@ -115,8 +115,8 @@ main:has(.pnav) {
 }
 
 .ptab {
-    padding: 10px 18px;
-    font-size: 13px;
+    padding: 14px 24px;
+    font-size: 16px;
     color: var(--text-mid);
     background: none;
     border: none;
@@ -151,7 +151,7 @@ main:has(.pnav) {
 }
 
 .pstat-label {
-    font-size: 12px;
+    font-size: 15px;
     color: var(--text-mid);
     margin-bottom: 8px;
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -159,7 +159,7 @@ main:has(.pnav) {
 }
 
 .pstat-value {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
     color: var(--text-dark);
     line-height: 1;
@@ -167,7 +167,7 @@ main:has(.pnav) {
 }
 
 .pstat-sub {
-    font-size: 12px;
+    font-size: 15px;
     color: var(--text-mid);
     margin-top: 6px;
 }
@@ -182,7 +182,7 @@ main:has(.pnav) {
 .preview-header {
     padding: 14px 16px;
     border-bottom: 1px solid var(--gray-200);
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -200,20 +200,20 @@ main:has(.pnav) {
 
 
 .preview-name {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-dark);
 }
 
 .preview-text {
-    font-size: 13px;
+    font-size: 16px;
     color: var(--text-mid);
     margin-top: 3px;
     line-height: 1.5;
 }
 
 .preview-time {
-    font-size: 11px;
+    font-size: 14px;
     color: var(--text-light);
     margin-left: auto;
     white-space: nowrap;
@@ -222,7 +222,7 @@ main:has(.pnav) {
 
 .pstars {
     color: var(--star-color);
-    font-size: 13px;
+    font-size: 15px;
     letter-spacing: 1px;
 }
 
@@ -237,7 +237,7 @@ main:has(.pnav) {
 }
 
 .plist {
-    width: 240px;
+    width: 280px;
     flex-shrink: 0;
     border-right: 1px solid var(--gray-200);
     overflow-y: auto;
@@ -248,7 +248,7 @@ main:has(.pnav) {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--gray-100);
     cursor: pointer;
     text-decoration: none;
@@ -262,8 +262,8 @@ main:has(.pnav) {
     }
 
 .plist-thumb {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
@@ -274,12 +274,12 @@ main:has(.pnav) {
 }
 
     .plist-thumb i {
-        font-size: 18px;
+        font-size: 22px;
         color: var(--text-light);
     }
 
 .plist-name {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--text-dark);
     white-space: nowrap;
@@ -290,7 +290,7 @@ main:has(.pnav) {
 }
 
 .plist-sub {
-    font-size: 11px;
+    font-size: 14px;
     color: var(--text-light);
 }
 
@@ -306,12 +306,12 @@ main:has(.pnav) {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
+    font-size: 16px;
     color: var(--text-light);
 }
 
 .pdetail-title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--text-dark);
     margin-bottom: 16px;
@@ -322,13 +322,13 @@ main:has(.pnav) {
 .psec {
     border: 1px solid var(--gray-200);
     border-radius: 8px;
-    padding: 14px 16px;
+    padding: 16px 20px;
     margin-bottom: 12px;
     background: var(--white);
 }
 
 .psec-label {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-light);
     text-transform: uppercase;
@@ -352,8 +352,8 @@ main:has(.pnav) {
 }
 
 .pstep-dot {
-    width: 26px;
-    height: 26px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     border: 1.5px solid var(--gray-300);
     background: var(--gray-100);
@@ -361,7 +361,7 @@ main:has(.pnav) {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 13px;
+    font-size: 15px;
 }
 
     .pstep-dot.done {
@@ -370,11 +370,11 @@ main:has(.pnav) {
         color: var(--white);
     }
 
-    .pstep-dot i { font-size: 13px; color: var(--text-light); }
+    .pstep-dot i { font-size: 15px; color: var(--text-light); }
     .pstep-dot.done i { color: var(--white); }
 
 .pstep-label {
-    font-size: 10px;
+    font-size: 13px;
     color: var(--text-light);
     white-space: nowrap;
 }
@@ -385,7 +385,7 @@ main:has(.pnav) {
     flex: 1;
     height: 1.5px;
     background: var(--gray-300);
-    margin-top: 13px;
+    margin-top: 15px;
 }
 
     .pstep-line.done { background: var(--green); }
@@ -401,7 +401,7 @@ main:has(.pnav) {
 }
 
 .pchat-list {
-    width: 260px;
+    width: 300px;
     flex-shrink: 0;
     border-right: 1px solid var(--gray-200);
     background: var(--white);
@@ -411,7 +411,7 @@ main:has(.pnav) {
 
 .pchat-list-header {
     padding: 14px 16px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-dark);
     border-bottom: 1px solid var(--gray-200);
@@ -422,7 +422,7 @@ main:has(.pnav) {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px 14px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--gray-100);
     cursor: pointer;
     transition: background 0.1s;
@@ -432,8 +432,8 @@ main:has(.pnav) {
     .pchat-item.active { background: var(--blue-tint); }
 
 .pchat-thumb {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
@@ -441,15 +441,15 @@ main:has(.pnav) {
 }
 
 .pchat-thumb-placeholder {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: 8px;
     background: var(--gray-100);
     flex-shrink: 0;
 }
 
 .pchat-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-dark);
     white-space: nowrap;
@@ -459,7 +459,7 @@ main:has(.pnav) {
 }
 
 .pchat-preview {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-light);
     white-space: nowrap;
     overflow: hidden;
@@ -499,7 +499,7 @@ main:has(.pnav) {
 }
 
 .pchat-header-name {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--text-dark);
     margin: 0;
@@ -507,7 +507,7 @@ main:has(.pnav) {
 }
 
 .pchat-header-sub {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--text-light);
     margin: 0;
 }
@@ -525,7 +525,7 @@ main:has(.pnav) {
 
 .pchat-no-select {
     margin: auto;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--text-light);
 }
 
@@ -542,7 +542,7 @@ main:has(.pnav) {
     max-width: 65%;
     padding: 8px 12px;
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.5;
     color: var(--text-dark);
     background: var(--white);
@@ -558,7 +558,7 @@ main:has(.pnav) {
 .pchat-bubble p { margin: 0; }
 
 .pchat-bubble-time {
-    font-size: 10px;
+    font-size: 12px;
     color: var(--text-light);
     padding: 0 4px;
 }
@@ -604,7 +604,7 @@ main:has(.pnav) {
     border: 1px solid var(--gray-200);
     border-radius: 8px;
     padding: 8px 12px;
-    font-size: 13px;
+    font-size: 15px;
     background: var(--gray-50);
     color: var(--text-dark);
     resize: none;
@@ -641,11 +641,11 @@ main:has(.pnav) {
     margin-top: 4px;
 }
 
-.pnotif-msg { font-size: 13px; color: var(--text-dark); line-height: 1.5; flex: 1; }
-.pnotif-time { font-size: 11px; color: var(--text-light); margin-top: 4px; }
+.pnotif-msg { font-size: 15px; color: var(--text-dark); line-height: 1.5; flex: 1; }
+.pnotif-time { font-size: 13px; color: var(--text-light); margin-top: 4px; }
 
 .pnotif-link {
-    font-size: 12px;
+    font-size: 14px;
     color: var(--blue);
     text-decoration: none;
     white-space: nowrap;
@@ -664,20 +664,20 @@ main:has(.pnav) {
     .preq-row:last-child { border-bottom: none; }
 
 .preq-avatar {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--gray-100);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-mid);
     flex-shrink: 0;
 }
 
-.preq-name { flex: 1; font-size: 13px; color: var(--text-dark); }
+.preq-name { flex: 1; font-size: 15px; color: var(--text-dark); }
 .preq-actions { display: flex; gap: 6px; align-items: center; }
 
 /* ── Condition buttons ── */
@@ -910,5 +910,196 @@ main:has(.pnav) {
 
     .pstep-label {
         font-size: 9px;
+    }
+
+    .pdetail-header {
+        flex-wrap: wrap;
+    }
+
+    .pdetail-header > div:last-child {
+        width: 100%;
+        justify-content: flex-start;
+        margin-top: 4px;
+    }
+
+    .preview-item .flex-1 > div:first-child {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .ptab-bar {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .ptab-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .preq-row {
+        flex-wrap: wrap;
+    }
+
+    .preq-actions {
+        width: 100%;
+        justify-content: flex-end;
+        padding-top: 6px;
+    }
+
+    .penerima-row {
+        flex-wrap: wrap;
+    }
+
+    .pdetail-title {
+        font-size: 14px;
+        word-break: break-word;
+    }
+
+    .pdetail {
+        padding: 14px 12px !important;
+    }
+
+    .pstat-card {
+        padding: 12px 10px;
+    }
+
+    .pstat-label {
+        font-size: 11px;
+    }
+
+    .pstat-sub {
+        font-size: 12px;
+    }
+
+    .pnav-badge {
+        font-size: 10px;
+        padding: 1px 5px;
+    }
+
+    .plist-name {
+        font-size: 13px;
+    }
+
+    .plist-sub {
+        font-size: 11px;
+    }
+
+    .psec-label {
+        font-size: 11px;
+    }
+
+    .preview-header {
+        font-size: 13px;
+    }
+
+    .preview-name {
+        font-size: 13px;
+    }
+
+    .preview-text {
+        font-size: 13px;
+    }
+
+    .preview-time {
+        font-size: 11px;
+    }
+
+    .preview-item {
+        padding: 12px;
+        gap: 10px;
+    }
+
+    .ppage-title {
+        font-size: 18px;
+    }
+
+    .plist-thumb {
+        width: 40px;
+        height: 40px;
+    }
+
+    .plist-thumb i {
+        font-size: 18px;
+    }
+
+    .pdetail-empty {
+        font-size: 13px;
+    }
+
+    .pstep-dot {
+        width: 26px;
+        height: 26px;
+        font-size: 13px;
+    }
+
+    .pstep-dot i {
+        font-size: 13px;
+    }
+
+    .pstep-line {
+        margin-top: 13px;
+    }
+
+    .pchat-list-header {
+        font-size: 13px;
+    }
+
+    .pchat-name {
+        font-size: 13px;
+    }
+
+    .pchat-preview {
+        font-size: 11px;
+    }
+
+    .pchat-header-name {
+        font-size: 13px;
+    }
+
+    .pchat-header-sub {
+        font-size: 11px;
+    }
+
+    .pchat-bubble {
+        font-size: 13px;
+    }
+
+    .pchat-bubble-time {
+        font-size: 10px;
+    }
+
+    .pchat-no-select {
+        font-size: 13px;
+    }
+
+    .pchat-textarea {
+        font-size: 13px;
+    }
+
+    .pnotif-msg {
+        font-size: 13px;
+    }
+
+    .pnotif-time {
+        font-size: 11px;
+    }
+
+    .pnotif-link {
+        font-size: 12px;
+    }
+
+    .preq-avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
+    }
+
+    .preq-name {
+        font-size: 13px;
+    }
+
+    .pstars {
+        font-size: 13px;
     }
 }

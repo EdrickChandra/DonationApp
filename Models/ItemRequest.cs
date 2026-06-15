@@ -11,6 +11,7 @@ public class ItemRequest : ListingBase
     public ItemCondition? KondisiMinimum { get; set; }
 
     public ItemRequestStatus Status { get; set; } = ItemRequestStatus.Open;
+    public MetodePengiriman MetodePengiriman { get; set; } = MetodePengiriman.BelumDipilih;
 
     public ICollection<ItemImage> Images { get; set; } = new List<ItemImage>();
     public ICollection<RequestOffer> Offers { get; set; } = new List<RequestOffer>();

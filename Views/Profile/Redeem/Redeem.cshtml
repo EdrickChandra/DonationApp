@@ -1,7 +1,7 @@
 ﻿@using DonationApp.Models
 @{
     var items = ViewBag.RedeemItems as List<RedeemItem> ?? new List<RedeemItem>();
-    var history = ViewBag.RedeemHistory as List<RedeemTransaction> ?? new List<RedeemTransaction>();
+    var history = ViewBag.RedeemHistory as List<PointTransaction> ?? new List<PointTransaction>();
     var pointHistory = ViewBag.PointHistory as List<PointTransaction> ?? new List<PointTransaction>();
     var userPoints = (int)(ViewBag.UserPoints ?? 0);
 }
@@ -34,7 +34,7 @@
 
         @if (TempData["RedeemSuccess"] != null)
         {
-            <div style="background:#dcfce7;border:1px solid #86efac;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:13px;display:flex;align-items:center;gap:8px;">
+            <div style="background:#dcfce7;border:1px solid #86efac;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:15px;display:flex;align-items:center;gap:8px;">
                 <i class="ti ti-circle-check" aria-hidden="true"></i>
                 @TempData["RedeemSuccess"]
             </div>
@@ -109,18 +109,18 @@
                                           onsubmit="return confirm('Tukar @item.Name seharga @item.PointCost poin?')">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="redeemItemId" value="@item.Id" />
-                                        <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;font-size:12px;">
+                                        <button type="submit" class="btn btn-primary btn-block" style="margin-top:10px;font-size:14px;">
                                             <i class="ti ti-exchange" aria-hidden="true"></i> Tukar Sekarang
                                         </button>
                                     </form>
                                 }
                                 else if (item.Stock <= 0)
                                 {
-                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>Stok Habis</button>
+                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:14px;opacity:0.5;" disabled>Stok Habis</button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:12px;opacity:0.5;" disabled>
+                                    <button class="btn btn-secondary btn-block" style="margin-top:10px;font-size:14px;opacity:0.5;" disabled>
                                         Kurang @(item.PointCost - userPoints) poin lagi
                                     </button>
                                 }
@@ -143,32 +143,18 @@
                 <div class="preview-card">
                     @foreach (var r in history)
                     {
-                        var statusLabel = r.Status switch
-                        {
-                            RedeemStatus.Pending => "Diproses",
-                            RedeemStatus.Fulfilled => "Selesai",
-                            RedeemStatus.Cancelled => "Dibatalkan",
-                            _ => "-"
-                        };
-                        var statusClass = r.Status switch
-                        {
-                            RedeemStatus.Pending => "badge-pending",
-                            RedeemStatus.Fulfilled => "badge-available",
-                            RedeemStatus.Cancelled => "badge-rejected",
-                            _ => "badge-muted"
-                        };
                         <div class="preview-item">
                             <div style="width:36px;height:36px;border-radius:8px;background:#fef9c3;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="ti ti-gift" style="color:#854d0e;font-size:18px;" aria-hidden="true"></i>
                             </div>
                             <div class="flex-1">
                                 <div class="preview-name">@(r.RedeemItem?.Name ?? "Item")</div>
-                                <div style="font-size:11px;color:#64748b;margin-top:2px;">
-                                    <i class="ti ti-coin" style="font-size:11px;" aria-hidden="true"></i>
-                                    @r.PointsSpent poin · @r.CreatedAt.ToString("dd MMM yyyy")
+                                <div style="font-size:13px;color:#64748b;margin-top:2px;">
+                                    <i class="ti ti-coin" style="font-size:13px;" aria-hidden="true"></i>
+                                    @Math.Abs(r.Amount) poin · @r.CreatedAt.ToString("dd MMM yyyy")
                                 </div>
                             </div>
-                            <span class="badge @statusClass">@statusLabel</span>
+                            <span class="badge badge-available">Selesai</span>
                         </div>
                     }
                 </div>
@@ -201,9 +187,9 @@
                             </div>
                             <div class="flex-1">
                                 <div class="preview-name">@typeLabel</div>
-                                <div style="font-size:11px;color:#64748b;margin-top:2px;">@p.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div>
+                                <div style="font-size:13px;color:#64748b;margin-top:2px;">@p.CreatedAt.ToString("dd MMM yyyy, HH:mm")</div>
                             </div>
-                            <div style="font-size:14px;font-weight:700;color:@(isPositive ? "#16a34a" : "#dc2626");font-family:'Plus Jakarta Sans',sans-serif;">
+                            <div style="font-size:16px;font-weight:700;color:@(isPositive ? "#16a34a" : "#dc2626");font-family:'Plus Jakarta Sans',sans-serif;">
                                 @(isPositive ? "+" : "")@p.Amount
                             </div>
                         </div>
