@@ -14,10 +14,10 @@
 }
 
 <div class="ppage">
-    <div class="ppage-inner" style="max-width:100%;padding:0;">
+    <div class="ppage-inner ppage-inner--flush">
 
-        <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:0.5px solid var(--color-border-tertiary, #cbd5e1);">
-            <div class="ptab-bar" style="margin:0;border:none;">
+        <div class="ptab-header">
+            <div class="ptab-bar ptab-bar--flush">
                 <a asp-controller="Donasi" asp-action="Index" class="ptab active">Donasi Saya</a>
                 <a asp-controller="Donasi" asp-action="PenawaranDonasi" class="ptab">Penawaran Donasi</a>
                 <a asp-controller="Donasi" asp-action="Create" class="ptab">Buat Donasi</a>
@@ -26,25 +26,25 @@
 
         @if (TempData["DonasiSuccess"] != null)
         {
-            <div style="margin:12px 16px 0;background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);font-size:15px;">
+            <div class="palert-success">
                 @TempData["DonasiSuccess"]
             </div>
         }
         @if (TempData["DonasiError"] != null)
         {
-            <div style="margin:12px 16px 0;" class="form-error-banner">@TempData["DonasiError"]</div>
+            <div class="palert-error-wrap form-error-banner">@TempData["DonasiError"]</div>
         }
 
         @if (visibleDonations == null || !visibleDonations.Any())
         {
             <div class="empty-state">
                 Belum ada donasi.
-                <a asp-controller="Donasi" asp-action="Create" class="btn btn-primary" style="display:inline-flex;margin-top:12px;">Buat Donasi Pertama</a>
+                <a asp-controller="Donasi" asp-action="Create" class="btn btn-primary btn-inline-mt">Buat Donasi Pertama</a>
             </div>
         }
         else
         {
-            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
+            <div class="psplit psplit--flush">
 
                 <div class="plist" id="donasi-list">
                     @foreach (var d in visibleDonations)
@@ -72,7 +72,7 @@
                            href="/Donasi/Index?selectedId=@d.Id">
                             @if (d.Images.Any())
                             {
-                                <img src="@d.Images.First().FilePath" class="plist-thumb" style="object-fit:cover;" />
+                                <img src="@d.Images.First().FilePath" class="plist-thumb img-cover-fill" />
                             }
                             else
                             {
@@ -112,22 +112,22 @@
                         var pendingRequests = selected.ClaimRequests.Where(r => r.Status == TransactionStatus.Pending).ToList();
                         var hasAnyActive = activeRequests.Any();
 
-                        <div class="pdetail-header" style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+                        <div class="pdetail-header pdetail-head-row">
                             @if (selected.Images.Any())
                             {
                                 <img src="@selected.Images.First().FilePath" class="img-60" />
                             }
                             <div class="flex-1">
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.NamaBarang</div>
-                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                <div class="pbadge-row">
                                     <span class="badge badge-claimed">@CategoryHelper.DisplayName(selected.Kategori)</span>
                                     <span class="badge badge-muted">@selected.Kondisi</span>
                                     <span class="badge badge-muted">Sisa @selected.Jumlah pcs</span>
                                     <span class="badge badge-muted">@selected.Lokasi</span>
                                 </div>
                             </div>
-                            <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;">
-                                <button onclick="runMatch(@selected.Id, this)" class="btn btn-secondary btn-sm" style="background:linear-gradient(135deg,#1e40af,#2563eb);color:#fff;border-color:#2563eb;">
+                            <div class="pdetail-actions">
+                                <button onclick="runMatch(@selected.Id, this)" class="btn btn-secondary btn-sm btn-match-grad">
                                     <i class="ti ti-search" aria-hidden="true"></i> Cari Kecocokan
                                 </button>
                                 @if (!hasAnyActive)
@@ -150,7 +150,7 @@
                         {
                             <div class="psec">
                                 <div class="psec-label">Penerima (@activeRequests.Count)</div>
-                                <div style="display:flex;flex-direction:column;gap:6px;">
+                                <div class="poffer-list">
                                     @foreach (var r in activeRequests)
                                     {
                                         var rAvatar = r.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
@@ -172,19 +172,18 @@
                                             _ => "badge-muted"
                                         };
                                         <div>
-                                            <div class="penerima-row" onclick="togglePenerima('penerima-detail-@r.Id')"
-                                                 style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:#e2e8f0;border-radius:8px;cursor:pointer;border:1px solid #c4c9d4;transition:background 0.15s;">
+                                            <div class="penerima-row" onclick="togglePenerima('penerima-detail-@r.Id')">
                                                 <a href="/Profile/View/@r.UserId" class="avatar avatar-sm" style="text-decoration:none;color:#fff;" onclick="event.stopPropagation();">@rAvatar</a>
                                                 <div class="flex-1">
                                                     <a href="/Profile/View/@r.UserId" class="text-strong" style="text-decoration:none;" onclick="event.stopPropagation();">@rName</a>
                                                     <div class="text-xs-muted">@r.Jumlah pcs · @r.User?.Kota - @r.User?.Provinsi</div>
                                                 </div>
                                                 <span class="badge @rStatusClass" style="font-size:12px;">@rStatusLabel</span>
-                                                <i class="ti ti-chevron-down" id="chevron-@r.Id" style="font-size:16px;color:#64748b;transition:transform 0.2s;" aria-hidden="true"></i>
+                                                <i class="ti ti-chevron-down penerima-chevron" id="chevron-@r.Id" aria-hidden="true"></i>
                                             </div>
-                                            <div id="penerima-detail-@r.Id" style="display:none;padding:12px;background:#f8fafc;border:1px solid #c4c9d4;border-top:none;border-radius:0 0 8px 8px;margin-bottom:2px;">
-                                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                                                    <form asp-controller="Donasi" asp-action="Chat" method="post" style="margin-left:auto;">
+                                            <div id="penerima-detail-@r.Id" class="poffer-detail">
+                                                <div class="poffer-chat-row">
+                                                    <form asp-controller="Donasi" asp-action="Chat" method="post" class="ml-auto">
                                                         @Html.AntiForgeryToken()
                                                         <input type="hidden" name="itemId" value="@selected.Id" />
                                                         <input type="hidden" name="otherUserId" value="@r.UserId" />
@@ -216,27 +215,27 @@
                                                 </div>
                                                 @if (r.Status == TransactionStatus.Accepted && r.MetodePengiriman == MetodePengiriman.BelumDipilih)
                                                 {
-                                                    <p style="font-size:14px;color:#64748b;text-align:center;">Menunggu penerima memilih metode pengiriman...</p>
+                                                    <p class="ptext-center-sm">Menunggu penerima memilih metode pengiriman...</p>
                                                 }
                                                 else if (r.Status == TransactionStatus.Accepted)
                                                 {
                                                     <div style="text-align:center;margin-bottom:8px;">
-                                                        <span style="font-size:14px;color:#3b82f6;font-weight:600;">
+                                                        <span class="pmethod-tag">
                                                             <i class="ti @(rIsPickup ? "ti-walk" : "ti-truck")" aria-hidden="true"></i>
                                                             @(rIsPickup ? "Pickup" : "Kurir")
                                                         </span>
                                                         @if (rIsPickup)
                                                         {
-                                                            <p style="font-size:14px;color:#64748b;margin-top:4px;">Chat dengan penerima untuk mengatur penjemputan</p>
+                                                            <p class="ptext-note">Chat dengan penerima untuk mengatur penjemputan</p>
                                                         }
                                                         else
                                                         {
-                                                            <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px 14px;margin-top:8px;text-align:left;">
-                                                                <div style="font-size:13px;color:#0369a1;font-weight:600;margin-bottom:4px;">
+                                                            <div class="ppickup-box">
+                                                                <div class="ppickup-title">
                                                                     <i class="ti ti-map-pin" aria-hidden="true"></i> Alamat Penerima
                                                                 </div>
-                                                                <div style="font-size:15px;color:#0c4a6e;">@r.User?.Alamat</div>
-                                                                <div style="font-size:14px;color:#0369a1;">@r.User?.Kota - @r.User?.Provinsi</div>
+                                                                <div class="ppickup-addr">@r.User?.Alamat</div>
+                                                                <div class="ppickup-loc">@r.User?.Kota - @r.User?.Provinsi</div>
                                                             </div>
                                                         }
                                                     </div>
@@ -251,7 +250,7 @@
                                                 }
                                                 else if (r.Status == TransactionStatus.Shipped)
                                                 {
-                                                    <p style="font-size:14px;color:#64748b;text-align:center;">Menunggu konfirmasi penerima...</p>
+                                                    <p class="ptext-center-sm">Menunggu konfirmasi penerima...</p>
                                                 }
                                                 else if (r.Status == TransactionStatus.Delivered)
                                                 {
@@ -260,9 +259,9 @@
                                                         .FirstOrDefault(f => f.ReviewerId == r.UserId);
                                                     @if (claimFeedback != null)
                                                     {
-                                                        <div style="padding:12px;background:#f1f5f9;border-radius:8px;margin-top:10px;">
-                                                            <div style="font-size:13px;color:#94a3b8;font-weight:600;margin-bottom:4px;">Feedback dari Penerima</div>
-                                                            <div style="display:flex;gap:2px;margin-bottom:4px;">
+                                                        <div class="pfeedback-box" style="padding:12px;margin-top:10px;">
+                                                            <div class="pfeedback-label">Feedback dari Penerima</div>
+                                                            <div class="pfeedback-stars">
                                                                 @for (int s = 1; s <= 5; s++)
                                                                 {
                                                                     <span style="font-size:16px;color:@(s <= claimFeedback.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
@@ -270,12 +269,12 @@
                                                             </div>
                                                             @if (!string.IsNullOrEmpty(claimFeedback.Komentar))
                                                             {
-                                                                <p style="font-size:14px;color:#64748b;margin:0;">@claimFeedback.Komentar</p>
+                                                                <p class="penerima-meta" style="margin:0;">@claimFeedback.Komentar</p>
                                                             }
                                                             @if (!string.IsNullOrEmpty(claimFeedback.FotoPath))
                                                             {
                                                                 <div style="margin-top:6px;">
-                                                                    <img src="@claimFeedback.FotoPath" style="max-width:120px;max-height:120px;border-radius:6px;object-fit:cover;cursor:pointer;" onclick="window.open(this.src)" />
+                                                                    <img src="@claimFeedback.FotoPath" class="pfeedback-img" onclick="window.open(this.src)" />
                                                                 </div>
                                                             }
                                                         </div>
@@ -291,9 +290,9 @@
                         @if (selected.Jumlah <= 0 && !hasAnyActive)
                         {
                             <div class="psec">
-                                <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+                                <div class="pstock-row">
                                     <span class="badge badge-muted">Stok Habis</span>
-                                    <span style="font-size:14px;color:#64748b;">Tidak dapat menerima permintaan baru.</span>
+                                    <span class="pmuted-sm">Tidak dapat menerima permintaan baru.</span>
                                 </div>
                             </div>
                         }
@@ -302,7 +301,7 @@
                             <div class="psec-label">Permintaan Masuk (@pendingRequests.Count)</div>
                             @if (!pendingRequests.Any())
                             {
-                                <p style="font-size:15px;color:#64748b;text-align:center;padding:12px 0;">Belum ada permintaan.</p>
+                                <p class="ptext-center-muted">Belum ada permintaan.</p>
                             }
                             @foreach (var r in pendingRequests)
                             {

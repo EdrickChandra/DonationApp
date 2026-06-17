@@ -435,7 +435,7 @@ main:has(.pnav) {
 .pdetail-actions    { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
 .btn-xs             { font-size: 14px; padding: 5px 12px; }
 .btn-match-grad     { background: linear-gradient(135deg, #1e40af, #2563eb); color: #fff; border-color: #2563eb; }
-.avatar-xs          { width: 28px; height: 28px; font-size: 14px; flex-shrink: 0; }
+.avatar.avatar-xs   { width: 28px; height: 28px; font-size: 14px; flex-shrink: 0; }
 .icon-12            { font-size: 12px; }
 
 /* delivery-method picker + pickup address */
@@ -471,6 +471,10 @@ main:has(.pnav) {
 .pempty-icon        { font-size: 40px; color: var(--gray-400); display: block; margin-bottom: 12px; }
 .pempty-text        { font-size: 15px; color: var(--text-light); margin-bottom: 12px; }
 .psec-text          { font-size: 15px; color: var(--text-light); line-height: 1.5; }
+.ptext-center-sm    { font-size: 14px; color: var(--text-light); text-align: center; }
+.pmuted-sm          { font-size: 14px; color: var(--text-light); }
+.pstock-row         { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+.btn-inline-mt      { display: inline-flex; margin-top: 12px; }
 
 /* ── Chat (Pesan) ── */
 .pchat-shell {
