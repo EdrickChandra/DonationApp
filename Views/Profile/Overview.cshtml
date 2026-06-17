@@ -60,23 +60,23 @@
             <div class="preview-header">Donasi aktif</div>
             @if (activeDonations.Any())
             {
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;">
+                <div class="pcard-grid">
                     @foreach (var item in activeDonations)
                     {
                         var img = item.Images.FirstOrDefault();
                         var daysLeft = (item.ExpiresAt - DateTime.UtcNow).Days;
-                        <a href="/Donasi/Index?selectedId=@item.Id" style="text-decoration:none;display:block;">
-                            <div style="border:1px solid var(--color-border-secondary);border-radius:10px;overflow:hidden;background:var(--color-bg-primary);">
-                                <div style="aspect-ratio:1;overflow:hidden;background:#f1f5f9;">
+                        <a href="/Donasi/Index?selectedId=@item.Id" class="link-block">
+                            <div class="pmini-card">
+                                <div class="pmini-card-media">
                                     @if (img != null)
                                     {
-                                        <img src="@img.FilePath" style="width:100%;height:100%;object-fit:cover;" />
+                                        <img src="@img.FilePath" class="img-cover-fill" />
                                     }
                                 </div>
-                                <div style="padding:8px;">
-                                    <div style="font-size:14px;font-weight:600;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@item.NamaBarang</div>
-                                    <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;">
-                                        <i class="ti ti-clock" style="font-size:13px;" aria-hidden="true"></i> @daysLeft hari lagi
+                                <div class="pmini-card-body">
+                                    <div class="pmini-card-name">@item.NamaBarang</div>
+                                    <div class="pmini-card-meta">
+                                        <i class="ti ti-clock icon-13" aria-hidden="true"></i> @daysLeft hari lagi
                                     </div>
                                 </div>
                             </div>
@@ -86,7 +86,7 @@
             }
             else
             {
-                <div style="padding:24px;text-align:center;font-size:15px;color:var(--color-text-secondary);">Belum ada donasi aktif. Mulai berdonasi sekarang!</div>
+                <div class="pcard-empty">Belum ada donasi aktif. Mulai berdonasi sekarang!</div>
             }
         </div>
 
@@ -94,29 +94,29 @@
             <div class="preview-header">Request aktif</div>
             @if (activeRequests.Any())
             {
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;">
+                <div class="pcard-grid">
                     @foreach (var req in activeRequests)
                     {
                         var img = req.Images.FirstOrDefault();
                         var daysLeft = (req.ExpiresAt - DateTime.UtcNow).Days;
-                        <a href="/Request/MyRequests?selectedId=@req.Id" style="text-decoration:none;display:block;">
-                            <div style="border:1px solid var(--color-border-secondary);border-radius:10px;overflow:hidden;background:var(--color-bg-primary);">
-                                <div style="aspect-ratio:1;overflow:hidden;background:#f1f5f9;">
+                        <a href="/Request/MyRequests?selectedId=@req.Id" class="link-block">
+                            <div class="pmini-card">
+                                <div class="pmini-card-media">
                                     @if (img != null)
                                     {
-                                        <img src="@img.FilePath" style="width:100%;height:100%;object-fit:cover;" />
+                                        <img src="@img.FilePath" class="img-cover-fill" />
                                     }
                                     else
                                     {
-                                        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;">
-                                            <i class="ti ti-list-search" style="font-size:24px;" aria-hidden="true"></i>
+                                        <div class="pmini-card-ph">
+                                            <i class="ti ti-list-search icon-24" aria-hidden="true"></i>
                                         </div>
                                     }
                                 </div>
-                                <div style="padding:8px;">
-                                    <div style="font-size:14px;font-weight:600;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@req.Title</div>
-                                    <div style="font-size:13px;color:var(--color-text-secondary);margin-top:2px;">
-                                        <i class="ti ti-clock" style="font-size:13px;" aria-hidden="true"></i> @daysLeft hari lagi
+                                <div class="pmini-card-body">
+                                    <div class="pmini-card-name">@req.Title</div>
+                                    <div class="pmini-card-meta">
+                                        <i class="ti ti-clock icon-13" aria-hidden="true"></i> @daysLeft hari lagi
                                     </div>
                                 </div>
                             </div>
@@ -126,7 +126,7 @@
             }
             else
             {
-                <div style="padding:24px;text-align:center;font-size:15px;color:var(--color-text-secondary);">Belum ada request aktif. Buat request barang yang kamu butuhkan!</div>
+                <div class="pcard-empty">Belum ada request aktif. Buat request barang yang kamu butuhkan!</div>
             }
         </div>
 
@@ -143,7 +143,7 @@
                     <div class="preview-item">
                         <div class="avatar">@rAvatar</div>
                         <div class="flex-1">
-                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                            <div class="preview-name-row">
                                 <span class="preview-name">@rName</span>
                                 <span class="pstars" style="font-size:14px;">
                                     @for (int i = 1; i <= 5; i++)
@@ -160,12 +160,12 @@
                             @if (!string.IsNullOrEmpty(r.FotoPath))
                             {
                                 <div style="margin-top:6px;">
-                                    <img src="@r.FotoPath" style="max-width:120px;max-height:120px;border-radius:6px;object-fit:cover;cursor:pointer;" onclick="window.open(this.src)" />
+                                    <img src="@r.FotoPath" class="img-thumb-120" onclick="window.open(this.src)" />
                                 </div>
                             }
                             @if (!string.IsNullOrEmpty(itemName))
                             {
-                                <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px;">untuk "@itemName"</div>
+                                <div class="preview-item-note">untuk "@itemName"</div>
                             }
                         </div>
                     </div>
@@ -176,7 +176,7 @@
         {
             <div class="preview-card" style="margin-top:12px;">
                 <div class="preview-header">Ulasan terbaru</div>
-                <div style="padding:32px;text-align:center;font-size:15px;color:var(--color-text-secondary);">Belum ada ulasan.</div>
+                <div class="pcard-empty pcard-empty--lg">Belum ada ulasan.</div>
             </div>
         }
 

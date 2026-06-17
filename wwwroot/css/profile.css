@@ -489,6 +489,22 @@ main:has(.pnav) {
 .ptext-desc         { font-size: 15px; color: var(--text-mid); }
 .ptext-ago          { font-size: 13px; color: var(--gray-400); margin-top: 6px; }
 
+/* overview mini cards + review preview */
+.pcard-grid         { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.pmini-card         { border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; background: var(--white); }
+.pmini-card-media   { aspect-ratio: 1; overflow: hidden; background: var(--gray-100); }
+.pmini-card-ph      { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--gray-400); }
+.pmini-card-body    { padding: 8px; }
+.pmini-card-name    { font-size: 14px; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pmini-card-meta    { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+.pcard-empty        { padding: 24px; text-align: center; font-size: 15px; color: var(--text-light); }
+.pcard-empty--lg    { padding: 32px; }
+.preview-name-row   { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.preview-item-note  { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+.img-thumb-120      { max-width: 120px; max-height: 120px; border-radius: 6px; object-fit: cover; cursor: pointer; }
+.icon-13            { font-size: 13px; }
+.icon-24            { font-size: 24px; }
+
 /* ── Chat (Pesan) ── */
 .pchat-shell {
     display: flex;
