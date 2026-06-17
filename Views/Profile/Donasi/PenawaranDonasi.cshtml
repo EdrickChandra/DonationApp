@@ -6,10 +6,10 @@
 }
 
 <div class="ppage">
-    <div class="ppage-inner" style="max-width:100%;padding:0;">
+    <div class="ppage-inner ppage-inner--flush">
 
-        <div style="display:flex;align-items:center;padding:16px 20px;border-bottom:0.5px solid #e2e8f0;">
-            <div class="ptab-bar" style="margin:0;border:none;">
+        <div class="ptab-header">
+            <div class="ptab-bar ptab-bar--flush">
                 <a asp-controller="Donasi" asp-action="Index" class="ptab">Donasi Saya</a>
                 <a asp-controller="Donasi" asp-action="PenawaranDonasi" class="ptab active">Penawaran Donasi</a>
                 <a asp-controller="Donasi" asp-action="Create" class="ptab">Buat Donasi</a>
@@ -19,14 +19,14 @@
         @if (myOffers == null || !myOffers.Any())
         {
             <div class="empty-state">
-                <i class="ti ti-package-off" class="empty-icon" aria-hidden="true"></i>
-                <p style="font-size:15px;color:#64748b;margin-bottom:12px;">Belum ada penawaran yang dibuat.</p>
+                <i class="ti ti-package-off empty-icon" aria-hidden="true"></i>
+                <p class="pempty-text">Belum ada penawaran yang dibuat.</p>
                 <a asp-controller="Request" asp-action="Index" class="btn btn-primary">Lihat Request Barang</a>
             </div>
         }
         else
         {
-            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
+            <div class="psplit psplit--flush">
 
                 <div class="plist" id="penawaran-list">
                     @foreach (var offer in myOffers)
@@ -54,7 +54,7 @@
                            href="/Donasi/PenawaranDonasi?selectedId=@offer.Id">
                             @if (firstReqImg != null)
                             {
-                                <img src="@firstReqImg.FilePath" class="plist-thumb" style="object-fit:cover;" />
+                                <img src="@firstReqImg.FilePath" class="plist-thumb img-cover-fill" />
                             }
                             else
                             {
@@ -106,28 +106,28 @@
                                 dotColor = "#f59e0b"; break;
                         }
 
-                        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+                        <div class="pdetail-head-row">
                             @if (firstReqImg != null)
                             {
                                 <img src="@firstReqImg.FilePath" class="img-60" />
                             }
                             else
                             {
-                                <div class="plist-thumb" style="width:60px;height:60px;flex-shrink:0;"><i class="ti ti-list-search" aria-hidden="true" style="font-size:22px;"></i></div>
+                                <div class="plist-thumb plist-thumb--60"><i class="ti ti-list-search icon-22" aria-hidden="true"></i></div>
                             }
                             <div class="flex-1">
-                                <div style="font-size:13px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;">Request dari</div>
+                                <div class="plabel-up">Request dari</div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@(req?.Title ?? "Request dihapus")</div>
-                                <a href="/Profile/View/@req?.UserId" style="display:flex;align-items:center;gap:6px;text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
-                                    <div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;">@reqOwnerInitial</div>
+                                <a href="/Profile/View/@req?.UserId" class="powner-link" onclick="event.stopPropagation();">
+                                    <div class="pmini-avatar">@reqOwnerInitial</div>
                                     <span class="text-sm-muted">@reqOwnerName</span>
                                 </a>
                             </div>
-                            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0;">
+                            <div class="pdetail-side">
                                 <span class="badge @statusClass">@statusLabel</span>
                                 @if (req != null)
                                 {
-                                    <a asp-controller="Request" asp-action="Detail" asp-route-id="@req.Id" style="font-size:13px;color:#2563eb;text-decoration:none;">Lihat request →</a>
+                                    <a asp-controller="Request" asp-action="Detail" asp-route-id="@req.Id" class="plink-sm">Lihat request →</a>
                                 }
                                 @if (selected.Status >= TransactionStatus.Accepted && selected.Status <= TransactionStatus.Delivered)
                                 {
@@ -144,25 +144,25 @@
 
                         <div class="psec">
                             <div class="psec-label">Penawaran Anda</div>
-                            <div style="display:flex;gap:12px;align-items:flex-start;">
+                            <div class="prow-top">
                                 @if (selected.Images.Any())
                                 {
                                     <img src="@selected.Images.First().FilePath" class="img-64" />
                                 }
                                 <div class="flex-1">
-                                    <div style="font-size:16px;font-weight:600;color:#0f172a;margin-bottom:4px;">@selected.NamaBarang</div>
-                                    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+                                    <div class="poffer-itemname">@selected.NamaBarang</div>
+                                    <div class="poffer-badges">
                                         <span class="badge badge-muted">@selected.Kondisi</span>
                                         <span class="badge badge-muted">@selected.Jumlah pcs</span>
                                         @if (!string.IsNullOrEmpty(selected.Lokasi))
                                         {
                                             <span class="badge badge-muted">
-                                                <i class="ti ti-map-pin" style="font-size:12px;" aria-hidden="true"></i>
+                                                <i class="ti ti-map-pin icon-12" aria-hidden="true"></i>
                                                 @selected.Lokasi@(!string.IsNullOrEmpty(selected.Provinsi) ? ", " + selected.Provinsi : "")
                                             </span>
                                         }
                                     </div>
-                                    <div style="font-size:15px;color:#64748b;line-height:1.5;">@selected.Deskripsi</div>
+                                    <div class="poffer-desc">@selected.Deskripsi</div>
                                 </div>
                             </div>
                         </div>
@@ -197,27 +197,27 @@
 
                                 @if (selected.Status == TransactionStatus.Accepted && selected.ItemRequest.MetodePengiriman == MetodePengiriman.BelumDipilih)
                                 {
-                                    <p style="font-size:14px;color:#64748b;text-align:center;">Menunggu peminta memilih metode pengiriman...</p>
+                                    <p class="ptext-center-sm">Menunggu peminta memilih metode pengiriman...</p>
                                 }
                                 else if (selected.Status == TransactionStatus.Accepted)
                                 {
                                     <div style="text-align:center;margin-bottom:8px;">
-                                        <span style="font-size:14px;color:#3b82f6;font-weight:600;">
+                                        <span class="pmethod-tag">
                                             <i class="ti @(poIsPickup ? "ti-walk" : "ti-truck")" aria-hidden="true"></i>
                                             @(poIsPickup ? "Pickup" : "Kurir")
                                         </span>
                                         @if (poIsPickup)
                                         {
-                                            <p style="font-size:14px;color:#64748b;margin-top:4px;">Chat dengan peminta untuk mengatur penjemputan</p>
+                                            <p class="ptext-note">Chat dengan peminta untuk mengatur penjemputan</p>
                                         }
                                         else
                                         {
-                                            <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px 14px;margin-top:8px;text-align:left;">
-                                                <div style="font-size:13px;color:#0369a1;font-weight:600;margin-bottom:4px;">
+                                            <div class="ppickup-box">
+                                                <div class="ppickup-title">
                                                     <i class="ti ti-map-pin" aria-hidden="true"></i> Alamat Penerima
                                                 </div>
-                                                <div style="font-size:15px;color:#0c4a6e;">@selected.ItemRequest?.User?.Alamat</div>
-                                                <div style="font-size:14px;color:#0369a1;">@selected.ItemRequest?.User?.Kota - @selected.ItemRequest?.User?.Provinsi</div>
+                                                <div class="ppickup-addr">@selected.ItemRequest?.User?.Alamat</div>
+                                                <div class="ppickup-loc">@selected.ItemRequest?.User?.Kota - @selected.ItemRequest?.User?.Provinsi</div>
                                             </div>
                                         }
                                     </div>
@@ -232,7 +232,7 @@
                                 }
                                 else if (selected.Status == TransactionStatus.Shipped)
                                 {
-                                    <p style="font-size:14px;color:#64748b;text-align:center;">Menunggu konfirmasi penerima...</p>
+                                    <p class="ptext-center-sm">Menunggu konfirmasi penerima...</p>
                                 }
                                 else if (selected.Status == TransactionStatus.Delivered)
                                 {
@@ -241,9 +241,9 @@
                                         .FirstOrDefault(f => f.ReviewerId == selected.ItemRequest.UserId && f.ReviewedUserId == selected.UserId);
                                     @if (requesterFeedback != null)
                                     {
-                                        <div style="padding:12px;background:#f1f5f9;border-radius:8px;margin-top:10px;">
-                                            <div style="font-size:13px;color:#94a3b8;font-weight:600;margin-bottom:4px;">Feedback dari Peminta</div>
-                                            <div style="display:flex;gap:2px;margin-bottom:4px;">
+                                        <div class="pfeedback-box" style="padding:12px;margin-top:10px;">
+                                            <div class="pfeedback-label">Feedback dari Peminta</div>
+                                            <div class="pfeedback-stars">
                                                 @for (int s = 1; s <= 5; s++)
                                                 {
                                                     <span style="font-size:16px;color:@(s <= requesterFeedback.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
@@ -251,12 +251,12 @@
                                             </div>
                                             @if (!string.IsNullOrEmpty(requesterFeedback.Komentar))
                                             {
-                                                <p style="font-size:14px;color:#64748b;margin:0;">@requesterFeedback.Komentar</p>
+                                                <p class="penerima-meta" style="margin:0;">@requesterFeedback.Komentar</p>
                                             }
                                             @if (!string.IsNullOrEmpty(requesterFeedback.FotoPath))
                                             {
                                                 <div style="margin-top:6px;">
-                                                    <img src="@requesterFeedback.FotoPath" style="max-width:120px;max-height:120px;border-radius:6px;object-fit:cover;cursor:pointer;" onclick="window.open(this.src)" />
+                                                    <img src="@requesterFeedback.FotoPath" class="pfeedback-img" onclick="window.open(this.src)" />
                                                 </div>
                                             }
                                         </div>
@@ -268,11 +268,11 @@
                         {
                             <div class="psec">
                                 <div class="psec-label">Status</div>
-                                <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
-                                    <div style="width:8px;height:8px;border-radius:50%;background:@dotColor;flex-shrink:0;"></div>
-                                    <span style="font-size:15px;color:#334155;">@statusDesc</span>
+                                <div class="pstock-row">
+                                    <div class="pstatus-dot" style="background:@dotColor;"></div>
+                                    <span class="ptext-desc">@statusDesc</span>
                                 </div>
-                                <div style="font-size:13px;color:#94a3b8;margin-top:6px;">Ditawarkan @((DateTime.UtcNow - selected.CreatedAt).Days) hari lalu</div>
+                                <div class="ptext-ago">Ditawarkan @((DateTime.UtcNow - selected.CreatedAt).Days) hari lalu</div>
                             </div>
                         }
 
