@@ -5,72 +5,72 @@
     var sourceId = ViewData["SourceId"] as string ?? "";
 }
 
-<div id="matchModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
-    <div style="background:#fff;border-radius:14px;width:100%;max-width:420px;overflow:hidden;position:relative;z-index:10000;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+<div id="matchModal" class="modal-overlay">
+    <div class="modal-dialog">
 
-        <div style="background:linear-gradient(135deg,#1e40af,#2563eb);padding:16px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between;">
+        <div class="modal-header">
             <div>
-                <p id="matchModalTitle" style="font-size:16px;font-weight:700;color:#fff;margin:0 0 3px;font-family:'Plus Jakarta Sans',sans-serif;">
-                    <i class="ti ti-search" aria-hidden="true" style="margin-right:6px;"></i>Kecocokan ditemukan!
+                <p id="matchModalTitle" class="modal-title">
+                    <i class="ti ti-search match-title-icon" aria-hidden="true"></i>Kecocokan ditemukan!
                 </p>
-                <p id="matchModalSubtitle" style="font-size:14px;color:#bfdbfe;margin:0;"></p>
+                <p id="matchModalSubtitle" class="modal-subtitle"></p>
             </div>
-            <button onclick="closeMatchModal()" style="background:rgba(255,255,255,0.2);border:none;cursor:pointer;color:#fff;font-size:16px;line-height:1;padding:4px 8px;border-radius:6px;">
+            <button onclick="closeMatchModal()" class="modal-close">
                 <i class="ti ti-x" aria-hidden="true"></i>
             </button>
         </div>
 
-        <div style="padding:16px 20px;">
-            <div id="matchCard" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
-                <div style="position:relative;height:180px;background:#f1f5f9;">
-                    <div id="matchCardImageInner" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">
-                        <i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:#94a3b8;"></i>
+        <div class="modal-body">
+            <div id="matchCard" class="match-card">
+                <div class="match-card__media">
+                    <div id="matchCardImageInner" class="match-card__media-inner">
+                        <i class="ti ti-package match-card__icon" aria-hidden="true"></i>
                     </div>
-                    <div id="matchCardBadges" style="position:absolute;top:10px;left:10px;display:flex;gap:6px;z-index:2;"></div>
+                    <div id="matchCardBadges" class="match-card__badges"></div>
                 </div>
-                <div style="padding:14px 16px 4px;">
-                    <p id="matchCardTitle" style="font-size:15px;font-weight:600;color:#0f172a;margin:0 0 4px;font-family:'Plus Jakarta Sans',sans-serif;"></p>
-                    <p id="matchCardLocation" style="font-size:14px;color:#64748b;margin:0 0 8px;display:flex;align-items:center;gap:4px;"></p>
-                    <p id="matchCardDesc" style="font-size:15px;color:#64748b;margin:0 0 10px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;"></p>
-                    <div id="matchCardReasons" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;"></div>
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-                        <div id="matchCardAvatar" style="width:22px;height:22px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#1e40af;flex-shrink:0;"></div>
+                <div class="match-card__body">
+                    <p id="matchCardTitle" class="match-card__title"></p>
+                    <p id="matchCardLocation" class="match-card__loc"></p>
+                    <p id="matchCardDesc" class="match-card__desc"></p>
+                    <div id="matchCardReasons" class="match-card__reasons"></div>
+                    <div class="match-card__poster">
+                        <div id="matchCardAvatar" class="match-card__avatar"></div>
                         <span id="matchCardPoster" class="text-sm-muted"></span>
                     </div>
                 </div>
-                <div style="padding:0 16px 14px;display:flex;gap:8px;">
-                    <button onclick="prevMatch()" id="matchPrevBtn" class="btn btn-secondary" style="flex:1;font-size:14px;padding:7px 0;">← Prev</button>
-                    <button onclick="quickAction()" id="matchActionBtn" class="btn btn-primary" style="flex:2;font-size:14px;padding:7px 0;border:none;cursor:pointer;"></button>
-                    <button onclick="nextMatch()" id="matchNextBtn" class="btn btn-secondary" style="flex:1;font-size:14px;padding:7px 0;">Next →</button>
+                <div class="match-card__actions">
+                    <button onclick="prevMatch()" id="matchPrevBtn" class="btn btn-secondary match-side-btn">← Prev</button>
+                    <button onclick="quickAction()" id="matchActionBtn" class="btn btn-primary match-action-btn"></button>
+                    <button onclick="nextMatch()" id="matchNextBtn" class="btn btn-secondary match-side-btn">Next →</button>
                 </div>
-                <div id="matchActionFeedback" style="display:none;padding:0 16px 10px;font-size:14px;text-align:center;"></div>
+                <div id="matchActionFeedback" class="match-card__feedback"></div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
-                <div style="display:flex;gap:6px;" id="matchDots"></div>
-                <a id="matchDetailLink" href="#" style="font-size:14px;color:#2563eb;text-decoration:none;">Lihat detail →</a>
+            <div class="match-nav">
+                <div class="match-dots" id="matchDots"></div>
+                <a id="matchDetailLink" href="#" class="match-detail-link">Lihat detail →</a>
             </div>
-            <p id="matchCounter" style="text-align:center;font-size:14px;color:#64748b;margin:6px 0 0;"></p>
+            <p id="matchCounter" class="match-counter"></p>
         </div>
 
-        <div style="padding:0 20px 16px;">
-            <button onclick="closeMatchModal()" class="btn btn-secondary btn-block" style="font-size:15px;padding:8px 0;">Tutup</button>
+        <div class="modal-footer">
+            <button onclick="closeMatchModal()" class="btn btn-secondary btn-block match-close-btn">Tutup</button>
         </div>
     </div>
 </div>
 
-<div id="matchNoResultModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
-    <div style="background:#fff;border-radius:14px;width:100%;max-width:360px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-        <div style="background:linear-gradient(135deg,#1e40af,#2563eb);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;">
-            <p style="font-size:15px;font-weight:700;color:#fff;margin:0;font-family:'Plus Jakarta Sans',sans-serif;"><i class="ti ti-search" aria-hidden="true" style="margin-right:6px;"></i>Smart Matching</p>
-            <button onclick="closeNoResultModal()" style="background:rgba(255,255,255,0.2);border:none;cursor:pointer;color:#fff;font-size:16px;padding:4px 8px;border-radius:6px;"><i class="ti ti-x" aria-hidden="true"></i></button>
+<div id="matchNoResultModal" class="modal-overlay">
+    <div class="modal-dialog modal-dialog--sm">
+        <div class="modal-header modal-header--center">
+            <p class="modal-title modal-title--sm"><i class="ti ti-search match-title-icon" aria-hidden="true"></i>Smart Matching</p>
+            <button onclick="closeNoResultModal()" class="modal-close"><i class="ti ti-x" aria-hidden="true"></i></button>
         </div>
-        <div style="padding:24px 20px;text-align:center;">
-            <i class="ti ti-mood-sad" aria-hidden="true" class="empty-icon"></i>
-            <p style="font-size:16px;font-weight:600;color:#0f172a;margin:0 0 6px;">Tidak ada kecocokan</p>
-            <p style="font-size:15px;color:#64748b;margin:0;">Belum ada yang cocok saat ini. Coba lagi nanti.</p>
+        <div class="modal-body--center">
+            <i class="ti ti-mood-sad empty-icon" aria-hidden="true"></i>
+            <p class="match-empty-title">Tidak ada kecocokan</p>
+            <p class="match-empty-text">Belum ada yang cocok saat ini. Coba lagi nanti.</p>
         </div>
-        <div style="padding:0 20px 16px;">
-            <button onclick="closeNoResultModal()" class="btn btn-secondary btn-block" style="font-size:15px;padding:8px 0;">Tutup</button>
+        <div class="modal-footer">
+            <button onclick="closeNoResultModal()" class="btn btn-secondary btn-block match-close-btn">Tutup</button>
         </div>
     </div>
 </div>
@@ -120,23 +120,23 @@
 
         var imgEl = document.getElementById('matchCardImageInner');
         if (m.firstImage) {
-            imgEl.innerHTML = '<img src="' + m.firstImage + '" style="width:100%;height:100%;object-fit:cover;" />';
+            imgEl.innerHTML = '<img src="' + m.firstImage + '" class="img-cover-fill" />';
         } else {
-            imgEl.innerHTML = '<i class="ti ti-package" aria-hidden="true" style="font-size:48px;color:#94a3b8;"></i>';
+            imgEl.innerHTML = '<i class="ti ti-package match-card__icon" aria-hidden="true"></i>';
         }
 
         var scoreColor = m.score >= 80 ? '#1e40af' : m.score >= 60 ? '#166534' : '#64748b';
         document.getElementById('matchCardBadges').innerHTML =
-            '<span style="background:#dbeafe;color:#1e40af;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;font-family:Plus Jakarta Sans,sans-serif;">' + m.kategori + '</span>' +
-            '<span style="background:#fff;color:' + scoreColor + ';font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;border:1px solid #e2e8f0;">' + m.score + ' pts</span>';
+            '<span class="pill pill--cat">' + m.kategori + '</span>' +
+            '<span class="pill pill--score" style="color:' + scoreColor + ';">' + m.score + ' pts</span>';
 
         document.getElementById('matchCardTitle').textContent = m.title;
         document.getElementById('matchCardLocation').innerHTML =
-            '<i class="ti ti-map-pin" style="font-size:13px;" aria-hidden="true"></i>' +
+            '<i class="ti ti-map-pin text-sm" aria-hidden="true"></i>' +
             (m.lokasi || '') + (m.provinsi ? ' · ' + m.provinsi : '');
         document.getElementById('matchCardDesc').textContent = m.deskripsi;
         document.getElementById('matchCardReasons').innerHTML = (m.reasons || []).map(function(r) {
-            return '<span style="font-size:13px;color:#64748b;background:#f1f5f9;border:1px solid #e2e8f0;padding:2px 8px;border-radius:99px;">' + r + '</span>';
+            return '<span class="reason-chip">' + r + '</span>';
         }).join('');
         document.getElementById('matchCardAvatar').textContent = m.posterAvatar;
         document.getElementById('matchCardPoster').textContent = m.posterName + ' · ' + m.createdAgo + ' hari lalu';
@@ -158,7 +158,7 @@
         }
 
         document.getElementById('matchDots').innerHTML = matchData.map(function(_, i) {
-            return '<div style="width:8px;height:8px;border-radius:50%;background:' + (i === matchIndex ? '#2563eb' : '#cbd5e1') + ';cursor:pointer;transition:background 0.15s;" onclick="goToMatch(' + i + ')"></div>';
+            return '<div class="match-dot" style="background:' + (i === matchIndex ? '#2563eb' : '#cbd5e1') + ';" onclick="goToMatch(' + i + ')"></div>';
         }).join('');
         document.getElementById('matchCounter').textContent = (matchIndex + 1) + ' dari ' + matchData.length + ' kecocokan';
         document.getElementById('matchPrevBtn').style.opacity = matchIndex === 0 ? '0.4' : '1';
