@@ -5,27 +5,27 @@
     var isResolved = Model.Status == ReportStatus.Resolved || Model.Status == ReportStatus.Dismissed;
 }
 
-<div style="max-width:800px;margin:0 auto;padding:24px 0;">
+<div class="admin-page admin-page--narrow">
 
-    <a href="/Admin/Reports" style="display:inline-flex;align-items:center;gap:6px;font-size:15px;color:#64748b;text-decoration:none;margin-bottom:20px;">
+    <a href="/Admin/Reports" class="admin-back-link">
         <i class="ti ti-arrow-left" aria-hidden="true"></i> Kembali ke laporan
     </a>
 
     @if (TempData["AdminSuccess"] != null)
     {
-        <div style="background:#dcfce7;border:1px solid #86efac;color:#166534;padding:12px 16px;border-radius:8px;margin-bottom:16px;font-size:15px;display:flex;align-items:center;gap:8px;">
+        <div class="admin-alert-success">
             <i class="ti ti-circle-check" aria-hidden="true"></i>
             @TempData["AdminSuccess"]
         </div>
     }
 
-    <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;">
+    <div class="admin-detail-grid">
 
-        <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="admin-col">
 
             <div class="admin-card">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-                    <h2 style="font-size:16px;font-weight:700;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;margin:0;">
+                <div class="admin-card-head">
+                    <h2 class="admin-card-title">
                         Laporan #@Model.Id
                     </h2>
                     @{
@@ -51,7 +51,7 @@
                             _ => "#f1f5f9"
                         };
                     }
-                    <span style="font-size:13px;font-weight:700;padding:4px 12px;border-radius:99px;background:@statusBg;color:@statusColor;font-family:'Plus Jakarta Sans',sans-serif;">
+                    <span class="admin-status-pill" style="background:@statusBg;color:@statusColor;">
                         @statusLabel
                     </span>
                 </div>
@@ -83,7 +83,7 @@
                 {
                     <div>
                         <div class="admin-field-label" style="margin-bottom:6px;">Deskripsi</div>
-                        <div style="font-size:15px;color:#334155;line-height:1.6;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid #e2e8f0;">
+                        <div class="admin-desc-box">
                             @Model.Deskripsi
                         </div>
                     </div>
@@ -94,19 +94,19 @@
             {
                 <div class="admin-card">
                     <div class="admin-section-label">Target: Pengguna</div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
-                        <div style="width:40px;height:40px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;">
+                    <div class="admin-target-row">
+                        <div class="admin-avatar-lg">
                             @(Model.TargetUser.NamaDepan.Substring(0, 1).ToUpper())
                         </div>
                         <div>
-                            <div style="font-size:16px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">
+                            <div class="admin-target-name">
                                 @(Model.TargetUser.NamaDepan + " " + Model.TargetUser.NamaBelakang)
                             </div>
                             <div class="text-sm-muted">@Model.TargetUser.Email</div>
                         </div>
                         @if (Model.TargetUser.IsBanned)
                         {
-                            <span style="margin-left:auto;font-size:13px;font-weight:700;padding:3px 10px;border-radius:99px;background:#fee2e2;color:#991b1b;">Banned</span>
+                            <span class="admin-banned-pill">Banned</span>
                         }
                     </div>
                 </div>
@@ -116,18 +116,17 @@
             {
                 <div class="admin-card">
                     <div class="admin-section-label">Target: Donasi</div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+                    <div class="admin-target-row">
                         @if (Model.TargetDonation.Images.Any())
                         {
                             <img src="@Model.TargetDonation.Images.First().FilePath"
                                  class="img-60" />
                         }
                         <div>
-                            <div style="font-size:16px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetDonation.NamaBarang</div>
+                            <div class="admin-target-name">@Model.TargetDonation.NamaBarang</div>
                             <div class="text-sm-muted">@Model.TargetDonation.Kategori · @Model.TargetDonation.Lokasi</div>
                         </div>
-                        <a href="/Donasi/Detail/@Model.TargetDonation.Id" target="_blank"
-                           style="margin-left:auto;font-size:14px;color:#2563eb;text-decoration:none;font-weight:500;">
+                        <a href="/Donasi/Detail/@Model.TargetDonation.Id" target="_blank" class="admin-detail-action">
                             Lihat item →
                         </a>
                     </div>
@@ -138,18 +137,17 @@
             {
                 <div class="admin-card">
                     <div class="admin-section-label">Target: Request</div>
-                    <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+                    <div class="admin-target-row">
                         @if (Model.TargetRequest.Images.Any())
                         {
                             <img src="@Model.TargetRequest.Images.First().FilePath"
                                  class="img-60" />
                         }
                         <div>
-                            <div style="font-size:16px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@Model.TargetRequest.Title</div>
+                            <div class="admin-target-name">@Model.TargetRequest.Title</div>
                             <div class="text-sm-muted">@Model.TargetRequest.Kategori · @Model.TargetRequest.Lokasi</div>
                         </div>
-                        <a href="/Request/Detail/@Model.TargetRequest.Id" target="_blank"
-                           style="margin-left:auto;font-size:14px;color:#2563eb;text-decoration:none;font-weight:500;">
+                        <a href="/Request/Detail/@Model.TargetRequest.Id" target="_blank" class="admin-detail-action">
                             Lihat request →
                         </a>
                     </div>
@@ -160,18 +158,18 @@
             {
                 <div class="admin-card">
                     <div class="admin-section-label">Riwayat Aksi Admin</div>
-                    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                    <div class="admin-stack" style="margin-top:10px;">
                         @foreach (var a in Model.AdminActions.OrderByDescending(x => x.CreatedAt))
                         {
-                            <div style="padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-                                    <span style="font-size:14px;font-weight:600;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;">@a.Action</span>
+                            <div class="admin-action-item">
+                                <div class="admin-action-item-head">
+                                    <span class="admin-action-name">@a.Action</span>
                                     <span class="text-xs-dim">@a.CreatedAt.ToString("dd MMM yyyy, HH:mm")</span>
                                 </div>
                                 <div class="text-sm-muted">oleh @(a.Admin?.NamaDepan + " " + a.Admin?.NamaBelakang)</div>
                                 @if (!string.IsNullOrEmpty(a.Note))
                                 {
-                                    <div style="font-size:14px;color:#334155;margin-top:4px;font-style:italic;">@a.Note</div>
+                                    <div class="admin-action-note">@a.Note</div>
                                 }
                             </div>
                         }
@@ -180,7 +178,7 @@
             }
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:14px;">
+        <div class="admin-col">
             @if (!isResolved)
             {
                 @if (Model.Status == ReportStatus.Open)
@@ -190,7 +188,7 @@
                         <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this)">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="reportId" value="@Model.Id" />
-                            <button type="submit" name="actionType" value="Reviewing" class="admin-action-btn" style="background:#fef9c3;color:#854d0e;border-color:#fde68a;">
+                            <button type="submit" name="actionType" value="Reviewing" class="admin-action-btn admin-action-btn--review">
                                 <i class="ti ti-eye" aria-hidden="true"></i> Tandai Sedang Direview
                             </button>
                         </form>
@@ -202,15 +200,15 @@
                     <div class="admin-card">
                         <div class="admin-section-label" style="margin-bottom:10px;">Aksi Pengguna</div>
                         <div style="margin-bottom:10px;">
-                            <label style="font-size:14px;font-weight:600;color:#64748b;display:block;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Catatan (opsional)</label>
-                            <textarea id="userActionNote" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:15px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Catatan untuk aksi ini..."></textarea>
+                            <label class="admin-note-label">Catatan (opsional)</label>
+                            <textarea id="userActionNote" rows="2" class="admin-note-textarea" placeholder="Catatan untuk aksi ini..."></textarea>
                         </div>
-                        <div style="display:flex;flex-direction:column;gap:8px;">
+                        <div class="admin-stack">
                             <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this, 'userActionNote')">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="reportId" value="@Model.Id" />
                                 <input type="hidden" name="note" class="admin-note-input" />
-                                <button type="submit" name="actionType" value="WarnUser" class="admin-action-btn" style="background:#fff7ed;color:#9a3412;border-color:#fed7aa;">
+                                <button type="submit" name="actionType" value="WarnUser" class="admin-action-btn admin-action-btn--warn">
                                     <i class="ti ti-alert-triangle" aria-hidden="true"></i> Beri Peringatan
                                 </button>
                             </form>
@@ -219,7 +217,7 @@
                                 <input type="hidden" name="reportId" value="@Model.Id" />
                                 <input type="hidden" name="note" class="admin-note-input" />
                                 <button type="submit" name="actionType" value="BanUser"
-                                        class="admin-action-btn" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;"
+                                        class="admin-action-btn admin-action-btn--danger"
                                         onclick="return confirm('Ban pengguna ini? Tindakan ini tidak dapat dibatalkan dengan mudah.')">
                                     <i class="ti ti-ban" aria-hidden="true"></i> Ban Pengguna
                                 </button>
@@ -233,14 +231,14 @@
                     <div class="admin-card">
                         <div class="admin-section-label" style="margin-bottom:10px;">Aksi Item</div>
                         <div style="margin-bottom:10px;">
-                            <label style="font-size:14px;font-weight:600;color:#64748b;display:block;margin-bottom:6px;font-family:'Plus Jakarta Sans',sans-serif;">Catatan (opsional)</label>
-                            <textarea id="itemActionNote" rows="2" style="width:100%;padding:8px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:15px;font-family:'DM Sans',sans-serif;resize:vertical;outline:none;box-sizing:border-box;" placeholder="Catatan untuk aksi ini..."></textarea>
+                            <label class="admin-note-label">Catatan (opsional)</label>
+                            <textarea id="itemActionNote" rows="2" class="admin-note-textarea" placeholder="Catatan untuk aksi ini..."></textarea>
                         </div>
                         <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this, 'itemActionNote')">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="reportId" value="@Model.Id" />
                             <input type="hidden" name="note" class="admin-note-input" />
-                            <button type="submit" name="actionType" value="RemoveItems" class="admin-action-btn" style="background:#fee2e2;color:#991b1b;border-color:#fca5a5;"
+                            <button type="submit" name="actionType" value="RemoveItems" class="admin-action-btn admin-action-btn--danger"
                                     onclick="return confirm('Hapus item yang dilaporkan? Item akan ditutup dan pemilik akan diberitahu.')">
                                 <i class="ti ti-trash" aria-hidden="true"></i>
                                 Hapus @(Model.TargetDonation != null ? "Donasi" : "Request")
@@ -253,7 +251,7 @@
                     <form asp-controller="Admin" asp-action="TakeAction" method="post" onsubmit="return adminSubmit(this)">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="reportId" value="@Model.Id" />
-                        <button type="submit" name="actionType" value="Dismiss" class="admin-action-btn" style="background:#f1f5f9;color:#64748b;border-color:#e2e8f0;">
+                        <button type="submit" name="actionType" value="Dismiss" class="admin-action-btn admin-action-btn--dismiss">
                             <i class="ti ti-x" aria-hidden="true"></i> Dismiss Laporan
                         </button>
                     </form>
@@ -261,67 +259,14 @@
             }
             else
             {
-                <div class="admin-card" style="text-align:center;padding:24px;">
-                    <i class="ti ti-circle-check" style="font-size:32px;color:#22c55e;display:block;margin-bottom:8px;" aria-hidden="true"></i>
-                    <p style="font-size:15px;color:#64748b;margin:0;">Laporan ini sudah diselesaikan.</p>
+                <div class="admin-card admin-card--center">
+                    <i class="ti ti-circle-check admin-resolved-icon" aria-hidden="true"></i>
+                    <p class="admin-resolved-text">Laporan ini sudah diselesaikan.</p>
                 </div>
             }
         </div>
     </div>
 </div>
-
-<style>
-.admin-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 18px;
-}
-.admin-section-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.admin-field-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    margin-bottom: 3px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.admin-field-value {
-    font-size: 13px;
-    font-weight: 500;
-    color: #0f172a;
-}
-.admin-action-btn {
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    transition: opacity 0.15s;
-}
-.admin-action-btn:hover { opacity: 0.85; }
-.admin-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-@@media (max-width: 768px) {
-    div[style*="grid-template-columns:1fr 320px"] {
-        display: block !important;
-    }
-}
-</style>
 
 <script>
     function adminSubmit(form, noteFieldId) {

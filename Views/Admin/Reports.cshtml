@@ -5,12 +5,12 @@
     var selectedStatus = ViewBag.SelectedStatus as ReportStatus?;
 }
 
-<div style="max-width:1000px;margin:0 auto;padding:24px 0;">
+<div class="admin-page">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+    <div class="admin-header-row">
         <div>
-            <h1 style="font-size:22px;font-weight:800;color:#0f172a;font-family:'Plus Jakarta Sans',sans-serif;margin:0 0 4px;">Panel Admin</h1>
-            <p style="font-size:15px;color:#64748b;margin:0;">Kelola laporan pengguna</p>
+            <h1 class="admin-page-title">Panel Admin</h1>
+            <p class="admin-page-subtitle">Kelola laporan pengguna</p>
         </div>
         <div style="display:flex;align-items:center;gap:8px;">
             <a href="/Admin/ManageUsers" class="admin-filter-btn"><i class="ti ti-users" aria-hidden="true"></i> Kelola Pengguna</a>
@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;">
+    <div class="admin-filter-row">
         <a href="/Admin/Reports" class="admin-filter-btn @(selectedStatus == null ? "active" : "")">Semua</a>
         <a href="/Admin/Reports?status=0" class="admin-filter-btn @(selectedStatus == ReportStatus.Open ? "active" : "")">
             <span class="admin-status-dot" style="background:#ef4444;"></span> Open
@@ -36,14 +36,14 @@
 
     @if (!Model.Any())
     {
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:48px;text-align:center;">
-            <i class="ti ti-flag-off" class="empty-icon" aria-hidden="true"></i>
+        <div class="admin-empty-card">
+            <i class="ti ti-flag-off empty-icon" aria-hidden="true"></i>
             <p class="text-muted">Tidak ada laporan.</p>
         </div>
     }
     else
     {
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+        <div class="admin-table-wrap">
             <table class="admin-table">
                 <thead>
                     <tr>
@@ -86,24 +86,24 @@
                             : r.TargetRequest != null ? r.TargetRequest.Title
                             : "-";
                         <tr>
-                            <td style="color:#94a3b8;font-size:14px;">#@r.Id</td>
+                            <td class="admin-cell-id">#@r.Id</td>
                             <td>
                                 <div class="text-strong">@(r.Reporter?.NamaDepan + " " + r.Reporter?.NamaBelakang)</div>
                             </td>
                             <td>
-                                <div style="font-size:15px;color:#334155;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">@targetName</div>
+                                <div class="admin-cell-target">@targetName</div>
                             </td>
                             <td>
                                 <span class="text-sm-muted">@r.Alasan</span>
                             </td>
                             <td>
-                                <span style="font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;background:@statusBg;color:@statusColor;font-family:'Plus Jakarta Sans',sans-serif;">
+                                <span class="admin-status-pill" style="background:@statusBg;color:@statusColor;">
                                     @statusLabel
                                 </span>
                             </td>
                             <td class="text-sm-muted">@r.CreatedAt.ToString("dd MMM yyyy")</td>
                             <td>
-                                <a href="/Admin/ReportDetail/@r.Id" style="font-size:14px;color:#2563eb;font-weight:600;text-decoration:none;">Lihat →</a>
+                                <a href="/Admin/ReportDetail/@r.Id" class="admin-cell-link">Lihat →</a>
                             </td>
                         </tr>
                     }
@@ -112,44 +112,3 @@
         </div>
     }
 </div>
-
-<style>
-.admin-filter-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #334155;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    text-decoration: none;
-    transition: all 0.15s;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.admin-filter-btn:hover { background: #f8fafc; }
-.admin-filter-btn.active { background: #0f1f3d; color: #fff; border-color: #0f1f3d; }
-.admin-status-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-.admin-table { width: 100%; border-collapse: collapse; }
-.admin-table th {
-    padding: 12px 16px;
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    border-bottom: 1px solid #e2e8f0;
-    background: #f8fafc;
-    text-align: left;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.admin-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
-}
-.admin-table tr:last-child td { border-bottom: none; }
-.admin-table tr:hover td { background: #f8fafc; }
-</style>
