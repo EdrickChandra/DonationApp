@@ -707,6 +707,7 @@ public class DonasiController : AppBaseController
             {
                 OwnerType = ImageOwnerType.Donation,
                 ItemId = itemId,
+                FileSize = image.Length,
                 FilePath = $"/uploads/{userId}/{itemId}/{fileName}"
             });
 

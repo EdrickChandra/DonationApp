@@ -531,6 +531,7 @@ public class RequestController : AppBaseController
             {
                 OwnerType = ImageOwnerType.Request,
                 ItemRequestId = requestId,
+                FileSize = image.Length,
                 FilePath = $"/uploads/requests/{userId}/{requestId}/{fileName}"
             });
             count++;
@@ -557,6 +558,7 @@ public class RequestController : AppBaseController
             {
                 OwnerType = ImageOwnerType.RequestOffer,
                 RequestOfferId = offerId,
+                FileSize = image.Length,
                 FilePath = $"/uploads/offers/{offerId}/{fileName}"
             });
             count++;

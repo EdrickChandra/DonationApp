@@ -24,4 +24,6 @@ public class ItemImage
 
     [Required]
     public string FilePath { get; set; } = string.Empty;
+
+    public long FileSize { get; set; }
 }
