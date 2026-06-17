@@ -715,6 +715,7 @@
 .mb-6               { margin-bottom: 6px; }
 .mb-8               { margin-bottom: 8px; }
 .mb-12              { margin-bottom: 12px; }
+.mb-14              { margin-bottom: 14px; }
 .ddetail-tambahan-list { display: flex; flex-direction: column; gap: 8px; }
 .ddetail-tambahan-row  { display: flex; justify-content: space-between; align-items: center; font-size: 15px; border-bottom: 1px solid var(--gray-100); padding-bottom: 6px; }
 .ddetail-key        { color: var(--text-light); }

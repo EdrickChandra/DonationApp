@@ -46,20 +46,20 @@
         <div class="dpage-right">
 
             <div class="dcard">
-                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;">
+                <div class="dhead-row">
                     <div>
-                        <div class="detail-badges" style="margin-bottom:8px;">
+                        <div class="detail-badges mb-8">
                             <span class="badge badge-lg badge-blue">@CategoryHelper.DisplayName(Model.Kategori)</span>
                         </div>
                         <h1 class="dpage-title">@Model.NamaBarang</h1>
                     </div>
                 </div>
 
-                <a href="/Profile/View/@Model.UserId" class="duser-row" style="text-decoration:none;color:inherit;">
+                <a href="/Profile/View/@Model.UserId" class="duser-row link-plain">
                     <div class="avatar">@posterInitial</div>
                     <div class="flex-min">
                         <div class="detail-poster-name">@posterName</div>
-                        <div style="display:flex;align-items:center;gap:5px;margin-top:1px;">
+                        <div class="drating-row">
                             @if (totalReviews > 0)
                             {
                                 @for (int s = 1; s <= 5; s++)
@@ -74,8 +74,8 @@
                             }
                         </div>
                     </div>
-                    <div style="font-size:13px;color:#64748b;display:flex;align-items:center;gap:3px;white-space:nowrap;">
-                        <i class="ti ti-map-pin" style="font-size:14px;" aria-hidden="true"></i>
+                    <div class="dloc-row">
+                        <i class="ti ti-map-pin icon-14" aria-hidden="true"></i>
                         @Model.Lokasi@(!string.IsNullOrWhiteSpace(Model.Provinsi) ? ", " + Model.Provinsi : "")
                     </div>
                 </a>
@@ -83,32 +83,32 @@
 
             <div class="dcard">
                 <div class="dinfo-grid">
-                    <div class="dinfo-cell" style="border-right:1px solid #e2e8f0;">
+                    <div class="dinfo-cell dinfo-cell--border">
                         <div class="detail-row-label">Kondisi</div>
-                        <div class="detail-row-value" style="margin-top:4px;">@Model.Kondisi</div>
+                        <div class="detail-row-value mt-4">@Model.Kondisi</div>
                     </div>
                     <div class="dinfo-cell">
                         <div class="detail-row-label">Tersedia</div>
-                        <div class="detail-row-value" style="margin-top:4px;">@Model.Jumlah pcs</div>
+                        <div class="detail-row-value mt-4">@Model.Jumlah pcs</div>
                     </div>
                 </div>
             </div>
 
             <div class="dcard">
-                <div class="detail-row-label" style="margin-bottom:6px;">Deskripsi</div>
+                <div class="detail-row-label mb-6">Deskripsi</div>
                 <div class="detail-row-value">@Model.Deskripsi</div>
             </div>
 
             @if (detailTambahan != null && detailTambahan.Any())
             {
                 <div class="dcard">
-                    <div class="detail-row-label" style="margin-bottom:8px;">Detail Tambahan</div>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="detail-row-label mb-8">Detail Tambahan</div>
+                    <div class="ddetail-tambahan-list">
                         @foreach (var kv in detailTambahan)
                         {
-                            <div class="ddetail-tambahan-row" style="display:flex;justify-content:space-between;align-items:center;font-size:15px;border-bottom:1px solid #f1f5f9;padding-bottom:6px;">
-                                <span style="color:#64748b;">@kv.Key</span>
-                                <span style="color:#0f172a;font-weight:600;">@kv.Value</span>
+                            <div class="ddetail-tambahan-row">
+                                <span class="ddetail-key">@kv.Key</span>
+                                <span class="ddetail-val">@kv.Value</span>
                             </div>
                         }
                     </div>
@@ -122,7 +122,7 @@
                 }
                 else if (hasRequested)
                 {
-                    <button class="btn btn-ghost btn-lg btn-block" style="margin-bottom:8px;" disabled>Sudah Diminta</button>
+                    <button class="btn btn-ghost btn-lg btn-block mb-8" disabled>Sudah Diminta</button>
                     <form asp-controller="Donasi" asp-action="Chat" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="itemId" value="@Model.Id" />
@@ -140,13 +140,13 @@
 
                         @if (Model.Jumlah > 1)
                         {
-                            <div style="margin-bottom:14px;">
-                                <div class="detail-row-label" style="margin-bottom:8px;">Jumlah yang diminta</div>
-                                <div style="display:flex;align-items:center;gap:10px;">
+                            <div class="mb-14">
+                                <div class="detail-row-label mb-8">Jumlah yang diminta</div>
+                                <div class="dstepper-row">
                                     <button type="button" class="stepper-btn" onclick="stepDown()">−</button>
-                                    <span id="stepperDisplay" style="font-size:18px;font-weight:700;min-width:28px;text-align:center;">1</span>
+                                    <span id="stepperDisplay" class="dstepper-display">1</span>
                                     <button type="button" class="stepper-btn" onclick="stepUp(@Model.Jumlah)">+</button>
-                                    <span style="font-size:14px;color:#94a3b8;">maks. @Model.Jumlah pcs</span>
+                                    <span class="text-xs-dim">maks. @Model.Jumlah pcs</span>
                                 </div>
                                 <input type="hidden" name="jumlah" id="stepperInput" value="1" />
                             </div>
@@ -166,14 +166,14 @@
                     <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg btn-block">Masuk untuk Meminta</a>
                 }
 
-                <div class="daction-bar" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;">
+                <div class="daction-bar">
                     <div class="detail-timer">
                         <i class="ti ti-clock" aria-hidden="true"></i>
                         Sisa @daysLeft hari
                     </div>
-                    <div style="display:flex;gap:8px;">
+                    <div class="dbtn-group">
                         <button class="btn btn-ghost btn-sm" onclick="reportDetail()">
-                            <i class="ti ti-flag" aria-hidden="true" style="color:#ef4444;"></i> Lapor
+                            <i class="ti ti-flag icon-danger" aria-hidden="true"></i> Lapor
                         </button>
                         <button class="btn btn-ghost btn-sm" onclick="copyDetailLink()">
                             <i class="ti ti-copy" aria-hidden="true"></i> Salin Link
