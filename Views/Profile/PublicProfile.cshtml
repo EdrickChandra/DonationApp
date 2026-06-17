@@ -14,73 +14,73 @@
     var memberSince = user?.CreatedAt.ToString("MMMM yyyy") ?? "";
 }
 
-<div style="max-width:720px;margin:0 auto;padding:24px 16px;">
+<div class="pubprof">
 
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px;margin-bottom:16px;">
-        <div style="display:flex;align-items:center;gap:18px;">
-            <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1e40af,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;flex-shrink:0;">
+    <div class="pubprof-card">
+        <div class="pubprof-head">
+            <div class="pubprof-avatar">
                 @avatarLetter
             </div>
-            <div style="flex:1;">
-                <h1 style="font-size:20px;font-weight:700;color:#0f172a;margin:0 0 4px;font-family:'Plus Jakarta Sans',sans-serif;">
+            <div class="flex-1">
+                <h1 class="pubprof-name">
                     @user?.NamaDepan @user?.NamaBelakang
                 </h1>
-                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <div class="pubprof-meta">
                     @if (!string.IsNullOrEmpty(user?.Kota) || !string.IsNullOrEmpty(user?.Provinsi))
                     {
-                        <span style="font-size:14px;color:#64748b;display:flex;align-items:center;gap:3px;">
-                            <i class="ti ti-map-pin" style="font-size:15px;" aria-hidden="true"></i>
+                        <span class="pubprof-meta-item">
+                            <i class="ti ti-map-pin icon-15" aria-hidden="true"></i>
                             @user?.Kota@(!string.IsNullOrEmpty(user?.Provinsi) ? ", " + user?.Provinsi : "")
                         </span>
                     }
-                    <span style="font-size:14px;color:#94a3b8;display:flex;align-items:center;gap:3px;">
-                        <i class="ti ti-calendar" style="font-size:15px;" aria-hidden="true"></i>
+                    <span class="pubprof-meta-item pubprof-meta-item--dim">
+                        <i class="ti ti-calendar icon-15" aria-hidden="true"></i>
                         Bergabung @memberSince
                     </span>
                 </div>
             </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;">
-            <div style="text-align:center;padding:12px;background:#f8fafc;border-radius:10px;">
-                <div style="font-size:22px;font-weight:700;color:#0f172a;">@totalDonasi</div>
-                <div style="font-size:13px;color:#64748b;font-weight:500;">Donasi</div>
+        <div class="pubprof-stats">
+            <div class="pubprof-stat">
+                <div class="pubprof-stat-num">@totalDonasi</div>
+                <div class="pubprof-stat-lbl">Donasi</div>
             </div>
-            <div style="text-align:center;padding:12px;background:#f8fafc;border-radius:10px;">
-                <div style="font-size:22px;font-weight:700;color:#0f172a;">@totalRequest</div>
-                <div style="font-size:13px;color:#64748b;font-weight:500;">Request</div>
+            <div class="pubprof-stat">
+                <div class="pubprof-stat-num">@totalRequest</div>
+                <div class="pubprof-stat-lbl">Request</div>
             </div>
-            <div style="text-align:center;padding:12px;background:#f8fafc;border-radius:10px;">
-                <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-                    <span style="font-size:22px;font-weight:700;color:#0f172a;">@avgRating.ToString("0.0")</span>
-                    <span style="color:#EF9F27;font-size:16px;">★</span>
+            <div class="pubprof-stat">
+                <div class="pubprof-stat-rating">
+                    <span class="pubprof-stat-num">@avgRating.ToString("0.0")</span>
+                    <span class="icon-star" style="font-size:16px;">★</span>
                 </div>
-                <div style="font-size:13px;color:#64748b;font-weight:500;">@totalReviews ulasan</div>
+                <div class="pubprof-stat-lbl">@totalReviews ulasan</div>
             </div>
         </div>
     </div>
 
     @if (activeDonations.Any())
     {
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px;">
-            <h2 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
-                <i class="ti ti-gift" style="color:#3b82f6;" aria-hidden="true"></i> Donasi Aktif
+        <div class="pubprof-section">
+            <h2 class="pubprof-h2">
+                <i class="ti ti-gift icon-blue" aria-hidden="true"></i> Donasi Aktif
             </h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">
+            <div class="pubprof-grid">
                 @foreach (var d in activeDonations)
                 {
-                    <a href="/Item/Detail/@d.Id" style="text-decoration:none;display:block;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;transition:box-shadow 0.15s;">
+                    <a href="/Item/Detail/@d.Id" class="pubprof-item">
                         @if (d.Images.Any())
                         {
-                            <img src="@d.Images.First().FilePath" style="width:100%;height:120px;object-fit:cover;display:block;" />
+                            <img src="@d.Images.First().FilePath" class="pubprof-item-img" />
                         }
                         else
                         {
-                            <div style="width:100%;height:120px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="ti ti-gift" style="font-size:28px;" aria-hidden="true"></i></div>
+                            <div class="pubprof-item-ph"><i class="ti ti-gift icon-28" aria-hidden="true"></i></div>
                         }
-                        <div style="padding:10px;">
-                            <div style="font-size:15px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@d.NamaBarang</div>
-                            <div style="font-size:13px;color:#64748b;">@CategoryHelper.DisplayName(d.Kategori)</div>
+                        <div class="pubprof-item-body">
+                            <div class="pubprof-item-name">@d.NamaBarang</div>
+                            <div class="pubprof-item-cat">@CategoryHelper.DisplayName(d.Kategori)</div>
                         </div>
                     </a>
                 }
@@ -90,25 +90,25 @@
 
     @if (activeRequests.Any())
     {
-        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;margin-bottom:16px;">
-            <h2 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
-                <i class="ti ti-list-search" style="color:#3b82f6;" aria-hidden="true"></i> Request Aktif
+        <div class="pubprof-section">
+            <h2 class="pubprof-h2">
+                <i class="ti ti-list-search icon-blue" aria-hidden="true"></i> Request Aktif
             </h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;">
+            <div class="pubprof-grid">
                 @foreach (var r in activeRequests)
                 {
-                    <a href="/Request/Detail/@r.Id" style="text-decoration:none;display:block;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;transition:box-shadow 0.15s;">
+                    <a href="/Request/Detail/@r.Id" class="pubprof-item">
                         @if (r.Images.Any())
                         {
-                            <img src="@r.Images.First().FilePath" style="width:100%;height:120px;object-fit:cover;display:block;" />
+                            <img src="@r.Images.First().FilePath" class="pubprof-item-img" />
                         }
                         else
                         {
-                            <div style="width:100%;height:120px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="ti ti-list-search" style="font-size:28px;" aria-hidden="true"></i></div>
+                            <div class="pubprof-item-ph"><i class="ti ti-list-search icon-28" aria-hidden="true"></i></div>
                         }
-                        <div style="padding:10px;">
-                            <div style="font-size:15px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@r.Title</div>
-                            <div style="font-size:13px;color:#64748b;">@CategoryHelper.DisplayName(r.Kategori)</div>
+                        <div class="pubprof-item-body">
+                            <div class="pubprof-item-name">@r.Title</div>
+                            <div class="pubprof-item-cat">@CategoryHelper.DisplayName(r.Kategori)</div>
                         </div>
                     </a>
                 }
@@ -116,17 +116,17 @@
         </div>
     }
 
-    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:20px;">
-        <h2 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 14px;font-family:'Plus Jakarta Sans',sans-serif;">
-            <i class="ti ti-star" style="color:#EF9F27;" aria-hidden="true"></i> Ulasan (@totalReviews)
+    <div class="pubprof-section pubprof-section--last">
+        <h2 class="pubprof-h2">
+            <i class="ti ti-star icon-star" aria-hidden="true"></i> Ulasan (@totalReviews)
         </h2>
         @if (!reviews.Any())
         {
-            <p style="font-size:15px;color:#94a3b8;text-align:center;padding:20px 0;">Belum ada ulasan.</p>
+            <p class="pubprof-empty">Belum ada ulasan.</p>
         }
         else
         {
-            <div style="display:flex;flex-direction:column;gap:10px;">
+            <div class="pubprof-reviews">
                 @foreach (var f in reviews)
                 {
                     var rInitial = f.Reviewer?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?";
@@ -135,19 +135,19 @@
                     if (f.ClaimRequest?.Item != null) contextLabel = f.ClaimRequest.Item.NamaBarang;
                     else if (f.ItemRequest != null) contextLabel = f.ItemRequest.Title;
 
-                    <div style="padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                            <a href="/Profile/View/@f.ReviewerId" style="width:28px;height:28px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0;text-decoration:none;">@rInitial</a>
-                            <div style="flex:1;">
-                                <a href="/Profile/View/@f.ReviewerId" style="font-size:15px;font-weight:600;color:#0f172a;text-decoration:none;">@rName</a>
+                    <div class="review-card">
+                        <div class="review-head">
+                            <a href="/Profile/View/@f.ReviewerId" class="review-avatar">@rInitial</a>
+                            <div class="flex-1">
+                                <a href="/Profile/View/@f.ReviewerId" class="review-name">@rName</a>
                                 @if (!string.IsNullOrEmpty(contextLabel))
                                 {
-                                    <div style="font-size:13px;color:#94a3b8;">@contextLabel</div>
+                                    <div class="review-ctx">@contextLabel</div>
                                 }
                             </div>
-                            <span style="font-size:13px;color:#94a3b8;">@f.CreatedAt.ToString("dd MMM yyyy")</span>
+                            <span class="review-date">@f.CreatedAt.ToString("dd MMM yyyy")</span>
                         </div>
-                        <div style="display:flex;gap:2px;margin-bottom:6px;">
+                        <div class="review-stars">
                             @for (int s = 1; s <= 5; s++)
                             {
                                 <span style="font-size:16px;color:@(s <= f.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
@@ -155,12 +155,12 @@
                         </div>
                         @if (!string.IsNullOrEmpty(f.Komentar))
                         {
-                            <p style="font-size:15px;color:#334155;line-height:1.5;margin:0;">@f.Komentar</p>
+                            <p class="review-text">@f.Komentar</p>
                         }
                         @if (!string.IsNullOrEmpty(f.FotoPath))
                         {
                             <div style="margin-top:8px;">
-                                <img src="@f.FotoPath" style="max-width:200px;max-height:200px;border-radius:8px;object-fit:cover;cursor:pointer;" onclick="window.open(this.src)" />
+                                <img src="@f.FotoPath" class="review-img" onclick="window.open(this.src)" />
                             </div>
                         }
                     </div>

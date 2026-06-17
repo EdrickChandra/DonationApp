@@ -203,3 +203,44 @@
 @media (max-width: 768px) {
     .admin-detail-grid { display: block; }
 }
+
+/* ---------- Public profile page ---------- */
+.pubprof              { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+.pubprof-card         { background: var(--white); border: 1px solid var(--gray-200); border-radius: 16px; padding: 28px; margin-bottom: 16px; }
+.pubprof-head         { display: flex; align-items: center; gap: 18px; }
+.pubprof-avatar       { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #1e40af, var(--blue-light)); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; color: var(--white); flex-shrink: 0; }
+.pubprof-name         { font-size: 20px; font-weight: 700; color: var(--text-dark); margin: 0 0 4px; font-family: 'Plus Jakarta Sans', sans-serif; }
+.pubprof-meta         { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.pubprof-meta-item    { font-size: 14px; color: var(--text-light); display: flex; align-items: center; gap: 3px; }
+.pubprof-meta-item--dim { color: var(--gray-400); }
+.pubprof-stats        { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+.pubprof-stat         { text-align: center; padding: 12px; background: var(--gray-50); border-radius: 10px; }
+.pubprof-stat-num     { font-size: 22px; font-weight: 700; color: var(--text-dark); }
+.pubprof-stat-lbl     { font-size: 13px; color: var(--text-light); font-weight: 500; }
+.pubprof-stat-rating  { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.pubprof-section      { background: var(--white); border: 1px solid var(--gray-200); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.pubprof-section--last { margin-bottom: 0; }
+.pubprof-h2           { font-size: 16px; font-weight: 700; color: var(--text-dark); margin: 0 0 14px; font-family: 'Plus Jakarta Sans', sans-serif; }
+.pubprof-grid         { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
+.pubprof-item         { text-decoration: none; display: block; border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden; transition: box-shadow 0.15s; }
+.pubprof-item-img     { width: 100%; height: 120px; object-fit: cover; display: block; }
+.pubprof-item-ph      { width: 100%; height: 120px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: var(--gray-400); }
+.pubprof-item-body    { padding: 10px; }
+.pubprof-item-name    { font-size: 15px; font-weight: 600; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pubprof-item-cat     { font-size: 13px; color: var(--text-light); }
+.pubprof-empty        { font-size: 15px; color: var(--gray-400); text-align: center; padding: 20px 0; }
+.pubprof-reviews      { display: flex; flex-direction: column; gap: 10px; }
+.review-card          { padding: 14px; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; }
+.review-head          { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.review-avatar        { width: 28px; height: 28px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--white); flex-shrink: 0; text-decoration: none; }
+.review-name          { font-size: 15px; font-weight: 600; color: var(--text-dark); text-decoration: none; }
+.review-ctx           { font-size: 13px; color: var(--gray-400); }
+.review-date          { font-size: 13px; color: var(--gray-400); }
+.review-stars         { display: flex; gap: 2px; margin-bottom: 6px; }
+.review-text          { font-size: 15px; color: var(--text-mid); line-height: 1.5; margin: 0; }
+.review-img           { max-width: 200px; max-height: 200px; border-radius: 8px; object-fit: cover; cursor: pointer; }
+.icon-15              { font-size: 15px; }
+.icon-28              { font-size: 28px; }
+.icon-blue            { color: var(--blue-light); }
+.icon-star            { color: #EF9F27; }
+.star-on              { color: #EF9F27; font-size: 16px; }
