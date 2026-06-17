@@ -52,8 +52,8 @@
             }
             else
             {
-                <div class="dpage-img-wrap" style="display:flex;align-items:center;justify-content:center;background:#f1f5f9;">
-                    <i class="ti ti-list-search" style="font-size:64px;color:#94a3b8;" aria-hidden="true"></i>
+                <div class="dpage-img-wrap dpage-img-wrap--empty">
+                    <i class="ti ti-list-search dempty-icon" aria-hidden="true"></i>
                 </div>
             }
         </div>
@@ -61,9 +61,9 @@
         <div class="dpage-right">
 
             <div class="dcard">
-                <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+                <div class="dhead-row">
                     <div>
-                        <div class="detail-badges" style="margin-bottom:8px;">
+                        <div class="detail-badges mb-8">
                             <span class="badge badge-lg badge-sky">Request</span>
                             <span class="badge badge-lg badge-blue">@CategoryHelper.DisplayName(Model.Kategori)</span>
                         </div>
@@ -71,11 +71,11 @@
                     </div>
                 </div>
 
-                <a href="/Profile/View/@Model.UserId" class="duser-row" style="text-decoration:none;color:inherit;">
+                <a href="/Profile/View/@Model.UserId" class="duser-row link-plain">
                     <div class="avatar">@avatarLetter</div>
                     <div class="flex-min">
-                        <div class="detail-poster-name" style="transition:color 0.15s;">@posterName</div>
-                        <div style="display:flex;align-items:center;gap:5px;margin-top:1px;">
+                        <div class="detail-poster-name">@posterName</div>
+                        <div class="drating-row">
                             @if (totalReviews > 0)
                             {
                                 @for (int s = 1; s <= 5; s++)
@@ -90,8 +90,8 @@
                             }
                         </div>
                     </div>
-                    <div style="font-size:13px;color:#64748b;display:flex;align-items:center;gap:3px;white-space:nowrap;">
-                        <i class="ti ti-map-pin" style="font-size:14px;" aria-hidden="true"></i>
+                    <div class="dloc-row">
+                        <i class="ti ti-map-pin icon-14" aria-hidden="true"></i>
                         @Model.Lokasi@(!string.IsNullOrWhiteSpace(Model.Provinsi) ? ", " + Model.Provinsi : "")
                     </div>
                 </a>
@@ -99,32 +99,32 @@
 
             <div class="dcard">
                 <div class="dinfo-grid">
-                    <div class="dinfo-cell" style="border-right:1px solid #e2e8f0;">
+                    <div class="dinfo-cell dinfo-cell--border">
                         <div class="detail-row-label">Kondisi Minimum</div>
-                        <div class="detail-row-value" style="margin-top:4px;">@(Model.KondisiMinimum?.ToString() ?? "Apa saja")</div>
+                        <div class="detail-row-value mt-4">@(Model.KondisiMinimum?.ToString() ?? "Apa saja")</div>
                     </div>
                     <div class="dinfo-cell">
                         <div class="detail-row-label">Jumlah Dibutuhkan</div>
-                        <div class="detail-row-value" style="margin-top:4px;">@Model.Jumlah pcs</div>
+                        <div class="detail-row-value mt-4">@Model.Jumlah pcs</div>
                     </div>
                 </div>
             </div>
 
             <div class="dcard">
-                <div class="detail-row-label" style="margin-bottom:6px;">Deskripsi</div>
+                <div class="detail-row-label mb-6">Deskripsi</div>
                 <div class="detail-row-value">@Model.Deskripsi</div>
             </div>
 
             @if (detailTambahan != null && detailTambahan.Any())
             {
                 <div class="dcard">
-                    <div class="detail-row-label" style="margin-bottom:8px;">Detail Tambahan</div>
-                    <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="detail-row-label mb-8">Detail Tambahan</div>
+                    <div class="ddetail-tambahan-list">
                         @foreach (var kv in detailTambahan)
                         {
-                            <div class="ddetail-tambahan-row" style="display:flex;justify-content:space-between;align-items:center;font-size:15px;border-bottom:1px solid #f1f5f9;padding-bottom:6px;">
-                                <span style="color:#64748b;">@kv.Key</span>
-                                <span style="color:#0f172a;font-weight:600;">@kv.Value</span>
+                            <div class="ddetail-tambahan-row">
+                                <span class="ddetail-key">@kv.Key</span>
+                                <span class="ddetail-val">@kv.Value</span>
                             </div>
                         }
                     </div>
@@ -132,7 +132,7 @@
             }
 
             <div class="dcard">
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                <div class="dflex-between mb-12">
                     <span class="text-muted">@Model.Offers.Count penawaran masuk</span>
                 </div>
 
@@ -159,14 +159,14 @@
                     </button>
                 }
 
-                <div class="daction-bar" style="display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;">
+                <div class="daction-bar">
                     <div class="detail-timer">
                         <i class="ti ti-clock" aria-hidden="true"></i>
                         Sisa @daysLeft hari
                     </div>
-                    <div style="display:flex;gap:8px;">
+                    <div class="dbtn-group">
                         <button class="btn btn-ghost btn-sm" onclick="reportDetail()">
-                            <i class="ti ti-flag" aria-hidden="true" style="color:#ef4444;"></i> Lapor
+                            <i class="ti ti-flag icon-danger" aria-hidden="true"></i> Lapor
                         </button>
                         <button class="btn btn-ghost btn-sm" onclick="copyDetailLink()">
                             <i class="ti ti-copy" aria-hidden="true"></i> Salin Link
@@ -180,7 +180,7 @@
             {
                 <div id="offerForm" style="display:none;">
                     <div class="dcard">
-                        <div class="detail-row-label" style="margin-bottom:12px;">Tawarkan Barang</div>
+                        <div class="detail-row-label mb-12">Tawarkan Barang</div>
                         <form asp-controller="Request" asp-action="Offer" method="post" enctype="multipart/form-data">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="itemRequestId" value="@Model.Id" />
@@ -192,7 +192,7 @@
 
                             <div class="form-group">
                                 <label class="form-label">Kondisi</label>
-                                <div style="display:flex;gap:8px;">
+                                <div class="dcondition-row">
                                     <input type="hidden" name="kondisi" id="offerKondisiInput" value="1" />
                                     <button type="button" class="btn-condition" id="offerKondisiBaru" data-value="0" onclick="setOfferKondisi(0)">Baru</button>
                                     <button type="button" class="btn-condition selected" id="offerKondisiBekas" data-value="1" onclick="setOfferKondisi(1)">Bekas</button>
@@ -201,11 +201,11 @@
 
                             <div class="form-group">
                                 <label class="form-label">Jumlah yang bisa ditawarkan</label>
-                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+                                <div class="dstepper-row">
                                     <button type="button" class="stepper-btn" onclick="offerStepDown()">−</button>
-                                    <span id="offerStepperDisplay" style="font-size:18px;font-weight:700;min-width:28px;text-align:center;">1</span>
+                                    <span id="offerStepperDisplay" class="dstepper-display">1</span>
                                     <button type="button" class="stepper-btn" onclick="offerStepUp(@Model.Jumlah)">+</button>
-                                    <span style="font-size:14px;color:#94a3b8;">maks. @Model.Jumlah pcs</span>
+                                    <span class="text-xs-dim">maks. @Model.Jumlah pcs</span>
                                 </div>
                                 <input type="hidden" name="jumlah" id="offerStepperInput" value="1" />
                             </div>
@@ -216,15 +216,15 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Foto Barang <span style="font-weight:400;color:#94a3b8;">(maks. 3, 5MB, JPG/PNG)</span></label>
+                                <label class="form-label">Foto Barang <span class="label-hint">(maks. 3, 5MB, JPG/PNG)</span></label>
                                 <input type="file" id="offer-file-input" name="Images" multiple accept=".jpg,.jpeg,.png" style="display:none;" />
                                 <div class="upload-zone" onclick="document.getElementById('offer-file-input').click()">
                                     <i class="ti ti-photo-plus" aria-hidden="true"></i> Tambah Foto
                                 </div>
-                                <div id="offer-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
+                                <div id="offer-preview" class="dupload-preview"></div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary btn-lg btn-block" style="background:var(--sky);">Kirim Penawaran</button>
+                            <button type="submit" class="btn btn-primary btn-lg btn-block btn-sky">Kirim Penawaran</button>
                         </form>
                     </div>
                 </div>
