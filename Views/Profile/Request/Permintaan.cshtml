@@ -7,10 +7,10 @@
 }
 
 <div class="ppage">
-    <div class="ppage-inner" style="max-width:100%;padding:0;">
+    <div class="ppage-inner ppage-inner--flush">
 
-        <div style="padding:16px 20px 0;border-bottom:0.5px solid #cbd5e1;">
-            <div class="ptab-bar" style="margin:0;border:none;">
+        <div class="ptab-header">
+            <div class="ptab-bar ptab-bar--flush">
                 <a asp-controller="Request" asp-action="MyRequests" class="ptab">Request Saya</a>
                 <a asp-controller="Request" asp-action="Permintaan" class="ptab active">Permintaan Donasi</a>
                 <a asp-controller="Request" asp-action="CreateView" class="ptab">Buat Request</a>
@@ -23,7 +23,7 @@
         }
         else
         {
-            <div class="psplit" style="border:none;border-radius:0;min-height:calc(100vh - 120px);">
+            <div class="psplit psplit--flush">
 
                 <div class="plist" id="permintaan-list">
                     @foreach (var r in claimRequests)
@@ -41,7 +41,7 @@
                            href="/Request/Permintaan?selectedId=@r.Id">
                             @if (r.Item?.Images.Any() == true)
                             {
-                                <img src="@r.Item.Images.First().FilePath" class="plist-thumb" style="object-fit:cover;" />
+                                <img src="@r.Item.Images.First().FilePath" class="plist-thumb img-cover-fill" />
                             }
                             else
                             {
@@ -66,14 +66,14 @@
                         var alreadyReviewed = selected.Feedbacks.Any(f => f.ReviewerId == currentUserId);
                         var permIsPickup = selected.MetodePengiriman == MetodePengiriman.Pickup;
 
-                        <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px;">
+                        <div class="pdetail-head-row">
                             @if (selected.Item?.Images.Any() == true)
                             {
                                 <img src="@selected.Item.Images.First().FilePath" class="img-60" />
                             }
                             <div>
                                 <div class="pdetail-title" style="margin-bottom:8px;">@selected.Item?.NamaBarang</div>
-                                <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                                <div class="pbadge-row">
                                     <span class="badge badge-claimed">@CategoryHelper.DisplayName(selected.Item?.Kategori ?? ItemCategory.Pakaian)</span>
                                     <span class="badge badge-muted">@selected.Jumlah pcs diminta</span>
                                 </div>
@@ -82,15 +82,15 @@
 
                         <div class="psec">
                             <div class="psec-label">Donor</div>
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <a href="/Profile/View/@selected.Item?.UserId" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;flex:1;min-width:0;" onclick="event.stopPropagation();">
+                            <div class="pflex-row">
+                                <a href="/Profile/View/@selected.Item?.UserId" class="penerima-link" onclick="event.stopPropagation();">
                                     <div class="avatar">@(selected.Item?.User?.NamaDepan?.Substring(0, 1).ToUpper() ?? "?")</div>
                                     <div>
                                         <div class="text-strong">@selected.Item?.User?.NamaDepan @selected.Item?.User?.NamaBelakang</div>
                                         <div class="text-xs-muted">@selected.Item?.User?.Kota - @selected.Item?.User?.Provinsi</div>
                                     </div>
                                 </a>
-                                <form asp-controller="Donasi" asp-action="Chat" method="post" style="margin-left:auto;">
+                                <form asp-controller="Donasi" asp-action="Chat" method="post" class="ml-auto">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="itemId" value="@selected.Item?.Id" />
                                     <input type="hidden" name="otherUserId" value="@selected.Item?.UserId" />
@@ -138,10 +138,10 @@
                             }
                             else if (selected.Status == TransactionStatus.Accepted && selected.MetodePengiriman == MetodePengiriman.BelumDipilih)
                             {
-                                <div style="text-align:center;margin-top:8px;">
-                                    <p style="font-size:14px;color:#64748b;margin-bottom:10px;">Pilih metode pengiriman:</p>
-                                    <div style="display:flex;gap:8px;justify-content:center;">
-                                        <form asp-controller="Donasi" asp-action="ChooseDeliveryMethod" method="post" style="flex:1;">
+                                <div class="pcenter-mt8">
+                                    <p class="pdelivery-hint">Pilih metode pengiriman:</p>
+                                    <div class="pdelivery-btns">
+                                        <form asp-controller="Donasi" asp-action="ChooseDeliveryMethod" method="post" class="flex-1">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="claimRequestId" value="@selected.Id" />
                                             <input type="hidden" name="metode" value="@((int)MetodePengiriman.Kurir)" />
@@ -149,7 +149,7 @@
                                                 <i class="ti ti-truck" aria-hidden="true"></i> Kurir
                                             </button>
                                         </form>
-                                        <form asp-controller="Donasi" asp-action="ChooseDeliveryMethod" method="post" style="flex:1;">
+                                        <form asp-controller="Donasi" asp-action="ChooseDeliveryMethod" method="post" class="flex-1">
                                             @Html.AntiForgeryToken()
                                             <input type="hidden" name="claimRequestId" value="@selected.Id" />
                                             <input type="hidden" name="metode" value="@((int)MetodePengiriman.Pickup)" />
@@ -162,27 +162,27 @@
                             }
                             else if (selected.Status == TransactionStatus.Accepted)
                             {
-                                <div style="text-align:center;margin-top:8px;">
-                                    <span style="font-size:14px;color:#3b82f6;font-weight:600;">
+                                <div class="pcenter-mt8">
+                                    <span class="pmethod-tag">
                                         <i class="ti @(selected.MetodePengiriman == MetodePengiriman.Pickup ? "ti-walk" : "ti-truck")" aria-hidden="true"></i>
                                         @(selected.MetodePengiriman == MetodePengiriman.Pickup ? "Pickup" : "Kurir")
                                     </span>
                                     @if (selected.MetodePengiriman == MetodePengiriman.Pickup)
                                     {
-                                        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:10px 14px;margin-top:8px;text-align:left;">
-                                            <div style="font-size:13px;color:#0369a1;font-weight:600;margin-bottom:4px;">
+                                        <div class="ppickup-box">
+                                            <div class="ppickup-title">
                                                 <i class="ti ti-map-pin" aria-hidden="true"></i> Alamat Donor
                                             </div>
-                                            <div style="font-size:15px;color:#0c4a6e;">@selected.Item?.User?.Alamat</div>
-                                            <div style="font-size:14px;color:#0369a1;">@selected.Item?.User?.Kota - @selected.Item?.User?.Provinsi</div>
+                                            <div class="ppickup-addr">@selected.Item?.User?.Alamat</div>
+                                            <div class="ppickup-loc">@selected.Item?.User?.Kota - @selected.Item?.User?.Provinsi</div>
                                         </div>
                                     }
-                                    <p style="font-size:14px;color:#64748b;margin-top:4px;">@(selected.MetodePengiriman == MetodePengiriman.Pickup ? "Menunggu donor mengonfirmasi penjemputan..." : "Menunggu donor mengirim barang...")</p>
+                                    <p class="ptext-note">@(selected.MetodePengiriman == MetodePengiriman.Pickup ? "Menunggu donor mengonfirmasi penjemputan..." : "Menunggu donor mengirim barang...")</p>
                                 </div>
                             }
                             else if (selected.Status == TransactionStatus.Pending)
                             {
-                                <p style="font-size:14px;color:#64748b;text-align:center;margin-top:8px;">Menunggu konfirmasi donor...</p>
+                                <p class="ptext-center-sm" style="margin-top:8px;">Menunggu konfirmasi donor...</p>
                             }
                         </div>
 
@@ -204,7 +204,7 @@
                                         <textarea class="form-input" name="komentar" rows="3" placeholder="Ceritakan pengalaman Anda..." style="resize:vertical;"></textarea>
                                     </div>
                                     <div class="form-group" style="margin-bottom:12px;">
-                                        <label style="font-size:14px;color:#64748b;font-weight:600;margin-bottom:6px;display:block;">Foto (opsional)</label>
+                                        <label class="pfeedback-filelbl">Foto (opsional)</label>
                                         <input type="file" name="foto" accept="image/*" style="font-size:14px;" />
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-block">Kirim Feedback</button>
@@ -229,7 +229,7 @@
                                 @if (!string.IsNullOrEmpty(myReview.FotoPath))
                                 {
                                     <div style="margin-top:8px;">
-                                        <img src="@myReview.FotoPath" style="max-width:160px;max-height:160px;border-radius:8px;object-fit:cover;cursor:pointer;" onclick="window.open(this.src)" />
+                                        <img src="@myReview.FotoPath" class="img-thumb-160" onclick="window.open(this.src)" />
                                     </div>
                                 }
                             </div>

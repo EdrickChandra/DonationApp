@@ -502,6 +502,9 @@ main:has(.pnav) {
 .preview-name-row   { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .preview-item-note  { font-size: 13px; color: var(--text-light); margin-top: 4px; }
 .img-thumb-120      { max-width: 120px; max-height: 120px; border-radius: 6px; object-fit: cover; cursor: pointer; }
+.img-thumb-160      { max-width: 160px; max-height: 160px; border-radius: 8px; object-fit: cover; cursor: pointer; }
+.pflex-row          { display: flex; align-items: center; gap: 10px; }
+.pcenter-mt8        { text-align: center; margin-top: 8px; }
 .icon-13            { font-size: 13px; }
 .icon-24            { font-size: 24px; }
 
