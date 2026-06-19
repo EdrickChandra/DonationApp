@@ -7,19 +7,17 @@
 .u-hidden        { display: none; }
 .u-inline        { display: inline; }
 .u-relative      { position: relative; }
-.flex-1          { flex: 1; }
 .flex-2          { flex: 2; }
 .text-xs         { font-size: 12px; }
 .text-sm         { font-size: 13px; }
 .text-md         { font-size: 14px; }
-.text-muted      { color: var(--text-light); }
 .text-muted-2    { color: var(--gray-400); }
 .link-plain      { text-decoration: none; color: inherit; }
 .link-block      { text-decoration: none; display: block; }
 .img-cover-fill  { width: 100%; height: 100%; object-fit: cover; }
 
 /* ---------- Modal (reusable) ---------- */
-.modal-overlay {
+.mm-overlay {
     display: none;
     position: fixed;
     inset: 0;
@@ -74,14 +72,14 @@
 .modal-footer        { padding: 0 20px 16px; }
 
 /* ---------- Badges / pills (reusable) ---------- */
-.pill {
+.mm-pill {
     font-size: 12px;
     font-weight: 600;
     padding: 3px 9px;
     border-radius: 99px;
 }
-.pill--cat   { background: var(--badge-blue-bg); color: var(--badge-blue-txt); font-family: 'Plus Jakarta Sans', sans-serif; }
-.pill--score { background: var(--white); border: 1px solid var(--gray-200); }
+.mm-pill--cat   { background: var(--badge-blue-bg); color: var(--badge-blue-txt); font-family: 'Plus Jakarta Sans', sans-serif; }
+.mm-pill--score { background: var(--white); border: 1px solid var(--gray-200); }
 .reason-chip {
     font-size: 13px;
     color: var(--text-light);

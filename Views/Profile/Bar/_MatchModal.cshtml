@@ -5,7 +5,7 @@
     var sourceId = ViewData["SourceId"] as string ?? "";
 }
 
-<div id="matchModal" class="modal-overlay">
+<div id="matchModal" class="mm-overlay">
     <div class="modal-dialog">
 
         <div class="modal-header">
@@ -58,7 +58,7 @@
     </div>
 </div>
 
-<div id="matchNoResultModal" class="modal-overlay">
+<div id="matchNoResultModal" class="mm-overlay">
     <div class="modal-dialog modal-dialog--sm">
         <div class="modal-header modal-header--center">
             <p class="modal-title modal-title--sm"><i class="ti ti-search match-title-icon" aria-hidden="true"></i>Smart Matching</p>
@@ -127,8 +127,8 @@
 
         var scoreColor = m.score >= 80 ? '#1e40af' : m.score >= 60 ? '#166534' : '#64748b';
         document.getElementById('matchCardBadges').innerHTML =
-            '<span class="pill pill--cat">' + m.kategori + '</span>' +
-            '<span class="pill pill--score" style="color:' + scoreColor + ';">' + m.score + ' pts</span>';
+            '<span class="mm-pill mm-pill--cat">' + m.kategori + '</span>' +
+            '<span class="mm-pill mm-pill--score" style="color:' + scoreColor + ';">' + m.score + ' pts</span>';
 
         document.getElementById('matchCardTitle').textContent = m.title;
         document.getElementById('matchCardLocation').innerHTML =
