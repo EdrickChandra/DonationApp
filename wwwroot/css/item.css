@@ -321,7 +321,7 @@
     }
 
 .card-grid-empty {
-    font-size: 15px;
+    font-size: var(--fs-base);
     color: var(--gray-400);
     padding: 48px 0;
     grid-column: 1 / -1;
@@ -452,7 +452,7 @@
     right: 12px;
     background: rgba(0,0,0,0.5);
     color: white;
-    font-size: 13px;
+    font-size: var(--fs-xs);
     padding: 3px 10px;
     border-radius: 99px;
 }
@@ -540,7 +540,7 @@
 
 
 .detail-poster-name {
-    font-size: 15px;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text-mid);
 }
@@ -569,7 +569,7 @@
 }
 
 .detail-row-label {
-    font-size: 12px;
+    font-size: var(--fs-2xs);
     font-weight: 700;
     color: var(--gray-400);
     text-transform: uppercase;
@@ -634,7 +634,7 @@
 }
 
 .offer-card-name {
-    font-size: 15px;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -642,13 +642,13 @@
 }
 
 .offer-card-time {
-    font-size: 13px;
+    font-size: var(--fs-xs);
     color: var(--gray-400);
     margin: 0;
 }
 
 .offer-card-desc {
-    font-size: 15px;
+    font-size: var(--fs-base);
     color: var(--text-light);
     margin: 0 0 10px;
     line-height: 1.6;
@@ -918,20 +918,8 @@
         font-size: 12px;
     }
 
-    .card-grid-empty {
-        font-size: 13px;
-    }
-
-    .detail-row-label {
-        font-size: 10px;
-    }
-
     .detail-row-value {
         font-size: 14px;
-    }
-
-    .detail-poster-name {
-        font-size: 13px;
     }
 
     .detail-poster-loc {
@@ -940,22 +928,6 @@
 
     .detail-poster-loc i {
         font-size: 12px;
-    }
-
-    .detail-counter {
-        font-size: 11px;
-    }
-
-    .offer-card-name {
-        font-size: 13px;
-    }
-
-    .offer-card-time {
-        font-size: 11px;
-    }
-
-    .offer-card-desc {
-        font-size: 13px;
     }
 
     .offers-title {

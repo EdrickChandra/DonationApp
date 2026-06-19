@@ -182,7 +182,7 @@ main:has(.pnav) {
 .preview-header {
     padding: 14px 16px;
     border-bottom: 1px solid var(--gray-200);
-    font-size: 16px;
+    font-size: var(--fs-md);
     font-weight: 600;
     color: var(--text-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
@@ -200,20 +200,20 @@ main:has(.pnav) {
 
 
 .preview-name {
-    font-size: 16px;
+    font-size: var(--fs-md);
     font-weight: 600;
     color: var(--text-dark);
 }
 
 .preview-text {
-    font-size: 16px;
+    font-size: var(--fs-md);
     color: var(--text-mid);
     margin-top: 3px;
     line-height: 1.5;
 }
 
 .preview-time {
-    font-size: 14px;
+    font-size: var(--fs-sm);
     color: var(--text-light);
     margin-left: auto;
     white-space: nowrap;
@@ -222,7 +222,7 @@ main:has(.pnav) {
 
 .pstars {
     color: var(--star-color);
-    font-size: 15px;
+    font-size: var(--fs-base);
     letter-spacing: 1px;
 }
 
@@ -279,7 +279,7 @@ main:has(.pnav) {
     }
 
 .plist-name {
-    font-size: 16px;
+    font-size: var(--fs-md);
     font-weight: 600;
     color: var(--text-dark);
     white-space: nowrap;
@@ -290,7 +290,7 @@ main:has(.pnav) {
 }
 
 .plist-sub {
-    font-size: 14px;
+    font-size: var(--fs-sm);
     color: var(--text-light);
 }
 
@@ -306,7 +306,7 @@ main:has(.pnav) {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
+    font-size: var(--fs-md);
     color: var(--text-light);
 }
 
@@ -328,7 +328,7 @@ main:has(.pnav) {
 }
 
 .psec-label {
-    font-size: 14px;
+    font-size: var(--fs-sm);
     font-weight: 600;
     color: var(--text-light);
     text-transform: uppercase;
@@ -361,7 +361,7 @@ main:has(.pnav) {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    font-size: 15px;
+    font-size: var(--fs-base);
 }
 
     .pstep-dot.done {
@@ -370,7 +370,7 @@ main:has(.pnav) {
         color: var(--white);
     }
 
-    .pstep-dot i { font-size: 15px; color: var(--text-light); }
+    .pstep-dot i { font-size: var(--fs-base); color: var(--text-light); }
     .pstep-dot.done i { color: var(--white); }
 
 .pstep-label {
@@ -529,7 +529,7 @@ main:has(.pnav) {
 
 .pchat-list-header {
     padding: 14px 16px;
-    font-size: 15px;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text-dark);
     border-bottom: 1px solid var(--gray-200);
@@ -567,7 +567,7 @@ main:has(.pnav) {
 }
 
 .pchat-name {
-    font-size: 15px;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text-dark);
     white-space: nowrap;
@@ -577,7 +577,7 @@ main:has(.pnav) {
 }
 
 .pchat-preview {
-    font-size: 13px;
+    font-size: var(--fs-xs);
     color: var(--text-light);
     white-space: nowrap;
     overflow: hidden;
@@ -617,7 +617,7 @@ main:has(.pnav) {
 }
 
 .pchat-header-name {
-    font-size: 15px;
+    font-size: var(--fs-base);
     font-weight: 600;
     color: var(--text-dark);
     margin: 0;
@@ -625,7 +625,7 @@ main:has(.pnav) {
 }
 
 .pchat-header-sub {
-    font-size: 13px;
+    font-size: var(--fs-xs);
     color: var(--text-light);
     margin: 0;
 }
@@ -643,7 +643,7 @@ main:has(.pnav) {
 
 .pchat-no-select {
     margin: auto;
-    font-size: 15px;
+    font-size: var(--fs-base);
     color: var(--text-light);
 }
 
@@ -660,7 +660,7 @@ main:has(.pnav) {
     max-width: 65%;
     padding: 8px 12px;
     border-radius: 10px;
-    font-size: 15px;
+    font-size: var(--fs-base);
     line-height: 1.5;
     color: var(--text-dark);
     background: var(--white);
@@ -676,7 +676,7 @@ main:has(.pnav) {
 .pchat-bubble p { margin: 0; }
 
 .pchat-bubble-time {
-    font-size: 12px;
+    font-size: var(--fs-2xs);
     color: var(--text-light);
     padding: 0 4px;
 }
@@ -722,7 +722,7 @@ main:has(.pnav) {
     border: 1px solid var(--gray-200);
     border-radius: 8px;
     padding: 8px 12px;
-    font-size: 15px;
+    font-size: var(--fs-base);
     background: var(--gray-50);
     color: var(--text-dark);
     resize: none;
@@ -759,8 +759,8 @@ main:has(.pnav) {
     margin-top: 4px;
 }
 
-.pnotif-msg { font-size: 15px; color: var(--text-dark); line-height: 1.5; flex: 1; }
-.pnotif-time { font-size: 13px; color: var(--text-light); margin-top: 4px; }
+.pnotif-msg { font-size: var(--fs-base); color: var(--text-dark); line-height: 1.5; flex: 1; }
+.pnotif-time { font-size: var(--fs-xs); color: var(--text-light); margin-top: 4px; }
 
 .pnotif-link {
     font-size: 14px;
@@ -795,7 +795,7 @@ main:has(.pnav) {
     flex-shrink: 0;
 }
 
-.preq-name { flex: 1; font-size: 15px; color: var(--text-dark); }
+.preq-name { flex: 1; font-size: var(--fs-base); color: var(--text-dark); }
 .preq-actions { display: flex; gap: 6px; align-items: center; }
 
 /* ── Condition buttons ── */
@@ -1095,34 +1095,6 @@ main:has(.pnav) {
         padding: 1px 5px;
     }
 
-    .plist-name {
-        font-size: 13px;
-    }
-
-    .plist-sub {
-        font-size: 11px;
-    }
-
-    .psec-label {
-        font-size: 11px;
-    }
-
-    .preview-header {
-        font-size: 13px;
-    }
-
-    .preview-name {
-        font-size: 13px;
-    }
-
-    .preview-text {
-        font-size: 13px;
-    }
-
-    .preview-time {
-        font-size: 11px;
-    }
-
     .preview-item {
         padding: 12px;
         gap: 10px;
@@ -1141,66 +1113,13 @@ main:has(.pnav) {
         font-size: 18px;
     }
 
-    .pdetail-empty {
-        font-size: 13px;
-    }
-
     .pstep-dot {
         width: 26px;
         height: 26px;
-        font-size: 13px;
-    }
-
-    .pstep-dot i {
-        font-size: 13px;
     }
 
     .pstep-line {
         margin-top: 13px;
-    }
-
-    .pchat-list-header {
-        font-size: 13px;
-    }
-
-    .pchat-name {
-        font-size: 13px;
-    }
-
-    .pchat-preview {
-        font-size: 11px;
-    }
-
-    .pchat-header-name {
-        font-size: 13px;
-    }
-
-    .pchat-header-sub {
-        font-size: 11px;
-    }
-
-    .pchat-bubble {
-        font-size: 13px;
-    }
-
-    .pchat-bubble-time {
-        font-size: 10px;
-    }
-
-    .pchat-no-select {
-        font-size: 13px;
-    }
-
-    .pchat-textarea {
-        font-size: 13px;
-    }
-
-    .pnotif-msg {
-        font-size: 13px;
-    }
-
-    .pnotif-time {
-        font-size: 11px;
     }
 
     .pnotif-link {
@@ -1211,13 +1130,5 @@ main:has(.pnav) {
         width: 28px;
         height: 28px;
         font-size: 12px;
-    }
-
-    .preq-name {
-        font-size: 13px;
-    }
-
-    .pstars {
-        font-size: 13px;
     }
 }
