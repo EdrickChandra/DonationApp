@@ -178,74 +178,16 @@
     </div>
 </div>
 
+<partial name="_CategoryFieldsScript" />
+<script src="~/js/form-helpers.js" asp-append-version="true"></script>
 <script>
     var isEdit = @(isEdit ? "true" : "false");
     var existingProvinsi = '@(editRequest?.Provinsi ?? userProvinsi)';
     var existingLokasi = '@(editRequest?.Lokasi ?? userKota)';
     var existingDetails = @Html.Raw(existingDetails != null ? JsonSerializer.Serialize(existingDetails) : "{}");
 
-    var categoryFields = {
-        "@((int)ItemCategory.Pakaian)": [
-            { key:"Ukuran", label:"Ukuran", type:"select", options:["XS","S","M","L","XL","XXL"] },
-            { key:"JenisKelamin", label:"Jenis Kelamin", type:"select", options:["Pria","Wanita","Unisex"] }
-        ],
-        "@((int)ItemCategory.Elektronik)": [
-            { key:"Jenis", label:"Jenis Perangkat", type:"select", options:["Laptop","Smartphone","Tablet","Kamera","TV","Printer","Lainnya"] },
-            { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Samsung, Apple, Asus" }
-        ],
-        "@((int)ItemCategory.PerabotRumah)": [
-            { key:"JenisPerabot", label:"Jenis Perabot", type:"select", options:["Meja","Kursi","Lemari","Rak","Sofa","Tempat Tidur","Lainnya"] },
-            { key:"Bahan", label:"Bahan", type:"select", options:["Kayu","Plastik","Besi/Logam","Rotan","Kaca","Lainnya"] }
-        ],
-        "@((int)ItemCategory.Mainan)": [
-            { key:"UsiaRekomendasi", label:"Usia Rekomendasi", type:"select", options:["0-1 tahun","1-3 tahun","3-5 tahun","5-12 tahun","12+ tahun"] },
-            { key:"Jenis", label:"Jenis Mainan", type:"select", options:["Edukatif","Action Figure","Boneka","Puzzle","Kendaraan","Lainnya"] }
-        ],
-        "@((int)ItemCategory.AlatMusik)": [
-            { key:"JenisInstrumen", label:"Jenis Instrumen", type:"select", options:["Gitar","Bass","Piano/Keyboard","Drum/Perkusi","Biola/String","Tiup Kayu","Tiup Logam","Vokal/Mikrofon","DJ/Elektronik","Lainnya"] },
-            { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Yamaha, Roland" }
-        ]
-    };
-
     function showReqFields(val) {
-        var container = document.getElementById('req-detail-fields');
-        container.innerHTML = '';
-        var fields = categoryFields[val];
-        if (!fields) return;
-        fields.forEach(function(f) {
-            var div = document.createElement('div');
-            div.className = 'form-group';
-            var label = document.createElement('label');
-            label.className = 'form-label';
-            label.textContent = f.label;
-            div.appendChild(label);
-            var input;
-            if (f.type === 'select') {
-                input = document.createElement('select');
-                input.className = 'form-input';
-                input.id = 'req-field-' + f.key;
-                input.dataset.key = f.key;
-                var empty = document.createElement('option');
-                empty.value = ''; empty.textContent = 'Pilih ' + f.label;
-                input.appendChild(empty);
-                f.options.forEach(function(o) {
-                    var opt = document.createElement('option');
-                    opt.value = o; opt.textContent = o;
-                    if (existingDetails && existingDetails[f.key] === o) opt.selected = true;
-                    input.appendChild(opt);
-                });
-            } else {
-                input = document.createElement('input');
-                input.className = 'form-input';
-                input.type = 'text';
-                input.placeholder = f.placeholder || '';
-                input.id = 'req-field-' + f.key;
-                input.dataset.key = f.key;
-                if (existingDetails && existingDetails[f.key]) input.value = existingDetails[f.key];
-            }
-            div.appendChild(input);
-            container.appendChild(div);
-        });
+        renderCategoryFields('req-detail-fields', 'req-field-', val, existingDetails);
     }
 
     var katEl = document.getElementById('req-kategori');
@@ -259,61 +201,14 @@
     if (provSelect) populateProvinsi(provSelect, existingProvinsi);
     if (existingProvinsi) updateReqKota(existingProvinsi);
 
-    var reqImageStore = [];
-
-    document.getElementById('req-file-input').addEventListener('change', function() {
-        Array.from(this.files).forEach(function(f) { if (reqImageStore.length < 5) reqImageStore.push(f); });
-        this.value = '';
-        renderReqPreviews();
-        syncReqInput();
+    initImageUploader({
+        inputId: 'req-file-input',
+        previewId: 'req-preview',
+        max: 5,
+        variant: 'grid',
+        addTileClass: 'req-add-tile',
+        renderOnInit: true
     });
-
-    renderReqPreviews();
-
-    function renderReqPreviews() {
-        var container = document.getElementById('req-preview');
-        container.innerHTML = '';
-        reqImageStore.forEach(function(file, i) {
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                var wrap = document.createElement('div');
-                wrap.style.cssText = 'position:relative;width:88px;height:88px;border-radius:10px;overflow:hidden;flex-shrink:0;';
-                var img = document.createElement('img');
-                img.src = e.target.result;
-                img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-                var del = document.createElement('button');
-                del.type = 'button';
-                del.style.cssText = 'position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1;';
-                del.innerHTML = '✕';
-                del.onclick = (function(idx) { return function() { reqImageStore.splice(idx, 1); renderReqPreviews(); syncReqInput(); }; })(i);
-                wrap.appendChild(img);
-                wrap.appendChild(del);
-                container.appendChild(wrap);
-                if (reqImageStore.length < 5) appendReqAddTile(container);
-            };
-            reader.readAsDataURL(file);
-        });
-        if (reqImageStore.length === 0) appendReqAddTile(container);
-    }
-
-    function appendReqAddTile(container) {
-        var existing = container.querySelector('.req-add-tile');
-        if (existing) existing.remove();
-        var tile = document.createElement('div');
-        tile.className = 'req-add-tile';
-        tile.style.cssText = 'width:88px;height:88px;border-radius:10px;border:2px dashed #cbd5e1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#94a3b8;gap:4px;background:#f8fafc;flex-shrink:0;transition:all 0.15s;';
-        tile.innerHTML = '<i class="ti ti-plus" style="font-size:22px;"></i><span style="font-size:12px;font-family:Plus Jakarta Sans,sans-serif;font-weight:600;">Tambah</span>';
-        tile.onmouseenter = function() { tile.style.borderColor = 'var(--blue)'; tile.style.color = 'var(--blue)'; tile.style.background = '#eff6ff'; };
-        tile.onmouseleave = function() { tile.style.borderColor = '#cbd5e1'; tile.style.color = '#94a3b8'; tile.style.background = '#f8fafc'; };
-        tile.onclick = function() { document.getElementById('req-file-input').click(); };
-        container.appendChild(tile);
-    }
-
-    function syncReqInput() {
-        var dt = new DataTransfer();
-        reqImageStore.forEach(function(f) { dt.items.add(f); });
-        document.getElementById('req-file-input').files = dt.files;
-    }
 
     function validateReq() {
         var valid = true;
@@ -350,11 +245,5 @@
         return valid;
     }
 
-        document.querySelectorAll('.btn-condition').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.btn-condition').forEach(function(b) { b.classList.remove('selected'); });
-            this.classList.add('selected');
-            document.getElementById('kondisiMinInput').value = this.dataset.value;
-        });
-    });
+    initConditionButtons('kondisiMinInput');
 </script>

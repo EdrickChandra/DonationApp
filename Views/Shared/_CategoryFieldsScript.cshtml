@@ -1,0 +1,26 @@
+@* Shared category->detail-fields map used by the donasi and request create forms.
+   Emits window.categoryFields, consumed by renderCategoryFields() in form-helpers.js. *@
+<script>
+    window.categoryFields = {
+        "@((int)ItemCategory.Pakaian)": [
+            { key:"Ukuran", label:"Ukuran", type:"select", options:["XS","S","M","L","XL","XXL"] },
+            { key:"JenisKelamin", label:"Jenis Kelamin", type:"select", options:["Pria","Wanita","Unisex"] }
+        ],
+        "@((int)ItemCategory.Elektronik)": [
+            { key:"Jenis", label:"Jenis Perangkat", type:"select", options:["Laptop","Smartphone","Tablet","Kamera","TV","Printer","Lainnya"] },
+            { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Samsung, Apple, Asus" }
+        ],
+        "@((int)ItemCategory.PerabotRumah)": [
+            { key:"JenisPerabot", label:"Jenis Perabot", type:"select", options:["Meja","Kursi","Lemari","Rak","Sofa","Tempat Tidur","Lainnya"] },
+            { key:"Bahan", label:"Bahan", type:"select", options:["Kayu","Plastik","Besi/Logam","Rotan","Kaca","Lainnya"] }
+        ],
+        "@((int)ItemCategory.Mainan)": [
+            { key:"UsiaRekomendasi", label:"Usia Rekomendasi", type:"select", options:["0-1 tahun","1-3 tahun","3-5 tahun","5-12 tahun","12+ tahun"] },
+            { key:"Jenis", label:"Jenis Mainan", type:"select", options:["Edukatif","Action Figure","Boneka","Puzzle","Kendaraan","Lainnya"] }
+        ],
+        "@((int)ItemCategory.AlatMusik)": [
+            { key:"JenisInstrumen", label:"Jenis Instrumen", type:"select", options:["Gitar","Bass","Piano/Keyboard","Drum/Perkusi","Biola/String","Tiup Kayu","Tiup Logam","Vokal/Mikrofon","DJ/Elektronik","Lainnya"] },
+            { key:"Merk", label:"Merk", type:"text", placeholder:"e.g. Yamaha, Roland" }
+        ]
+    };
+</script>

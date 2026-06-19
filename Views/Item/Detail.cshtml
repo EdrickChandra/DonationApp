@@ -215,35 +215,10 @@
             border-color: #94a3b8;
         }
     </style>
+    <script src="~/js/image-gallery.js" asp-append-version="true"></script>
     <script>
         var images = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(images.Select(i => i.FilePath).ToList()));
-        var currentIndex = 0;
-
-        function setImage(index) {
-            currentIndex = index;
-            document.getElementById('mainImage').src = images[index];
-            document.getElementById('imageCounter').textContent = (index + 1) + ' / ' + images.length;
-            document.querySelectorAll('[id^="thumb-"]').forEach(function(el, i) {
-                el.classList.toggle('active', i === index);
-            });
-        }
-
-        function slideImage(dir) {
-            setImage((currentIndex + dir + images.length) % images.length);
-        }
-
-        function openZoom() {
-            document.getElementById('zoomImage').src = images[currentIndex];
-            document.getElementById('zoomModal').classList.add('open');
-        }
-
-        function closeZoom() {
-            document.getElementById('zoomModal').classList.remove('open');
-        }
-
-        document.getElementById('zoomModal').addEventListener('click', function(e) {
-            if (e.target === this) closeZoom();
-        });
+        initImageGallery(images);
 
         function copyDetailLink() {
             navigator.clipboard.writeText(window.location.href);

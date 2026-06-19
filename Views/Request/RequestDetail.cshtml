@@ -252,30 +252,12 @@
         }
         .stepper-btn:hover { background: #e2e8f0; border-color: #94a3b8; }
     </style>
+    <script src="~/js/image-gallery.js" asp-append-version="true"></script>
+    <script src="~/js/form-helpers.js" asp-append-version="true"></script>
     <script>
         var images = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(images.Select(i => i.FilePath).ToList()));
-        var currentIndex = 0;
-        var offerImageStore = [];
+        initImageGallery(images);
         var offerStepperVal = 1;
-
-        function setImage(index) {
-            currentIndex = index;
-            document.getElementById('mainImage').src = images[index];
-            var counter = document.getElementById('imageCounter');
-            if (counter) counter.textContent = (index + 1) + ' / ' + images.length;
-            document.querySelectorAll('[id^="thumb-"]').forEach(function(el, i) {
-                el.classList.toggle('active', i === index);
-            });
-        }
-        function slideImage(dir) { setImage((currentIndex + dir + images.length) % images.length); }
-        function openZoom() {
-            if (!images.length) return;
-            document.getElementById('zoomImage').src = images[currentIndex];
-            document.getElementById('zoomModal').classList.add('open');
-        }
-        function closeZoom() { document.getElementById('zoomModal').classList.remove('open'); }
-        var zoomModal = document.getElementById('zoomModal');
-        if (zoomModal) zoomModal.addEventListener('click', function(e) { if (e.target === this) closeZoom(); });
 
         function toggleOfferForm() {
             var form = document.getElementById('offerForm');
@@ -306,39 +288,11 @@
         function copyDetailLink() { navigator.clipboard.writeText(window.location.href); }
         function reportDetail() { openReportModal(null, @Model.Id); }
 
-        document.getElementById('offer-file-input')?.addEventListener('change', function() {
-            Array.from(this.files).forEach(function(file) { if (offerImageStore.length < 3) offerImageStore.push(file); });
-            this.value = '';
-            syncOfferInput();
-            renderOfferPreviews();
+        initImageUploader({
+            inputId: 'offer-file-input',
+            previewId: 'offer-preview',
+            max: 3,
+            variant: 'compact'
         });
-        function renderOfferPreviews() {
-            var container = document.getElementById('offer-preview');
-            if (!container) return;
-            container.innerHTML = '';
-            offerImageStore.forEach(function(file, index) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var wrap = document.createElement('div');
-                    wrap.style.cssText = 'position:relative;width:72px;height:72px;';
-                    var img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.cssText = 'width:72px;height:72px;border-radius:8px;object-fit:cover;';
-                    var del = document.createElement('button');
-                    del.type = 'button'; del.textContent = '✕';
-                    del.style.cssText = 'position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:#fff;border:none;cursor:pointer;font-size:12px;';
-                    del.onclick = (function(i) { return function() { offerImageStore.splice(i, 1); syncOfferInput(); renderOfferPreviews(); }; })(index);
-                    wrap.appendChild(img); wrap.appendChild(del); container.appendChild(wrap);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-        function syncOfferInput() {
-            var input = document.getElementById('offer-file-input');
-            if (!input) return;
-            var dt = new DataTransfer();
-            offerImageStore.forEach(function(f) { dt.items.add(f); });
-            input.files = dt.files;
-        }
     </script>
 }
