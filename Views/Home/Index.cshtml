@@ -104,13 +104,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        function toggleCardMenu(id, e) {
-            e.preventDefault(); e.stopPropagation();
-            document.querySelectorAll('.card-menu-dropdown').forEach(el => { if (el.id !== id) el.classList.remove('open'); });
-            document.getElementById(id).classList.toggle('open');
-        }
-        document.addEventListener('click', () => document.querySelectorAll('.card-menu-dropdown').forEach(el => el.classList.remove('open')));
-        function copyLink(path) { navigator.clipboard.writeText(window.location.origin + path); }
-    </script>
+    <script src="~/js/card-menu.js" asp-append-version="true"></script>
 }

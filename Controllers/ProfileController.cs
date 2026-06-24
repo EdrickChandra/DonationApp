@@ -82,7 +82,7 @@ public class ProfileController : AppBaseController
         ViewBag.ActiveDonations = activeDonations;
         ViewBag.ActiveRequests = activeRequests;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Overview.cshtml");
 
         ViewBag.InitialSection = "overview";
@@ -94,7 +94,7 @@ public class ProfileController : AppBaseController
         var user = await _userManager.GetUserAsync(User);
         if (user == null) return RedirectToAction("Login", "Account");
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Edit.cshtml", user);
 
         ViewBag.InitialSection = "profil";
@@ -189,7 +189,7 @@ public class ProfileController : AppBaseController
         ViewBag.Unread = unreadTask.Result;
         ViewBag.Read = readTask.Result;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Notifikasi/Notifikasi.cshtml");
 
         ViewBag.InitialSection = "notifikasi";

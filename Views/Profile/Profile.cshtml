@@ -463,6 +463,7 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/form-helpers.js" asp-append-version="true"></script>
     <script>
         function switchOvTab(tab) {
             document.getElementById('ovDonasi').style.display = tab === 'donasi' ? 'block' : 'none';
@@ -471,32 +472,10 @@
             document.getElementById('ovTabRequest').classList.toggle('active', tab === 'request');
         }
 
-        document.getElementById('imageInput')?.addEventListener('change', function () {
-            var container = document.getElementById('previewContainer');
-            container.innerHTML = '';
-            Array.from(this.files).slice(0, 5).forEach(function(file) {
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    var div = document.createElement('div');
-                    div.style.cssText = 'width:60px;height:60px;border-radius:6px;overflow:hidden;border:0.5px solid #cbd5e1;';
-                    var img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-                    div.appendChild(img);
-                    container.appendChild(div);
-                };
-                reader.readAsDataURL(file);
-            });
-        });
+        initSimpleImagePreview('imageInput', 'previewContainer');
 
         function validateImages() {
-            var input = document.getElementById('imageInput');
-            var error = document.getElementById('imageError');
-            if (input && (!input.files || input.files.length === 0)) {
-                error.textContent = 'Minimal 1 foto harus diunggah.';
-                return false;
-            }
-            return true;
+            return validateRequiredImages('imageInput', 'imageError');
         }
     </script>
 

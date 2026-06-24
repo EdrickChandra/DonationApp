@@ -1,8 +1,5 @@
-// Shared helpers for the donasi/request create forms and offer form.
 
-// Render category-specific detail fields into `containerId`, giving each input
-// the id `idPrefix + field.key`. Reads the field map from window.categoryFields
-// (emitted by the _CategoryFieldsScript partial).
+
 window.renderCategoryFields = function (containerId, idPrefix, val, existingDetails) {
     var container = document.getElementById(containerId);
     if (!container) return;
@@ -48,7 +45,6 @@ window.renderCategoryFields = function (containerId, idPrefix, val, existingDeta
     });
 };
 
-// Wire up a .btn-condition toggle group to write the selected value into #inputId.
 window.initConditionButtons = function (inputId) {
     document.querySelectorAll('.btn-condition').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -62,11 +58,41 @@ window.initConditionButtons = function (inputId) {
     });
 };
 
-// Multi-image upload with in-memory store, live previews, delete, and
-// DataTransfer sync back into the file input so the form submits the kept files.
-// cfg: { inputId, previewId, max, variant: 'grid'|'compact', addTileClass, renderOnInit }
-//   variant 'grid'    -> 88px tiles + a dashed "Tambah" add-tile (create forms)
-//   variant 'compact' -> 72px tiles, no add-tile (offer form)
+window.initSimpleImagePreview = function (inputId, containerId, max) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    max = max || 5;
+    input.addEventListener('change', function () {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '';
+        Array.from(this.files).slice(0, max).forEach(function (file) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var div = document.createElement('div');
+                div.className = 'simg-tile';
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'simg-img';
+                div.appendChild(img);
+                container.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+};
+
+window.validateRequiredImages = function (inputId, errorId) {
+    var input = document.getElementById(inputId);
+    var error = document.getElementById(errorId);
+    if (input && (!input.files || input.files.length === 0)) {
+        if (error) error.textContent = 'Minimal 1 foto harus diunggah.';
+        return false;
+    }
+    if (error) error.textContent = '';
+    return true;
+};
+
 window.initImageUploader = function (cfg) {
     var input = document.getElementById(cfg.inputId);
     if (!input) return null;
@@ -84,11 +110,8 @@ window.initImageUploader = function (cfg) {
         var existing = container.querySelector('.' + cfg.addTileClass);
         if (existing) existing.remove();
         var tile = document.createElement('div');
-        tile.className = cfg.addTileClass;
-        tile.style.cssText = 'width:88px;height:88px;border-radius:10px;border:2px dashed #cbd5e1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#94a3b8;gap:4px;background:#f8fafc;flex-shrink:0;transition:all 0.15s;';
-        tile.innerHTML = '<i class="ti ti-plus" style="font-size:22px;"></i><span style="font-size:12px;font-family:Plus Jakarta Sans,sans-serif;font-weight:600;">Tambah</span>';
-        tile.onmouseenter = function () { tile.style.borderColor = 'var(--blue)'; tile.style.color = 'var(--blue)'; tile.style.background = '#eff6ff'; };
-        tile.onmouseleave = function () { tile.style.borderColor = '#cbd5e1'; tile.style.color = '#94a3b8'; tile.style.background = '#f8fafc'; };
+        tile.className = cfg.addTileClass + ' up-add';
+        tile.innerHTML = '<i class="ti ti-plus"></i><span>Tambah</span>';
         tile.onclick = function () { input.click(); };
         container.appendChild(tile);
     }
@@ -106,14 +129,14 @@ window.initImageUploader = function (cfg) {
                 var del = document.createElement('button');
                 del.type = 'button';
                 if (variant === 'compact') {
-                    wrap.style.cssText = 'position:relative;width:72px;height:72px;';
-                    img.style.cssText = 'width:72px;height:72px;border-radius:8px;object-fit:cover;';
-                    del.style.cssText = 'position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:#fff;border:none;cursor:pointer;font-size:12px;';
+                    wrap.className = 'up-tile--compact';
+                    img.className = 'up-img--compact';
+                    del.className = 'up-del--compact';
                     del.textContent = '✕';
                 } else {
-                    wrap.style.cssText = 'position:relative;width:88px;height:88px;border-radius:10px;overflow:hidden;flex-shrink:0;';
-                    img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;';
-                    del.style.cssText = 'position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:rgba(0,0,0,0.55);color:#fff;border:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;line-height:1;';
+                    wrap.className = 'up-tile';
+                    img.className = 'up-img';
+                    del.className = 'up-del';
                     del.innerHTML = '✕';
                 }
                 del.onclick = (function (idx) {

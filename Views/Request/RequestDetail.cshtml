@@ -78,10 +78,7 @@
                         <div class="drating-row">
                             @if (totalReviews > 0)
                             {
-                                @for (int s = 1; s <= 5; s++)
-                                {
-                                    <span style="color:@(s <= Math.Round(avgRating) ? "#EF9F27" : "#cbd5e1");font-size:13px;">★</span>
-                                }
+                                @await Html.PartialAsync("_RatingStars", ((double)avgRating, 13))
                                 <span class="text-xs-muted">@avgRating.ToString("0.0") · @totalReviews ulasan</span>
                             }
                             else
@@ -175,7 +172,6 @@
                 </div>
             </div>
 
-            @* Offer form — no provinsi/kota fields, auto-filled from user *@
             @if (User.Identity!.IsAuthenticated && !isOwner && !hasOffered && Model.Status == ItemRequestStatus.Open)
             {
                 <div id="offerForm" style="display:none;">
@@ -242,16 +238,6 @@
 </div>
 
 @section Scripts {
-    <style>
-        .stepper-btn {
-            width: 34px; height: 34px; border-radius: 8px;
-            border: 1.5px solid #cbd5e1; background: #f1f5f9;
-            font-size: 18px; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: background 0.15s, border-color 0.15s; color: #0f172a;
-        }
-        .stepper-btn:hover { background: #e2e8f0; border-color: #94a3b8; }
-    </style>
     <script src="~/js/image-gallery.js" asp-append-version="true"></script>
     <script src="~/js/form-helpers.js" asp-append-version="true"></script>
     <script>

@@ -19,7 +19,6 @@ public class ChatMessage
     [ForeignKey("SenderId")]
     public ApplicationUser? Sender { get; set; }
 
-    // Not [Required] — can be empty when message is image-only
     public string Content { get; set; } = string.Empty;
 
     public string? ImagePath { get; set; }

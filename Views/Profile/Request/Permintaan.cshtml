@@ -217,10 +217,7 @@
                             <div class="psec">
                                 <div class="psec-label">Feedback Anda</div>
                                 <div style="display:flex;gap:2px;margin-bottom:8px;">
-                                    @for (int star = 1; star <= 5; star++)
-                                    {
-                                        <span style="font-size:20px;color:@(star <= myReview.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
-                                    }
+                                    @await Html.PartialAsync("_RatingStars", ((double)myReview.Rating, 20))
                                 </div>
                                 @if (!string.IsNullOrEmpty(myReview.Komentar))
                                 {

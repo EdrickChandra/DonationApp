@@ -1,7 +1,5 @@
-// Shared image gallery + zoom for item/request detail pages.
-// Call initImageGallery(imagesArray) after the DOM elements exist.
-// Markup contract: #mainImage, #imageCounter (optional), [id^="thumb-"],
-//                  #zoomModal, #zoomImage.
+
+
 (function () {
     var images = [];
     var currentIndex = 0;

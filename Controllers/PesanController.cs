@@ -20,10 +20,6 @@ public class PesanController : AppBaseController
         _environment = environment;
     }
 
-    // -------------------------------------------------------------------------
-    // Page view (was PesanController)
-    // -------------------------------------------------------------------------
-
     public async Task<IActionResult> Index(int? convId)
     {
         var userId = _userManager.GetUserId(User)!;
@@ -61,16 +57,12 @@ public class PesanController : AppBaseController
         ViewBag.CurrentUserId = userId;
         ViewBag.InitialConvId = convId;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Pesan/Pesan.cshtml");
 
         ViewBag.InitialSection = "pesan";
         return View("~/Views/Profile/Shell.cshtml");
     }
-
-    // -------------------------------------------------------------------------
-    // AJAX / API actions (was ChatController)
-    // -------------------------------------------------------------------------
 
     [HttpGet]
     public async Task<IActionResult> GetMessages(int conversationId)

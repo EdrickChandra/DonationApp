@@ -26,7 +26,7 @@
                 <input type="hidden" name="tab" id="searchTabHidden" value="donasi" />
             </form>
         }
-        
+
         <div class="nav-links-desktop" style="margin-left:12px;">
             <a class="nav-page-link" asp-controller="Home" asp-action="Index">Donasi</a>
             <a class="nav-page-link" asp-controller="Request" asp-action="Index">Request</a>
@@ -35,7 +35,7 @@
         @if (User.Identity != null && User.Identity.IsAuthenticated)
         {
             <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
-                
+
                 <a href="/Profile/Notifikasi" class="nav-bell" title="Notifikasi">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />

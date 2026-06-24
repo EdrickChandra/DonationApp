@@ -1,0 +1,6 @@
+
+@model (double Value, int Size)
+@for (int s = 1; s <= 5; s++)
+{
+    <span style="font-size:@(Model.Size)px;color:@(s <= System.Math.Round(Model.Value) ? "#EF9F27" : "#cbd5e1");">★</span>
+}

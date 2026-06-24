@@ -317,10 +317,7 @@
                                                         <div class="pfeedback-box">
                                                             <div class="pfeedback-label">Feedback Anda</div>
                                                             <div class="pfeedback-stars">
-                                                                @for (int s = 1; s <= 5; s++)
-                                                                {
-                                                                    <span style="font-size:16px;color:@(s <= myReview.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
-                                                                }
+                                                                @await Html.PartialAsync("_RatingStars", ((double)myReview.Rating, 16))
                                                             </div>
                                                             @if (!string.IsNullOrEmpty(myReview.Komentar))
                                                             {

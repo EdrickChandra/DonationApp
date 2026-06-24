@@ -4,7 +4,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-
 <div class="auth-wrap">
     <div class="auth-card" style="max-width:520px;">
         <div class="auth-title">Buat Akun</div>
@@ -47,7 +46,7 @@
             <div class="input-row">
                 <div class="form-group">
                     <label class="form-label" asp-for="Provinsi">Provinsi</label>
-                    <select class="form-input" asp-for="Provinsi" id="reg-provinsi" onchange="updateRegKota(this.value)">
+                    <select class="form-input" asp-for="Provinsi" id="reg-provinsi">
                         <option value="">Pilih Provinsi</option>
                     </select>
                     <span class="validation-message" asp-validation-for="Provinsi"></span>
@@ -89,9 +88,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
     <script>
-        function updateRegKota(provinsi) {
-            populateKota(provinsi, document.getElementById('reg-kota'), '');
-        }
-        populateProvinsi(document.getElementById('reg-provinsi'), '');
+        initLocation('reg-provinsi', 'reg-kota', '', '');
     </script>
 }

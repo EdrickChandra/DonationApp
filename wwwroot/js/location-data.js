@@ -60,3 +60,14 @@ function populateProvinsi(selectEl, selectedProv) {
         selectEl.appendChild(opt);
     });
 }
+
+function initLocation(provinsiId, kotaId, selectedProv, selectedKota) {
+    var prov = document.getElementById(provinsiId);
+    var kota = document.getElementById(kotaId);
+    if (!prov || !kota) return;
+    populateProvinsi(prov, selectedProv);
+    if (selectedProv) populateKota(selectedProv, kota, selectedKota);
+    prov.addEventListener('change', function () {
+        populateKota(this.value, kota, selectedKota);
+    });
+}

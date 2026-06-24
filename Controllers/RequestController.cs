@@ -49,7 +49,7 @@ public class RequestController : AppBaseController
         ViewBag.MyRequests = myRequests;
         ViewBag.Selected = selected;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
         {
             ViewBag.Matches = TempData["Matches"] as string;
             ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
@@ -88,7 +88,7 @@ public class RequestController : AppBaseController
         ViewBag.Selected = selected;
         ViewBag.CurrentUserId = userId;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Request/Permintaan.cshtml");
 
         ViewBag.InitialSection = "request";
@@ -109,7 +109,7 @@ public class RequestController : AppBaseController
         ViewBag.LimitReached = limit.IsLimitReached();
         ViewBag.PeriodEnd = limit.GetPeriodEnd();
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Request/BuatRequest.cshtml");
 
         ViewBag.InitialSection = "request";
@@ -132,7 +132,7 @@ public class RequestController : AppBaseController
         ViewBag.UserKota = user?.Kota ?? "";
         ViewBag.EditRequest = itemRequest;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Request/BuatRequest.cshtml");
 
         ViewBag.InitialSection = "request";
@@ -205,8 +205,7 @@ public class RequestController : AppBaseController
             return RedirectToAction("CreateView");
         }
 
-        var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
-        if (Images != null && Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+        if (Images != null && Images.Any(img => !ImageStorage.IsValidImage(img)))
         {
             TempData["RequestError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
             return RedirectToAction("CreateView");
@@ -276,8 +275,7 @@ public class RequestController : AppBaseController
 
         if (Images != null && Images.Count > 0)
         {
-            var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
-            if (Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+            if (Images.Any(img => !ImageStorage.IsValidImage(img)))
             {
                 TempData["RequestError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
                 return RedirectToAction("EditView", new { id });
@@ -357,8 +355,7 @@ public class RequestController : AppBaseController
         if (alreadyOffered || string.IsNullOrWhiteSpace(deskripsi))
             return RedirectToAction("Detail", new { id = itemRequestId });
 
-        var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
-        if (Images != null && Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+        if (Images != null && Images.Any(img => !ImageStorage.IsValidImage(img)))
         {
             TempData["RequestError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
             return RedirectToAction("Detail", new { id = itemRequestId });
@@ -368,7 +365,7 @@ public class RequestController : AppBaseController
         var lokasi = user?.Kota ?? string.Empty;
         var provinsi = user?.Provinsi ?? string.Empty;
 
-        var clampedJumlah = Math.Max(1, Math.Min(jumlah, itemRequest.Jumlah));
+        var clampedJumlah = QuantityHelper.Clamp(jumlah, itemRequest.Jumlah);
 
         var offer = new RequestOffer
         {
@@ -392,7 +389,7 @@ public class RequestController : AppBaseController
 
         await _db.SaveChangesAsync();
 
-        var offererName = user != null ? user.NamaDepan + " " + user.NamaBelakang : "Seseorang";
+        var offererName = user.GetFullName();
 
         _db.Notifications.Add(new Notification
         {
@@ -509,68 +506,18 @@ public class RequestController : AppBaseController
         return Json(new { success = true, count = matchData.Count, matches = matchData, sourceId = requestId, context = "request" });
     }
 
-    // -------------------------------------------------------------------------
+    private Task SaveRequestImagesAsync(List<IFormFile> images, string userId, int requestId, int maxCount, int currentCount = 0)
+        => ImageStorage.SaveImagesAsync(_db, _environment.WebRootPath, images, maxCount, currentCount,
+            img => { img.OwnerType = ImageOwnerType.Request; img.ItemRequestId = requestId; },
+            "uploads", "requests", userId, requestId.ToString());
 
-    private async Task SaveRequestImagesAsync(List<IFormFile> images, string userId, int requestId, int maxCount, int currentCount = 0)
-    {
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "requests", userId, requestId.ToString());
-        Directory.CreateDirectory(uploadFolder);
-
-        int count = currentCount;
-        foreach (var image in images)
-        {
-            if (count >= maxCount) break;
-            var extension = Path.GetExtension(image.FileName).ToLower();
-            if (!allowedExtensions.Contains(extension) || image.Length > 5 * 1024 * 1024) continue;
-            var fileName = Guid.NewGuid().ToString() + extension;
-            var filePath = Path.Combine(uploadFolder, fileName);
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await image.CopyToAsync(stream);
-            _db.ItemImages.Add(new ItemImage
-            {
-                OwnerType = ImageOwnerType.Request,
-                ItemRequestId = requestId,
-                FileSize = image.Length,
-                FilePath = $"/uploads/requests/{userId}/{requestId}/{fileName}"
-            });
-            count++;
-        }
-    }
-
-    private async Task SaveOfferImagesAsync(List<IFormFile> images, int offerId, int maxCount)
-    {
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-        var uploadFolder = Path.Combine(_environment.WebRootPath, "uploads", "offers", offerId.ToString());
-        Directory.CreateDirectory(uploadFolder);
-
-        int count = 0;
-        foreach (var image in images)
-        {
-            if (count >= maxCount) break;
-            var extension = Path.GetExtension(image.FileName).ToLower();
-            if (!allowedExtensions.Contains(extension) || image.Length > 5 * 1024 * 1024) continue;
-            var fileName = Guid.NewGuid().ToString() + extension;
-            var filePath = Path.Combine(uploadFolder, fileName);
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await image.CopyToAsync(stream);
-            _db.ItemImages.Add(new ItemImage
-            {
-                OwnerType = ImageOwnerType.RequestOffer,
-                RequestOfferId = offerId,
-                FileSize = image.Length,
-                FilePath = $"/uploads/offers/{offerId}/{fileName}"
-            });
-            count++;
-        }
-    }
+    private Task SaveOfferImagesAsync(List<IFormFile> images, int offerId, int maxCount)
+        => ImageStorage.SaveImagesAsync(_db, _environment.WebRootPath, images, maxCount, 0,
+            img => { img.OwnerType = ImageOwnerType.RequestOffer; img.RequestOfferId = offerId; },
+            "uploads", "offers", offerId.ToString());
 
     private void DeleteFileIfExists(string relativePath)
-    {
-        var fullPath = Path.Combine(_environment.WebRootPath, relativePath.TrimStart('/'));
-        if (System.IO.File.Exists(fullPath))
-            System.IO.File.Delete(fullPath);
-    }
+        => ImageStorage.DeleteFileIfExists(_environment.WebRootPath, relativePath);
 
     private async Task<RequestLimit> GetOrCreateRequestLimit(string userId)
     {

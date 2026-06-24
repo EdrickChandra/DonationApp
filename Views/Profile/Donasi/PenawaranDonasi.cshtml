@@ -244,10 +244,7 @@
                                         <div class="pfeedback-box" style="padding:12px;margin-top:10px;">
                                             <div class="pfeedback-label">Feedback dari Peminta</div>
                                             <div class="pfeedback-stars">
-                                                @for (int s = 1; s <= 5; s++)
-                                                {
-                                                    <span style="font-size:16px;color:@(s <= requesterFeedback.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
-                                                }
+                                                @await Html.PartialAsync("_RatingStars", ((double)requesterFeedback.Rating, 16))
                                             </div>
                                             @if (!string.IsNullOrEmpty(requesterFeedback.Komentar))
                                             {

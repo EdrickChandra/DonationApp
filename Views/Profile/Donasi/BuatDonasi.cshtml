@@ -48,7 +48,7 @@
         }
         @if (TempData["DonasiSuccess"] != null)
         {
-            <div style="background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:16px;font-size:15px;">
+            <div class="alert-success">
                 @TempData["DonasiSuccess"]
             </div>
         }
@@ -97,7 +97,7 @@
                 <div class="input-row">
                     <div class="form-group">
                         <label class="form-label">Provinsi</label>
-                        <select class="form-input" name="Provinsi" id="donasi-provinsi" onchange="updateDonasiKota(this.value)" required>
+                        <select class="form-input" name="Provinsi" id="donasi-provinsi" required>
                             <option value="">Pilih Provinsi</option>
                         </select>
                         <span class="form-error" data-for="Provinsi">Provinsi wajib dipilih.</span>
@@ -135,7 +135,7 @@
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="imageId" value="@img.Id" />
                                         <input type="hidden" name="itemId" value="@editItem.Id" />
-                                        <button type="submit" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;">✕</button>
+                                        <button type="submit" class="img-del">✕</button>
                                     </form>
                                 </div>
                             }
@@ -172,16 +172,7 @@
     var defaultKota = '@defaultKota';
     var existingDetails = @Html.Raw(existingDetails != null ? JsonSerializer.Serialize(existingDetails) : "{}");
 
-    function updateDonasiKota(provinsi) {
-        populateKota(provinsi, document.getElementById('donasi-kota'), defaultKota);
-    }
-
-    // Auto-fill provinsi and kota on load
-    (function() {
-        var provSel = document.getElementById('donasi-provinsi');
-        if (provSel) populateProvinsi(provSel, defaultProvinsi);
-        if (defaultProvinsi) updateDonasiKota(defaultProvinsi);
-    })();
+    initLocation('donasi-provinsi', 'donasi-kota', defaultProvinsi, defaultKota);
 
     function showDonasFields(val) {
         renderCategoryFields('donasi-detail-fields', 'donasi-field-', val, existingDetails);

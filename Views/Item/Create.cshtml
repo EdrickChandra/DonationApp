@@ -72,36 +72,12 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/form-helpers.js" asp-append-version="true"></script>
     <script>
-        document.getElementById('imageInput').addEventListener('change', function () {
-            const container = document.getElementById('previewContainer');
-            container.innerHTML = '';
-            const files = Array.from(this.files).slice(0, 5);
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const div = document.createElement('div');
-                    div.style.cssText = 'width:60px;height:60px;border-radius:6px;overflow:hidden;border:0.5px solid #cbd5e1;';
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
-                    div.appendChild(img);
-                    container.appendChild(div);
-                };
-                reader.readAsDataURL(file);
-            });
-        });
+        initSimpleImagePreview('imageInput', 'previewContainer');
 
         function validateImages() {
-
-            const input = document.getElementById('imageInput');
-            const error = document.getElementById('imageError');
-            if (!input.files || input.files.length === 0) {
-                error.textContent = 'Minimal 1 foto harus diunggah.';
-                return false;
-            }
-            error.textContent = '';
-            return true;
+            return validateRequiredImages('imageInput', 'imageError');
         }
     </script>
 }

@@ -13,7 +13,6 @@ public class AdminAction
     [ForeignKey("AdminId")]
     public ApplicationUser? Admin { get; set; }
 
-    // Nullable — admin may act without a specific report
     public int? ReportId { get; set; }
 
     [ForeignKey("ReportId")]

@@ -196,26 +196,5 @@
 </div>
 
 @section Scripts {
-    <script>
-        function toggleCardMenu(id, e) {
-            e.preventDefault();
-            e.stopPropagation();
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) {
-                if (el.id !== id) el.classList.remove('open');
-            });
-            document.getElementById(id).classList.toggle('open');
-        }
-
-        document.addEventListener('click', function() {
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) {
-                el.classList.remove('open');
-            });
-        });
-
-        function copyLink(path) {
-            navigator.clipboard.writeText(window.location.origin + path);
-            document.querySelectorAll('.card-menu-dropdown').forEach(function(el) { el.classList.remove('open'); });
-        }
-
-    </script>
+    <script src="~/js/card-menu.js" asp-append-version="true"></script>
 }

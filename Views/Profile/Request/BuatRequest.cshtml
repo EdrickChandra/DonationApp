@@ -68,7 +68,7 @@
         }
         @if (TempData["RequestSuccess"] != null)
         {
-            <div style="background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:16px;font-size:15px;">
+            <div class="alert-success">
                 @TempData["RequestSuccess"]
             </div>
         }
@@ -119,7 +119,7 @@
                 <div class="input-row">
                     <div class="form-group">
                         <label class="form-label">Provinsi</label>
-                        <select class="form-input" name="Provinsi" id="req-provinsi" onchange="updateReqKota(this.value)" required>
+                        <select class="form-input" name="Provinsi" id="req-provinsi" required>
                             <option value="">Pilih Provinsi</option>
                         </select>
                     </div>
@@ -151,7 +151,7 @@
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="imageId" value="@img.Id" />
                                         <input type="hidden" name="requestId" value="@editRequest.Id" />
-                                        <button type="submit" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#ef4444;color:#fff;border:none;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;">✕</button>
+                                        <button type="submit" class="img-del">✕</button>
                                     </form>
                                 </div>
                             }
@@ -193,13 +193,7 @@
     var katEl = document.getElementById('req-kategori');
     if (katEl && katEl.value) showReqFields(katEl.value);
 
-    function updateReqKota(provinsi) {
-        populateKota(provinsi, document.getElementById('req-kota'), existingLokasi);
-    }
-
-    var provSelect = document.getElementById('req-provinsi');
-    if (provSelect) populateProvinsi(provSelect, existingProvinsi);
-    if (existingProvinsi) updateReqKota(existingProvinsi);
+    initLocation('req-provinsi', 'req-kota', existingProvinsi, existingLokasi);
 
     initImageUploader({
         inputId: 'req-file-input',

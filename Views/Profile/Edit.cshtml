@@ -9,7 +9,7 @@
 
         @if (TempData["EditSuccess"] != null)
         {
-            <div style="background:var(--color-background-success);border:0.5px solid var(--color-border-success);color:var(--color-text-success);padding:10px 14px;border-radius:var(--border-radius-md);margin-bottom:16px;font-size:15px;">
+            <div class="alert-success">
                 @TempData["EditSuccess"]
             </div>
         }
@@ -48,7 +48,7 @@
                 <div class="input-row">
                     <div class="form-group">
                         <label class="form-label">Provinsi</label>
-                        <select class="form-input" name="Provinsi" id="edit-provinsi" onchange="updateEditKota(this.value)">
+                        <select class="form-input" name="Provinsi" id="edit-provinsi">
                             <option value="">Pilih Provinsi</option>
                         </select>
                     </div>
@@ -73,18 +73,5 @@
 </div>
 
 <script>
-    (function() {
-        var existingProvinsi = '@Model.Provinsi';
-        var existingKota = '@Model.Kota';
-
-        function updateEditKota(provinsi) {
-            populateKota(provinsi, document.getElementById('edit-kota'), existingKota);
-        }
-
-        window.updateEditKota = updateEditKota;
-
-        var provSel = document.getElementById('edit-provinsi');
-        if (provSel) populateProvinsi(provSel, existingProvinsi);
-        if (existingProvinsi) updateEditKota(existingProvinsi);
-    })();
+    initLocation('edit-provinsi', 'edit-kota', '@Model.Provinsi', '@Model.Kota');
 </script>

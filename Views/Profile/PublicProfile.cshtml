@@ -148,10 +148,7 @@
                             <span class="review-date">@f.CreatedAt.ToString("dd MMM yyyy")</span>
                         </div>
                         <div class="review-stars">
-                            @for (int s = 1; s <= 5; s++)
-                            {
-                                <span style="font-size:16px;color:@(s <= f.Rating ? "#EF9F27" : "#cbd5e1");">★</span>
-                            }
+                            @await Html.PartialAsync("_RatingStars", ((double)f.Rating, 16))
                         </div>
                         @if (!string.IsNullOrEmpty(f.Komentar))
                         {

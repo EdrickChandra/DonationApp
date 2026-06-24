@@ -43,7 +43,7 @@ public class RedeemController : AppBaseController
         ViewBag.RedeemHistory = pointHistory.Where(p => p.Type == PointTransactionType.SpendPoint).ToList();
         ViewBag.PointHistory = pointHistory;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Redeem/Redeem.cshtml");
 
         ViewBag.InitialSection = "redeem";

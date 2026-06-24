@@ -48,7 +48,7 @@ public class DonasiController : AppBaseController
         ViewBag.Donations = donations;
         ViewBag.Selected = selected;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
         {
             ViewBag.Matches = TempData["Matches"] as string;
             ViewBag.MatchCount = int.TryParse(TempData["MatchCount"] as string, out var mc) ? mc : 0;
@@ -70,7 +70,7 @@ public class DonasiController : AppBaseController
         ViewBag.UserProvinsi = user?.Provinsi ?? "";
         ViewBag.UserKota = user?.Kota ?? "";
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Donasi/BuatDonasi.cshtml");
 
         ViewBag.InitialSection = "donasi";
@@ -88,7 +88,7 @@ public class DonasiController : AppBaseController
         ViewBag.UserKota = user?.Kota ?? "";
         ViewBag.EditItem = item;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Donasi/BuatDonasi.cshtml");
 
         ViewBag.InitialSection = "donasi";
@@ -109,8 +109,7 @@ public class DonasiController : AppBaseController
             return RedirectToAction("Create");
         }
 
-        var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
-        if (Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+        if (Images.Any(img => !ImageStorage.IsValidImage(img)))
         {
             TempData["DonasiError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
             return RedirectToAction("Create");
@@ -172,8 +171,7 @@ public class DonasiController : AppBaseController
 
         if (Images != null && Images.Count > 0)
         {
-            var allowedImageExt = new[] { ".jpg", ".jpeg", ".png" };
-            if (Images.Any(img => !allowedImageExt.Contains(Path.GetExtension(img.FileName).ToLower()) || img.Length > 5 * 1024 * 1024))
+            if (Images.Any(img => !ImageStorage.IsValidImage(img)))
             {
                 TempData["DonasiError"] = "Format gambar tidak valid. Hanya file JPG/PNG maksimal 5 MB yang diperbolehkan.";
                 return RedirectToAction("Edit", new { id });
@@ -271,7 +269,7 @@ public class DonasiController : AppBaseController
         var existing = await _db.ClaimRequests.AnyAsync(r => r.ItemId == itemId && r.UserId == userId);
         if (!existing)
         {
-            var clampedJumlah = Math.Max(1, Math.Min(jumlah, item.Jumlah));
+            var clampedJumlah = QuantityHelper.Clamp(jumlah, item.Jumlah);
 
             _db.ClaimRequests.Add(new ClaimRequest
             {
@@ -282,7 +280,7 @@ public class DonasiController : AppBaseController
             });
 
             var requester = await _userManager.FindByIdAsync(userId);
-            var requesterName = requester != null ? requester.NamaDepan + " " + requester.NamaBelakang : "Seseorang";
+            var requesterName = requester.GetFullName();
 
             _db.Notifications.Add(new Notification
             {
@@ -329,7 +327,7 @@ public class DonasiController : AppBaseController
         if (alreadyOffered)
             return Json(new { success = false, error = "Anda sudah menawarkan untuk request ini." });
 
-        var clampedJumlah = Math.Max(1, Math.Min(fromItem.Jumlah, itemRequest.Jumlah));
+        var clampedJumlah = QuantityHelper.Clamp(fromItem.Jumlah, itemRequest.Jumlah);
 
         var offer = new RequestOffer
         {
@@ -360,7 +358,7 @@ public class DonasiController : AppBaseController
         }
 
         var offerer = await _userManager.FindByIdAsync(userId);
-        var offererName = offerer != null ? offerer.NamaDepan + " " + offerer.NamaBelakang : "Seseorang";
+        var offererName = offerer.GetFullName();
 
         _db.Notifications.Add(new Notification
         {
@@ -391,7 +389,7 @@ public class DonasiController : AppBaseController
         if (existing)
             return Json(new { success = false, error = "Anda sudah meminta item ini." });
 
-        var clampedJumlah = Math.Max(1, Math.Min(jumlah, item.Jumlah));
+        var clampedJumlah = QuantityHelper.Clamp(jumlah, item.Jumlah);
 
         _db.ClaimRequests.Add(new ClaimRequest
         {
@@ -402,7 +400,7 @@ public class DonasiController : AppBaseController
         });
 
         var requester = await _userManager.FindByIdAsync(userId);
-        var requesterName = requester != null ? requester.NamaDepan + " " + requester.NamaBelakang : "Seseorang";
+        var requesterName = requester.GetFullName();
 
         _db.Notifications.Add(new Notification
         {
@@ -682,45 +680,13 @@ public class DonasiController : AppBaseController
         return Json(new { success = true, count = matchData.Count, matches = matchData, sourceId = itemId, context = "donasi" });
     }
 
-    // -------------------------------------------------------------------------
-
-    private async Task SaveImagesAsync(List<IFormFile> images, string userId, int itemId, int maxCount, int currentCount = 0)
-    {
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-        var uploadFolder = Path.Combine(_env.WebRootPath, "uploads", userId, itemId.ToString());
-        Directory.CreateDirectory(uploadFolder);
-
-        int count = currentCount;
-        foreach (var image in images)
-        {
-            if (count >= maxCount) break;
-            var ext = Path.GetExtension(image.FileName).ToLower();
-            if (!allowedExtensions.Contains(ext) || image.Length > 5 * 1024 * 1024) continue;
-
-            var fileName = Guid.NewGuid() + ext;
-            var filePath = Path.Combine(uploadFolder, fileName);
-
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await image.CopyToAsync(stream);
-
-            _db.ItemImages.Add(new ItemImage
-            {
-                OwnerType = ImageOwnerType.Donation,
-                ItemId = itemId,
-                FileSize = image.Length,
-                FilePath = $"/uploads/{userId}/{itemId}/{fileName}"
-            });
-
-            count++;
-        }
-    }
+    private Task SaveImagesAsync(List<IFormFile> images, string userId, int itemId, int maxCount, int currentCount = 0)
+        => ImageStorage.SaveImagesAsync(_db, _env.WebRootPath, images, maxCount, currentCount,
+            img => { img.OwnerType = ImageOwnerType.Donation; img.ItemId = itemId; },
+            "uploads", userId, itemId.ToString());
 
     private void DeleteFileIfExists(string relativePath)
-    {
-        var fullPath = Path.Combine(_env.WebRootPath, relativePath.TrimStart('/'));
-        if (System.IO.File.Exists(fullPath))
-            System.IO.File.Delete(fullPath);
-    }
+        => ImageStorage.DeleteFileIfExists(_env.WebRootPath, relativePath);
 
     private async Task RunMatchingAndStoreTempData(int itemId)
     {
@@ -782,7 +748,7 @@ public class DonasiController : AppBaseController
         ViewBag.MyOffers = offers;
         ViewBag.Selected = selected;
 
-        if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+        if (Request.IsAjaxRequest())
             return PartialView("~/Views/Profile/Donasi/PenawaranDonasi.cshtml");
 
         ViewBag.InitialSection = "donasi";
