@@ -9,6 +9,7 @@ using System.Text.Json;
 
 namespace DonationApp.Controllers;
 
+[Authorize]
 public class RequestController : AppBaseController
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -26,7 +27,6 @@ public class RequestController : AppBaseController
         _pointsService = pointsService;
     }
 
-    [Authorize]
     public async Task<IActionResult> MyRequests(int? selectedId)
     {
         var userId = _userManager.GetUserId(User)!;
@@ -65,7 +65,6 @@ public class RequestController : AppBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
-    [Authorize]
     public async Task<IActionResult> Permintaan(int? selectedId)
     {
         var userId = _userManager.GetUserId(User)!;
@@ -95,7 +94,6 @@ public class RequestController : AppBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
-    [Authorize]
     public async Task<IActionResult> CreateView()
     {
         var user = await _userManager.GetUserAsync(User);
@@ -116,7 +114,6 @@ public class RequestController : AppBaseController
         return View("~/Views/Profile/Shell.cshtml");
     }
 
-    [Authorize]
     public async Task<IActionResult> EditView(int id)
     {
         var userId = _userManager.GetUserId(User)!;
@@ -179,17 +176,10 @@ public class RequestController : AppBaseController
         return View("RequestDetail", itemRequest);
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(ItemRequest itemRequest, List<IFormFile> Images, string? DetailTambahanJson)
+    public async Task<IActionResult> Create(RequestFormViewModel form, List<IFormFile> Images)
     {
-        ModelState.Remove("UserId");
-        ModelState.Remove("User");
-        ModelState.Remove("Images");
-        ModelState.Remove("Offers");
-        ModelState.Remove("Feedbacks");
-
         if (!ModelState.IsValid)
         {
             TempData["RequestError"] = "Pastikan semua field wajib sudah diisi dengan benar.";
@@ -213,17 +203,21 @@ public class RequestController : AppBaseController
 
         var user = await _userManager.FindByIdAsync(userId);
 
-        itemRequest.UserId = userId;
-        itemRequest.CreatedAt = DateTime.UtcNow;
-        itemRequest.ExpiresAt = DateTime.UtcNow.AddDays(14);
-        itemRequest.Status = ItemRequestStatus.Open;
-        itemRequest.Provinsi = string.IsNullOrWhiteSpace(itemRequest.Provinsi)
-            ? (user?.Provinsi ?? string.Empty)
-            : itemRequest.Provinsi;
-        itemRequest.Lokasi = string.IsNullOrWhiteSpace(itemRequest.Lokasi)
-            ? (user?.Alamat ?? string.Empty)
-            : itemRequest.Lokasi;
-        itemRequest.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
+        var itemRequest = new ItemRequest
+        {
+            Title = form.Title,
+            Kategori = form.Kategori,
+            KondisiMinimum = form.KondisiMinimum,
+            Deskripsi = form.Deskripsi,
+            Jumlah = form.Jumlah,
+            Provinsi = string.IsNullOrWhiteSpace(form.Provinsi) ? (user?.Provinsi ?? string.Empty) : form.Provinsi!,
+            Lokasi = string.IsNullOrWhiteSpace(form.Lokasi) ? (user?.Alamat ?? string.Empty) : form.Lokasi,
+            DetailTambahan = string.IsNullOrWhiteSpace(form.DetailTambahanJson) ? null : form.DetailTambahanJson,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(14),
+            Status = ItemRequestStatus.Open
+        };
 
         _db.ItemRequests.Add(itemRequest);
         await _db.SaveChangesAsync();
@@ -240,10 +234,9 @@ public class RequestController : AppBaseController
         return RedirectToAction("MyRequests", new { selectedId = itemRequest.Id });
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditPost(int id, ItemRequest itemRequest, List<IFormFile>? Images, string? DetailTambahanJson)
+    public async Task<IActionResult> EditPost(int id, RequestFormViewModel form, List<IFormFile>? Images)
     {
         var userId = _userManager.GetUserId(User)!;
         var existing = await _db.ItemRequests
@@ -252,26 +245,20 @@ public class RequestController : AppBaseController
 
         if (existing == null) return RedirectToAction("MyRequests");
 
-        ModelState.Remove("UserId");
-        ModelState.Remove("User");
-        ModelState.Remove("Images");
-        ModelState.Remove("Offers");
-        ModelState.Remove("Feedbacks");
-
         if (!ModelState.IsValid)
         {
             TempData["RequestError"] = "Pastikan semua field wajib sudah diisi dengan benar.";
             return RedirectToAction("EditView", new { id });
         }
 
-        existing.Title = itemRequest.Title;
-        existing.Kategori = itemRequest.Kategori;
-        existing.Deskripsi = itemRequest.Deskripsi;
-        existing.Lokasi = itemRequest.Lokasi;
-        existing.Provinsi = itemRequest.Provinsi;
-        existing.KondisiMinimum = itemRequest.KondisiMinimum;
-        existing.Jumlah = itemRequest.Jumlah;
-        existing.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
+        existing.Title = form.Title;
+        existing.Kategori = form.Kategori;
+        existing.Deskripsi = form.Deskripsi;
+        existing.Lokasi = form.Lokasi;
+        existing.Provinsi = form.Provinsi ?? string.Empty;
+        existing.KondisiMinimum = form.KondisiMinimum;
+        existing.Jumlah = form.Jumlah;
+        existing.DetailTambahan = string.IsNullOrWhiteSpace(form.DetailTambahanJson) ? null : form.DetailTambahanJson;
 
         if (Images != null && Images.Count > 0)
         {
@@ -288,7 +275,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("MyRequests");
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteRequest(int id)
@@ -316,7 +302,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("MyRequests");
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteRequestImage(int imageId, int requestId)
@@ -338,7 +323,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("EditView", new { id = requestId });
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Offer(int itemRequestId, string deskripsi, int jumlah, string namaBarang, int kondisi, List<IFormFile> Images)
@@ -405,7 +389,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("Detail", new { id = itemRequestId });
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> AcceptOffer(int offerId)
@@ -436,7 +419,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RejectOffer(int offerId)
@@ -466,7 +448,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
     }
 
-    [Authorize]
     [HttpGet]
     public async Task<IActionResult> FindMatches(int requestId)
     {
@@ -566,7 +547,6 @@ public class RequestController : AppBaseController
         TempData["MatchContext"] = "request";
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ChooseOfferDeliveryMethod(int offerId, MetodePengiriman metode)
@@ -601,7 +581,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("MyRequests", new { selectedId = offer.ItemRequestId });
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MarkOfferShipped(int offerId)
@@ -639,7 +618,6 @@ public class RequestController : AppBaseController
         return RedirectToAction("PenawaranDonasi", "Donasi", new { selectedId = offer.Id });
     }
 
-    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> MarkOfferDelivered(int offerId)

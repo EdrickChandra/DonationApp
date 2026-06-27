@@ -21,14 +21,16 @@ public class AdminController : AppBaseController
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        await base.OnActionExecutionAsync(context, next);
         var user = await _userManager.GetUserAsync(User);
         if (user == null || !user.IsAdmin)
         {
             context.Result = Forbid();
             return;
         }
-        await next();
+
+        // Admin confirmed: let the base filter populate the shared nav-bar data
+        // and invoke the action exactly once.
+        await base.OnActionExecutionAsync(context, next);
     }
 
     public async Task<IActionResult> Reports(ReportStatus? status)

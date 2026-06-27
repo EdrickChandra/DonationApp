@@ -97,12 +97,8 @@ public class DonasiController : AppBaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Item item, List<IFormFile> Images, string? DetailTambahanJson)
+    public async Task<IActionResult> Create(DonasiFormViewModel form, List<IFormFile> Images)
     {
-        ModelState.Remove("UserId");
-        ModelState.Remove("User");
-        ModelState.Remove("Images");
-
         if (Images == null || Images.Count == 0)
         {
             TempData["DonasiError"] = "Minimal 1 foto harus diunggah.";
@@ -124,13 +120,21 @@ public class DonasiController : AppBaseController
         var userId = _userManager.GetUserId(User)!;
         var user = await _userManager.FindByIdAsync(userId);
 
-        item.UserId = userId;
-        item.CreatedAt = DateTime.UtcNow;
-        item.ExpiresAt = DateTime.UtcNow.AddDays(7);
-        item.Status = ItemStatus.Available;
-        if (string.IsNullOrWhiteSpace(item.Provinsi))
-            item.Provinsi = user?.Provinsi ?? string.Empty;
-        item.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
+        var item = new Item
+        {
+            NamaBarang = form.NamaBarang,
+            Kategori = form.Kategori,
+            Kondisi = form.Kondisi,
+            Lokasi = form.Lokasi,
+            Provinsi = string.IsNullOrWhiteSpace(form.Provinsi) ? (user?.Provinsi ?? string.Empty) : form.Provinsi!,
+            Deskripsi = form.Deskripsi,
+            Jumlah = form.Jumlah,
+            DetailTambahan = string.IsNullOrWhiteSpace(form.DetailTambahanJson) ? null : form.DetailTambahanJson,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+            Status = ItemStatus.Available
+        };
 
         _db.Items.Add(item);
         await _db.SaveChangesAsync();
@@ -144,15 +148,11 @@ public class DonasiController : AppBaseController
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditPost(int id, Item item, List<IFormFile>? Images, string? DetailTambahanJson)
+    public async Task<IActionResult> EditPost(int id, DonasiFormViewModel form, List<IFormFile>? Images)
     {
         var userId = _userManager.GetUserId(User)!;
         var existing = await _db.Items.Include(i => i.Images).FirstOrDefaultAsync(i => i.Id == id && i.UserId == userId);
         if (existing == null) return RedirectToAction("Index");
-
-        ModelState.Remove("UserId");
-        ModelState.Remove("User");
-        ModelState.Remove("Images");
 
         if (!ModelState.IsValid)
         {
@@ -160,14 +160,14 @@ public class DonasiController : AppBaseController
             return RedirectToAction("Edit", new { id });
         }
 
-        existing.NamaBarang = item.NamaBarang;
-        existing.Kategori = item.Kategori;
-        existing.Kondisi = item.Kondisi;
-        existing.Lokasi = item.Lokasi;
-        existing.Provinsi = item.Provinsi;
-        existing.Deskripsi = item.Deskripsi;
-        existing.Jumlah = item.Jumlah;
-        existing.DetailTambahan = string.IsNullOrWhiteSpace(DetailTambahanJson) ? null : DetailTambahanJson;
+        existing.NamaBarang = form.NamaBarang;
+        existing.Kategori = form.Kategori;
+        existing.Kondisi = form.Kondisi;
+        existing.Lokasi = form.Lokasi;
+        existing.Provinsi = form.Provinsi ?? string.Empty;
+        existing.Deskripsi = form.Deskripsi;
+        existing.Jumlah = form.Jumlah;
+        existing.DetailTambahan = string.IsNullOrWhiteSpace(form.DetailTambahanJson) ? null : form.DetailTambahanJson;
 
         if (Images != null && Images.Count > 0)
         {
