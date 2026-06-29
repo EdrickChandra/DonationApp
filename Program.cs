@@ -147,7 +147,7 @@ using (var scope = app.Services.CreateScope())
         db.Items.AddRange(
             Donation("Jaket Hoodie Abu-abu", ItemCondition.Bekas, ItemCategory.Pakaian, 1, "Bandung", "Jawa Barat", "Hoodie ukuran L, bahan tebal, masih sangat layak pakai.", budi, "jaket-hoodie.jpg"),
             Donation("Sepatu Sneakers Putih", ItemCondition.Bekas, ItemCategory.Pakaian, 1, "Bandung", "Jawa Barat", "Sneakers ukuran 42, sol masih bagus, cocok sehari-hari.", budi, "sepatu-sneakers.jpg"),
-            Donation("Laptop Asus VivoBook", ItemCondition.Bekas, ItemCategory.Elektronik, 1, "Jakarta Selatan", "DKI Jakarta", "Laptop Core i3, RAM 4GB, masih normal untuk tugas ringan.", siti, "laptop-asus.jpg", "{\"Jenis\":\"Laptop\",\"Merk\":\"Asus\"}"),
+            Donation("Laptop Asus VivoBook", ItemCondition.Bekas, ItemCategory.Elektronik, 1, "Jakarta Selatan", "DKI Jakarta", "Laptop Core i3, RAM 4GB, masih normal untuk tugas ringan.", siti, "laptop-asus.png", "{\"Jenis\":\"Laptop\",\"Merk\":\"Asus\"}"),
             Donation("Kipas Angin Berdiri", ItemCondition.Bekas, ItemCategory.Elektronik, 1, "Jakarta Selatan", "DKI Jakarta", "Kipas angin berdiri 3 kecepatan, berfungsi dengan baik.", siti, "kipas-angin.jpg"),
             Donation("Meja Belajar Kayu Jati", ItemCondition.Bekas, ItemCategory.PerabotRumah, 1, "Jakarta Pusat", "DKI Jakarta", "Meja belajar kayu jati kokoh, ada laci penyimpanan.", seedAdmin!, "meja-belajar.jpg"),
             Donation("Set Lego Classic", ItemCondition.Baru, ItemCategory.Mainan, 2, "Jakarta Selatan", "DKI Jakarta", "Set Lego Classic baru, lengkap dalam kotak, belum dibuka.", siti, "lego-classic.jpg"),
@@ -175,7 +175,7 @@ using (var scope = app.Services.CreateScope())
             };
 
         db.ItemRequests.AddRange(
-            WantedItem("Mencari Seragam Sekolah SD", ItemCategory.Pakaian, "Bandung", "Jawa Barat", "Membutuhkan seragam sekolah SD ukuran anak 8 tahun untuk keluarga kurang mampu.", budi, "req-seragam.jpg", "{\"Ukuran\":\"8 tahun\",\"JenisKelamin\":\"Laki-laki\"}"),
+            WantedItem("Mencari Seragam Sekolah SD", ItemCategory.Pakaian, "Bandung", "Jawa Barat", "Membutuhkan seragam sekolah SD ukuran anak 8 tahun untuk keluarga.", budi, "req-seragam.jpg", "{\"Ukuran\":\"8 tahun\",\"JenisKelamin\":\"Laki-laki\"}"),
             WantedItem("Butuh Laptop untuk Belajar Online", ItemCategory.Elektronik, "Jakarta Selatan", "DKI Jakarta", "Mencari laptop bekas layak pakai untuk anak belajar online.", budi, "req-laptop.jpg", "{\"Jenis\":\"Laptop\",\"Merk\":\"Asus\"}")
         );
         await db.SaveChangesAsync();
