@@ -2,9 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DonationApp.Models;
 
-// Carries exactly the fields the donation form (BuatDonasi.cshtml) submits.
-// Binding to this instead of the Item entity avoids over-posting and removes
-// the need for ModelState.Remove(...) on server-controlled/navigation properties.
 public class DonasiFormViewModel
 {
     [Required(ErrorMessage = "Nama barang wajib diisi.")]

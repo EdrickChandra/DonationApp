@@ -2,10 +2,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace DonationApp.Models;
 
-// Carries exactly the fields the request form (BuatRequest.cshtml) submits.
-// Binding to this instead of the ItemRequest entity avoids over-posting and
-// removes the need for ModelState.Remove(...) on server-controlled/navigation
-// properties.
 public class RequestFormViewModel
 {
     [Required(ErrorMessage = "Judul request wajib diisi.")]
