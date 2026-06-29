@@ -210,15 +210,28 @@
         }
 
         function reinitScripts(container) {
-            container.querySelectorAll('script').forEach(function(oldScript) {
+            // Execute scripts in document order. External scripts (src) load
+            // asynchronously when inserted, so we must wait for each to finish
+            // before running the next one — otherwise an inline script that
+            // depends on a preceding external script (e.g. form-helpers.js)
+            // runs before that script has loaded and throws on first visit.
+            var scripts = Array.prototype.slice.call(container.querySelectorAll('script'));
+            function runNext(i) {
+                if (i >= scripts.length) return;
+                var oldScript = scripts[i];
                 var newScript = document.createElement('script');
+                if (oldScript.type) newScript.type = oldScript.type;
                 if (oldScript.src) {
                     newScript.src = oldScript.src;
+                    newScript.onload = newScript.onerror = function() { runNext(i + 1); };
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
                 } else {
                     newScript.textContent = oldScript.textContent;
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                    runNext(i + 1);
                 }
-                oldScript.parentNode.replaceChild(newScript, oldScript);
-            });
+            }
+            runNext(0);
         }
 
         function injectBackButton() {
