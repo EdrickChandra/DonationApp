@@ -180,7 +180,6 @@
             function loadMessages(convId) {
                 var messagesEl = document.getElementById('chatMessages');
                 messagesEl.innerHTML = '';
-                // Updated: /Pesan/GetMessages instead of /Chat/GetMessages
                 fetch('/Pesan/GetMessages?conversationId=' + convId)
                     .then(function(r) { return r.json(); })
                     .then(function(msgs) {
@@ -253,7 +252,6 @@
                 formData.append('image', input.files[0]);
                 var token = document.querySelector('input[name="__RequestVerificationToken"]');
                 var headers = token ? { 'RequestVerificationToken': token.value } : {};
-                // Updated: /Pesan/UploadImage instead of /Chat/UploadImage
                 var response = await fetch('/Pesan/UploadImage', { method: 'POST', headers: headers, body: formData });
                 var data = await response.json();
                 return data.success ? data.path : null;

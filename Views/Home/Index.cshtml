@@ -77,7 +77,7 @@
                         </div>
                     </div>
                     <div class="card-footer">
-                        <a href="/Profile/View/@item.UserId" class="card-poster" style="text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
+                        <a asp-controller="Profile" asp-action="View" asp-route-id="@item.UserId" class="card-poster" style="text-decoration:none;color:inherit;" onclick="event.stopPropagation();">
                             <div class="avatar avatar-xs">@posterInitial</div>
                             <span class="card-poster-name">@posterName</span>
                         </a>

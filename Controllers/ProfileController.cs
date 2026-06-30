@@ -118,7 +118,7 @@ public class ProfileController : AppBaseController
             .Include(f => f.ItemRequest)
             .Where(f => f.ReviewedUserId == id)
             .OrderByDescending(f => f.CreatedAt)
-            .Take(20)
+            .Take(5)
             .ToListAsync();
 
         var activeDonations = await _db.Items

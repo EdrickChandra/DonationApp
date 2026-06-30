@@ -56,7 +56,7 @@
     <script>
         var currentUrl = null;
 
-        // All paths that should load inside the shell via AJAX
+        
         var profilePaths = [
             '/Profile',
             '/Donasi',
@@ -70,7 +70,6 @@
             '/Redeem'
         ];
 
-        // Map initialSection -> URL for initial load
         var sectionUrls = {
             'overview':    '/Profile/Overview',
             'donasi':      '/Donasi/Index',
@@ -138,33 +137,23 @@
             });
         }
 
-        // Intercept form submits inside the shell so that after POST redirect
-        // we reload the target page inside the shell instead of full-page reload.
-        // Only intercept forms whose action targets a profile path.
         function bindFormSubmits(container) {
             container.querySelectorAll('form[method="post"], form[method="POST"]').forEach(function(form) {
-                // Skip forms that already have a data-shell-bound attribute
                 if (form.dataset.shellBound) return;
                 form.dataset.shellBound = '1';
 
-                // Only intercept if the form action (after redirect) would land in a profile path.
-                // We intercept ALL profile forms so that after redirect the shell handles it.
                 var action = form.getAttribute('action') || form.action || '';
 
-                // Don't intercept file upload forms (enctype multipart) — let them be full-page
-                // so the server can properly process files. After redirect, Shell init handles it.
                 if (form.enctype === 'multipart/form-data' || form.getAttribute('enctype') === 'multipart/form-data') {
                     return;
                 }
 
-                // Don't intercept logout
                 if (action.indexOf('Logout') !== -1 || action.indexOf('logout') !== -1) {
                     return;
                 }
 
                 form.addEventListener('submit', function(e) {
-                    // Let native submit happen but after it completes, intercept the redirect
-                    // We do this by fetching via AJAX instead
+
                     e.preventDefault();
 
                     var formData = new FormData(form);
@@ -177,21 +166,20 @@
                         headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     })
                     .then(function(r) {
-                        // After redirect, r.url is the final URL
                         var finalUrl = r.url;
                         var finalPath = new URL(finalUrl).pathname + new URL(finalUrl).search;
 
                         if (isProfilePath(new URL(finalUrl).pathname)) {
-                            // Load the redirected page inside shell
-                            currentUrl = null; // force reload
+
+                            currentUrl = null; 
                             loadSection(finalPath, true);
                         } else {
-                            // Non-profile redirect — do full page navigation
+
                             window.location.href = finalUrl;
                         }
                     })
                     .catch(function() {
-                        // Fallback to native submit
+
                         form.removeEventListener('submit', arguments.callee);
                         form.submit();
                     });
@@ -210,11 +198,7 @@
         }
 
         function reinitScripts(container) {
-            // Execute scripts in document order. External scripts (src) load
-            // asynchronously when inserted, so we must wait for each to finish
-            // before running the next one — otherwise an inline script that
-            // depends on a preceding external script (e.g. form-helpers.js)
-            // runs before that script has loaded and throws on first visit.
+
             var scripts = Array.prototype.slice.call(container.querySelectorAll('script'));
             function runNext(i) {
                 if (i >= scripts.length) return;
@@ -251,7 +235,6 @@
             pdetail.insertBefore(backBtn, pdetail.firstChild);
         }
 
-        // Intercept <a> clicks for profile paths
         document.addEventListener('click', function(e) {
             var link = e.target.closest('a[href]');
             if (!link) return;
@@ -275,8 +258,6 @@
             }
         });
 
-        // Determine initial URL: use actual current pathname if it's a profile path,
-        // otherwise fall back to the sectionUrls mapping.
         (function() {
             var currentPath = window.location.pathname + window.location.search;
             var initialUrl;

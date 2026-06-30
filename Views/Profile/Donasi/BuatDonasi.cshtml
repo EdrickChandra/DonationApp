@@ -7,8 +7,6 @@
     var pageTitle = isEdit ? "Edit Donasi" : "Buat Donasi";
     var userProvinsi = ViewBag.UserProvinsi as string ?? "";
     var userKota = ViewBag.UserKota as string ?? "";
-
-    // For edit: use saved values; for create: fall back to user profile values
     var defaultProvinsi = isEdit ? (editItem!.Provinsi) : userProvinsi;
     var defaultKota = isEdit ? (editItem!.Lokasi) : userKota;
 

@@ -198,16 +198,23 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap; 
 }
 
 .card-cat {
     font-size: 15px;
     color: var(--gray-400);
+    overflow: hidden;
+    text-overflow: ellipsis; 
+    min-width: 0;
 }
 
 .card-dot {
     font-size: 10px;
     color: var(--gray-300);
+    flex-shrink: 0;
 }
 
 .card-loc {
@@ -216,10 +223,12 @@
     display: flex;
     align-items: center;
     gap: 3px;
+    flex-shrink: 0;
 }
 
     .card-loc i {
         font-size: 15px;
+        flex-shrink: 0;
     }
 
 .card-offers {
