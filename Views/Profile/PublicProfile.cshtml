@@ -69,7 +69,7 @@
             <div class="pubprof-grid">
                 @foreach (var d in activeDonations)
                 {
-                    <a href="/Item/Detail/@d.Id" class="pubprof-item">
+                    <a href="/Donation/Detail/@d.Id" class="pubprof-item">
                         @if (d.Images.Any())
                         {
                             <img src="@d.Images.First().FilePath" class="pubprof-item-img" />
