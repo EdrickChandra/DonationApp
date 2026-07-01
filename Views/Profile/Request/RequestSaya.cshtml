@@ -348,8 +348,9 @@
                                                                 <textarea class="form-input" name="komentar" rows="2" placeholder="Ceritakan pengalaman Anda..." style="resize:vertical;font-size:14px;margin-bottom:8px;"></textarea>
                                                                 <div class="pfeedback-filerow">
                                                                     <label class="pfeedback-filelbl">Foto (opsional)</label>
-                                                                    <input type="file" name="foto" accept="image/*" style="font-size:13px;" />
+                                                                    <input type="file" name="foto" id="fbFotoInput-@o.Id" class="fb-foto-input" data-preview="fbFotoPreview-@o.Id" accept="image/*" style="font-size:13px;" />
                                                                 </div>
+                                                                <div id="fbFotoPreview-@o.Id" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;"></div>
                                                                 <button type="submit" class="btn btn-secondary btn-block" style="font-size:14px;">Kirim Feedback</button>
                                                             </form>
                                                         </div>
@@ -441,7 +442,14 @@
     { "SourceId", sourceId }
 })
 
+<script src="~/js/form-helpers.js" asp-append-version="true"></script>
 <script>
+    if (window.initSimpleImagePreview) {
+        document.querySelectorAll('.fb-foto-input').forEach(function (inp) {
+            initSimpleImagePreview(inp.id, inp.dataset.preview, 1);
+        });
+    }
+
     function togglePenerima(detailId) {
         var el = document.getElementById(detailId);
         if (!el) return;
