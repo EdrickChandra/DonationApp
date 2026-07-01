@@ -125,7 +125,7 @@
             imgEl.innerHTML = '<i class="ti ti-package match-card__icon" aria-hidden="true"></i>';
         }
 
-        var scoreColor = m.score >= 80 ? '#1e40af' : m.score >= 60 ? '#166534' : '#64748b';
+        var scoreColor = m.score >= 50 ? '#1e40af' : m.score >= 40 ? '#166534' : '#64748b';
         document.getElementById('matchCardBadges').innerHTML =
             '<span class="mm-pill mm-pill--cat">' + m.kategori + '</span>' +
             '<span class="mm-pill mm-pill--score" style="color:' + scoreColor + ';">' + m.score + ' pts</span>';
