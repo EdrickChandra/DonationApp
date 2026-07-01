@@ -81,7 +81,7 @@
                     var kondisiLabel = item.Kondisi == ItemCondition.Baru ? "Baru" : "Bekas";
                     var cardId = $"s-card-{item.Id}";
                     <div class="item-card" style="position:relative;">
-                        <a asp-controller="Item" asp-action="Detail" asp-route-id="@item.Id" style="text-decoration:none;display:block;">
+                        <a asp-controller="Donasi" asp-action="Detail" asp-route-id="@item.Id" style="text-decoration:none;display:block;">
                             <div class="card-img">
                                 <img src="@images.First().FilePath" class="card-img-fill" />
                                 <span class="card-timer-badge">
@@ -115,7 +115,7 @@
                             <button class="card-menu-item" onclick="reportItem(@item.Id)">
                                 <i class="ti ti-flag" aria-hidden="true"></i> Lapor
                             </button>
-                            <button class="card-menu-item" onclick="copyLink('/Item/Detail/@item.Id')">
+                            <button class="card-menu-item" onclick="copyLink('/Donasi/Detail/@item.Id')">
                                 <i class="ti ti-copy" aria-hidden="true"></i> Salin Link
                             </button>
                         </div>
