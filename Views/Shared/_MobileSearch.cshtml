@@ -1,0 +1,10 @@
+@{
+    var searchTab = ViewData["SearchTab"] as string ?? "donasi";
+    var searchQuery = ViewContext.HttpContext.Request.Query["q"].ToString();
+}
+<form action="/Search" method="get" class="mobile-search">
+    <i class="ti ti-search mobile-search-icon" aria-hidden="true"></i>
+    <input class="mobile-search-input" type="text" name="q" placeholder="Cari barang..."
+           value="@searchQuery" autocomplete="off" />
+    <input type="hidden" name="tab" value="@searchTab" />
+</form>

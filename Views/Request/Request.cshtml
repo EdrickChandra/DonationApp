@@ -6,6 +6,7 @@
 }
 
 <div class="page-header">
+    @await Html.PartialAsync("_MobileSearch", new ViewDataDictionary(ViewData) { { "SearchTab", "request" } })
     <div class="page-header-inner">
         <div class="pills">
             <a class="pill @(selected == null ? "active" : "")"

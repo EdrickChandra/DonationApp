@@ -107,8 +107,11 @@
 
                 <div class="form-group">
                     <label class="form-label">Kondisi Minimum</label>
-                    <button type="button" class="btn-condition" data-value="0">Baru</button>
-                    <button type="button" class="btn-condition" data-value="1">Bekas</button>
+                    <input type="hidden" id="kondisiMinInput" name="KondisiMinimum" value="@((int)(editRequest?.KondisiMinimum ?? ItemCondition.Baru))" />
+                    <div class="pcond-group">
+                        <button type="button" class="btn-condition @(editRequest == null || editRequest.KondisiMinimum == ItemCondition.Baru ? "selected" : "")" data-value="@((int)ItemCondition.Baru)">Baru</button>
+                        <button type="button" class="btn-condition @(editRequest?.KondisiMinimum == ItemCondition.Bekas ? "selected" : "")" data-value="@((int)ItemCondition.Bekas)">Bekas</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -145,14 +148,10 @@
                         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
                             @foreach (var img in editRequest.Images)
                             {
-                                <div style="position:relative;width:88px;height:88px;">
+                                <div style="position:relative;width:88px;height:88px;" data-img-tile>
                                     <img src="@img.FilePath" class="img-88" />
-                                    <form asp-controller="Request" asp-action="DeleteRequestImage" method="post" style="display:inline;">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="imageId" value="@img.Id" />
-                                        <input type="hidden" name="requestId" value="@editRequest.Id" />
-                                        <button type="submit" class="img-del">✕</button>
-                                    </form>
+                                    <button type="button" class="img-del"
+                                            onclick="deleteListingImage(this, '@Url.Action("DeleteRequestImage", "Request")', 'requestId', @editRequest.Id, @img.Id)">✕</button>
                                 </div>
                             }
                         </div>

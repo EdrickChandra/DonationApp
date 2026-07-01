@@ -127,14 +127,10 @@
                         <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
                             @foreach (var img in editItem.Images)
                             {
-                                <div style="position:relative;width:88px;height:88px;">
+                                <div style="position:relative;width:88px;height:88px;" data-img-tile>
                                     <img src="@img.FilePath" class="img-88" />
-                                    <form asp-controller="Donasi" asp-action="DeleteImage" method="post" style="display:inline;">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="imageId" value="@img.Id" />
-                                        <input type="hidden" name="itemId" value="@editItem.Id" />
-                                        <button type="submit" class="img-del">✕</button>
-                                    </form>
+                                    <button type="button" class="img-del"
+                                            onclick="deleteListingImage(this, '@Url.Action("DeleteImage", "Donasi")', 'itemId', @editItem.Id, @img.Id)">✕</button>
                                 </div>
                             }
                         </div>

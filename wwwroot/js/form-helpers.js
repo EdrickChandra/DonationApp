@@ -45,6 +45,22 @@ window.renderCategoryFields = function (containerId, idPrefix, val, existingDeta
     });
 };
 
+window.deleteListingImage = function (btn, url, idFieldName, listingId, imageId) {
+    var tile = btn.closest('[data-img-tile]');
+    var tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    var fd = new FormData();
+    fd.append('imageId', imageId);
+    fd.append(idFieldName, listingId);
+    if (tokenEl) fd.append('__RequestVerificationToken', tokenEl.value);
+    btn.disabled = true;
+    fetch(url, { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function (r) {
+            if (r.ok) { if (tile) tile.remove(); }
+            else { btn.disabled = false; }
+        })
+        .catch(function () { btn.disabled = false; });
+};
+
 window.initConditionButtons = function (inputId) {
     document.querySelectorAll('.btn-condition').forEach(function (btn) {
         btn.addEventListener('click', function () {

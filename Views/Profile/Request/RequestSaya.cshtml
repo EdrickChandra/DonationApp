@@ -410,6 +410,13 @@
                                             </div>
                                         </div>
                                         <div class="poffer-actions-end">
+                                            <form asp-controller="Request" asp-action="Chat" method="post" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="offerId" value="@o.Id" />
+                                                <button type="submit" class="btn btn-primary btn-xs">
+                                                    <i class="ti ti-message-2" aria-hidden="true"></i> Chat
+                                                </button>
+                                            </form>
                                             <form asp-controller="Request" asp-action="AcceptOffer" method="post" style="display:inline;" onsubmit="return confirm('Terima penawaran dari @oName?')">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="offerId" value="@o.Id" />
